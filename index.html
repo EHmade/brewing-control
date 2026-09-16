@@ -1,0 +1,943 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Coffee Brewing Control · Classroom v4.3.5</title>
+<style>
+:root{
+  --bg:#f3ede4; --card:#fffdf9; --ink:#2b2722; --muted:#766e66; --line:#ddd3c7;
+  --coffee:#6d4a24; --coffee2:#966632; --gold:#efc75d; --soft:#f3eadf;
+  --good:#39734a; --warn:#b87422; --danger:#a8453d; --blue:#3157d5;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",Segoe UI,sans-serif;background:linear-gradient(180deg,#ede2d2 0,#f8f5ef 44%,#f1ebe2 100%);min-height:100vh}
+button,input,select,textarea{font:inherit} button{cursor:pointer}
+.app{max-width:980px;margin:0 auto;min-height:100vh;background:rgba(255,253,249,.94);box-shadow:0 0 44px rgba(67,45,22,.12)}
+header{position:sticky;top:0;z-index:50;background:var(--coffee);color:#fff;padding:13px 16px 10px;box-shadow:0 2px 8px rgba(0,0,0,.16)}
+.headrow{display:flex;align-items:center;justify-content:space-between;gap:14px}.brand h1{font-size:18px;margin:0;font-weight:900;letter-spacing:-.02em}.brand p{font-size:10.5px;margin:3px 0 0;opacity:.76}
+.tabs{display:flex;gap:3px;padding:3px;border-radius:999px;background:#573a1d;overflow:auto}.tab{white-space:nowrap;border:0;border-radius:999px;padding:8px 11px;background:transparent;color:#e8ddcf;font-weight:900;font-size:12px}.tab.active{background:#fff;color:var(--coffee)}
+main{padding:16px}.page{display:none}.page.active{display:block}.stack>*+*{margin-top:14px}
+.panel{background:var(--card);border:1px solid #e5dbcf;border-radius:20px;padding:17px;box-shadow:0 8px 22px rgba(80,54,28,.06)}
+.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}.panel-head h2,.section-title{font-size:14px;font-weight:900;margin:0;color:#47382a}.panel-head p{font-size:11px;color:var(--muted);margin:4px 0 0;line-height:1.4}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom:6px}.field{position:relative}input,select,textarea{width:100%;border:1.5px solid #d8cdbf;border-radius:13px;background:#fff;color:#251f19;outline:none;transition:.16s}input,select{height:48px;padding:0 42px 0 12px;font-size:18px;font-weight:850}select{padding-right:34px;font-size:14px}textarea{min-height:48px;resize:vertical;padding:12px;font-size:13px;line-height:1.4}input:focus,select:focus,textarea:focus{border-color:var(--coffee2);box-shadow:0 0 0 4px rgba(150,102,50,.11)}input::placeholder,textarea::placeholder{color:#b5aaa0;font-weight:600}.unit{position:absolute;right:12px;bottom:14px;font-weight:850;color:#82786f;font-size:12px}.hint{font-size:10.5px;line-height:1.45;color:var(--muted);margin-top:5px}.auto{display:inline-block;margin-left:5px;padding:2px 6px;border-radius:999px;background:#eee6dc;font-size:9px;font-weight:900;color:#625342}
+.results{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.metric{padding:13px;border-radius:15px;background:#f7f1e8;border:1px solid #e6ddd1;min-height:86px}.metric.hero{background:#fff6db;border-color:#ead08c}.metric .k{font-size:10.5px;color:#766c63;font-weight:850}.metric .v{font-size:22px;font-weight:950;margin-top:5px;letter-spacing:-.03em}.metric .s{font-size:9.5px;color:#827970;margin-top:3px}.metric.hero .v{color:#69471f}
+.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}.btn{border:0;border-radius:11px;padding:10px 13px;background:var(--coffee);color:#fff;font-weight:900;font-size:12px}.btn.secondary{background:#e9e1d6;color:#4e3d2d}.btn.ghost{background:#fff;border:1px solid #ded4c8;color:#594a3a}.btn.danger{background:#f7e6e3;color:#8c3933;border:1px solid #edcbc7}.btn.small{padding:7px 9px;font-size:10.5px}.btn:disabled{opacity:.45;cursor:not-allowed}
+.status{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:12px 13px;border-radius:14px;background:#f0e9df;border:1px solid #e2d7c8}.status-dot{width:11px;height:11px;border-radius:50%;background:#777;margin-top:2px;flex:0 0 auto}.status.good .status-dot{background:var(--good)}.status.warn .status-dot{background:var(--warn)}.status.bad .status-dot{background:var(--danger)}.status b{font-size:12.5px}.status span{display:block;margin-top:2px;font-size:10.5px;color:#746b63;line-height:1.45}
+.switchline{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #e5dbcf;background:#faf6f0;border-radius:13px;padding:10px 12px}.switchline b{font-size:11.5px}.switchline span{font-size:10px;color:var(--muted);display:block;margin-top:2px}.toggle{position:relative;width:42px;height:24px;flex:0 0 auto}.toggle input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;background:#cfc5b9;border-radius:99px;transition:.18s}.slider:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:.18s}.toggle input:checked+.slider{background:var(--coffee2)}.toggle input:checked+.slider:before{transform:translateX(18px)}
+.student-bar{display:flex;gap:7px;overflow:auto;padding:2px 0 3px}.student-chip{border:1px solid #ded4c7;background:#fff;border-radius:999px;padding:8px 11px;font-size:11px;font-weight:900;color:#665646;white-space:nowrap}.student-chip.active{background:#6d4a24;color:#fff;border-color:#6d4a24}.empty{text-align:center;padding:28px 10px;color:#83786d;font-size:11px;line-height:1.6;background:#faf6f0;border:1px dashed #ded2c4;border-radius:14px}
+.form-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.form-title b{font-size:13px}.attempt-badge{padding:5px 8px;border-radius:999px;background:#eee5da;font-size:10px;font-weight:900;color:#5d4935}.record-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.record-form .wide{grid-column:1/-1}.record-form input{font-size:15px}
+.record-list{display:grid;gap:10px}.record-card{border:1px solid #e4dacf;background:#fff;border-radius:16px;padding:13px;box-shadow:0 3px 10px rgba(75,50,25,.035)}.record-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.record-title{display:flex;align-items:center;gap:8px}.attempt-no{display:grid;place-items:center;width:29px;height:29px;border-radius:50%;background:#eee3d5;color:#5c4328;font-size:11px;font-weight:950}.record-main b{font-size:12.5px}.record-main span{display:block;color:#7a7168;font-size:10px;margin-top:2px}.record-metrics{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.pill{border-radius:999px;background:#f3ede5;padding:5px 8px;font-size:10px;font-weight:900;color:#5c5147;border:1px solid transparent}.pill.good{background:#e7f2e9;color:#2f633d}.pill.target{background:#e5f1e7;color:#2d6540;border-color:#c8dfce}.pill.strong{background:#f7e8dd;color:#944d2f}.pill.weak{background:#e7eef8;color:#385e91}.pill.under{background:#eee8f7;color:#694f93}.pill.over{background:#f5eadf;color:#8b5a30}.pill.combo{background:#f0e8e2;color:#714d3c}.note{margin-top:9px;font-size:10.5px;color:#645a51;padding:8px 9px;border-left:3px solid #dac4a8;background:#faf6f0;border-radius:0 9px 9px 0}.note b{font-size:9.5px;color:#8a7765;margin-right:5px}.teacher-feedback{margin-top:9px;border:1px dashed #d8c8b6;border-radius:11px;background:#fffaf3;padding:9px 10px}.teacher-feedback-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}.teacher-feedback-head b{font-size:10px;color:#765b3f}.teacher-feedback-view{width:100%;border:0;background:transparent;text-align:left;padding:0;color:#4f443a;font-size:11px;line-height:1.5}.teacher-feedback-view.empty{color:#9d9184;font-style:italic}.teacher-feedback-edit textarea{min-height:62px}.teacher-feedback-edit .actions{margin-top:6px}.feedback{margin-top:9px;border-radius:12px;background:#f8f2e8;border:1px solid #eadfce;padding:10px}.feedback .arrow{font-size:17px;font-weight:950;color:#795326}.feedback b{font-size:11.5px}.feedback p{font-size:10.5px;line-height:1.5;color:#645a51;margin:4px 0 0}.feedback .rec{margin-top:5px;color:#3e352c;font-weight:800}
+.mode-chip{display:flex;padding:3px;border-radius:999px;background:#eee6db}.mode-chip button{border:0;background:transparent;border-radius:999px;padding:6px 10px;font-size:10px;font-weight:900;color:#71665b}.mode-chip button.active{background:#fff;color:#533d27;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.filter-panel{display:none;margin-top:9px;border:1px solid #e6ddd1;background:#fbf8f3;border-radius:13px;padding:10px}.filter-panel.open{display:block}.filter-actions{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}.filter-student+.filter-student{margin-top:7px}.filter-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.filter-name{min-width:72px;font-size:11px;font-weight:900;color:#554432}.checkchip{display:flex;align-items:center;gap:4px;border:1px solid #ddd3c6;background:#fff;border-radius:999px;padding:5px 8px;margin:0;font-size:9.5px;color:#5f554c}.checkchip input{width:13px;height:13px;padding:0;margin:0}
+.chart-card{position:relative;background:#fff;border:1px solid #e4d9cc;border-radius:22px;padding:12px 12px 10px;overflow:hidden;box-shadow:0 8px 26px rgba(71,47,24,.055)}.chart-stage{max-width:840px;margin:0 auto}.chart-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:4px 4px 2px}.chart-head h2{font-size:15px;margin:0}.chart-head p{font-size:10px;color:var(--muted);margin:3px 0 0}.badge{white-space:nowrap;padding:6px 8px;border-radius:999px;background:#eee5d8;font-size:10px;font-weight:900;color:#594531}svg{display:block;width:100%;height:auto;touch-action:manipulation;user-select:none;-webkit-user-select:none}.legend{display:flex;gap:9px 13px;flex-wrap:wrap;padding:7px 9px 3px;font-size:9.5px;color:#6e665f}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}.footnote{font-size:9.5px;color:#7c736a;line-height:1.5;margin:7px 7px 2px}.chart-warning{display:none;margin:4px 6px 0;padding:7px 9px;border-radius:10px;background:#fff1ee;color:#9a463c;font-size:9.5px;font-weight:800}.chart-warning.show{display:block}
+.detail-card{display:none;margin:8px 7px 2px;border:1px solid #e5dbcf;background:#faf6f0;border-radius:13px;padding:10px}.detail-card.show{display:block}.detail-card h3{font-size:11.5px;margin:0 0 4px}.detail-card p{font-size:10px;color:#665c53;margin:2px 0;line-height:1.45}.detail-card .teacher-line{margin-top:6px;padding-top:6px;border-top:1px solid #e3d8ca;color:#4c4137}.chart-tooltip{position:absolute;z-index:20;display:none;pointer-events:none;min-width:170px;max-width:260px;padding:9px 10px;border-radius:11px;background:rgba(47,40,33,.95);color:#fff;box-shadow:0 7px 22px rgba(0,0,0,.2);font-size:9.5px;line-height:1.45;transform:translate(12px,12px)}.chart-tooltip.show{display:block}.chart-tooltip b{font-size:10.5px}.chart-tooltip .muted{opacity:.78;margin-top:2px}.chart-tooltip .tip-feedback{margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,.18);font-weight:800}.chart-tooltip .tip-teacher{margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,.18)}.chart-tooltip .tip-delta{margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,.18);font-weight:850}.chart-tooltip .tip-action{margin-top:5px;opacity:.74;font-size:9px}.chart-output-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:7px 7px 3px}.chart-output-actions .hint{margin:0}.chart-image-preview{width:100%;max-height:64vh;object-fit:contain;border:1px solid #ded4c8;border-radius:12px;background:#fff;margin-top:10px}.chart-svg-preview{display:none;width:100%;max-height:64vh;overflow:auto;border:1px solid #ded4c8;border-radius:12px;background:#fff;margin-top:10px}.chart-svg-preview.show{display:block}.chart-svg-preview svg{width:100%;height:auto;display:block}.chart-image-preview.hidden{display:none}.chart-image-dialog{width:min(760px,100%)}.chart-image-dialog .actions{margin-top:10px}.chart-image-info{font-size:10px;color:#766b61;line-height:1.5;margin-top:7px}
+.public-info{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px;padding:11px 12px;border:1px solid #e5dbcf;background:#faf6f0;border-radius:14px}.public-info .meta{font-size:10px;color:#7b7066;line-height:1.5}.public-info .meta b{color:#554638}.public-info .actions{margin-top:0}.info-dialog{width:min(680px,100%);max-height:min(82vh,760px);overflow:auto}.info-dialog h3{font-size:15px}.info-dialog h4{font-size:11.5px;margin:16px 0 5px;color:#4d4034}.info-dialog p,.info-dialog li{font-size:10.5px;line-height:1.6;color:#675d54}.info-dialog ul{padding-left:18px;margin:6px 0}.info-dialog .reference{padding:8px 10px;border-left:3px solid #c6b4d0;background:#faf7fc;border-radius:0 9px 9px 0;margin-top:7px}.info-dialog .notice{padding:9px 10px;border:1px solid #d7e2d9;background:#f5faf6;border-radius:10px;color:#536358}.info-dialog .version-block{border-top:1px solid #e9e0d6;padding-top:10px;margin-top:10px}.info-dialog a{color:#5c4c73;text-decoration-thickness:1px;text-underline-offset:2px}
+.settings-accordion{display:grid;gap:10px}.settings-box{border:1px solid #e5dbcf;border-radius:15px;background:#fff;overflow:hidden}.settings-box summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;cursor:pointer;background:#fbf7f1}.settings-box summary::-webkit-details-marker{display:none}.settings-box summary:after{content:'＋';font-weight:900;color:#846d54}.settings-box[open] summary:after{content:'−'}.settings-summary-title{font-size:12px;font-weight:900;color:#493b2d}.settings-summary-sub{font-size:9.5px;color:#85796e;margin-top:2px}.settings-body{padding:13px 14px 15px;border-top:1px solid #eee5da}.student-manage{display:grid;gap:7px}.student-manage-row{display:flex;gap:7px;align-items:center}.student-manage-row input{height:40px;font-size:13px;padding-right:10px}.student-manage-row .name{flex:1;border:1px solid #e1d7ca;background:#faf6f0;border-radius:11px;padding:10px 11px;font-size:12px;font-weight:850}.add-student{display:flex;gap:7px}.add-student input{height:42px;font-size:13px;padding-right:10px}.excluded-students{margin-top:10px;border:1px dashed #ddcfbf;border-radius:12px;background:#fcf9f5;overflow:hidden}.excluded-students>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;padding:9px 10px;cursor:pointer;color:#716357;font-size:10px;font-weight:850;background:#f8f2eb}.excluded-students>summary::-webkit-details-marker{display:none}.excluded-students>summary:after{content:'＋';font-weight:900;color:#927b65}.excluded-students[open]>summary:after{content:'−'}.excluded-students .student-manage{padding:8px}.excluded-students .student-manage-row .name{background:#fff}.profile-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.profile-row select{height:44px}.profile-save-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:8px}.profile-save-row input{height:42px;font-size:13px;padding-right:10px}.profile-status{margin-top:7px;font-size:10px;color:#75695d}.profile-status b{color:#5d4935}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,14px);z-index:300;background:#2f2923;color:#fff;padding:10px 13px;border-radius:11px;font-size:11px;font-weight:850;opacity:0;pointer-events:none;transition:.2s;box-shadow:0 7px 22px rgba(0,0,0,.22)}.toast.show{opacity:1;transform:translate(-50%,0)}
+
+.quick-meta-details{margin-bottom:13px;border:1px solid #e5dbcf;background:#faf6f0;border-radius:14px;overflow:hidden}.quick-meta-details summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;cursor:pointer;user-select:none}.quick-meta-details summary::-webkit-details-marker{display:none}.quick-meta-details summary:after{content:'＋';flex:0 0 auto;font-weight:900;color:#846d54}.quick-meta-details[open] summary:after{content:'−'}.quick-meta-summary-main{min-width:0;display:flex;align-items:baseline;gap:8px}.quick-meta-summary-main b{font-size:11px;color:#5d4935;white-space:nowrap}.quick-meta-summary-text{min-width:0;color:#897b6e;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.quick-meta{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:0 12px 12px;border-top:1px solid #eee4d8}.quick-meta>div:first-child{padding-top:10px}.quick-meta input{height:42px;font-size:13px;padding-right:10px}.quick-note-box{border:1px dashed #d8c8b6;border-radius:11px;background:#fff;padding:9px 10px}.quick-note-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:3px}.quick-note-head b{font-size:10px;color:#765b3f}.quick-note-view{width:100%;border:0;background:transparent;text-align:left;padding:2px 0;color:#4f443a;font-size:11px;line-height:1.5}.quick-note-view.empty{color:#9d9184;font-style:italic}.quick-note-edit{display:none}.quick-note-edit.open{display:block}.quick-note-edit textarea{min-height:58px}.quick-note-edit .actions{margin-top:6px}.storage-warning{display:none;margin:0 0 12px;padding:10px 12px;border:1px solid #d9a54d;background:#fff7e6;border-radius:12px;color:#6e4b12;font-size:10.5px;line-height:1.5}.storage-warning.show{display:block}.storage-warning b{font-weight:900}
+.quick-history-wrap{margin-top:14px;padding-top:13px;border-top:1px solid #e7ddd1}.quick-history-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}.quick-history-head b{font-size:12px;color:#4e3d2d}.quick-history-list{display:grid;gap:8px}.quick-history-row{display:flex;align-items:center;gap:10px;padding:10px 11px;border:1px solid #e4dacf;background:#fff;border-radius:13px}.quick-history-no{flex:0 0 auto;display:grid;place-items:center;width:38px;height:28px;border-radius:999px;background:#eee3d5;color:#5c4328;font-size:10.5px;font-weight:950}.quick-history-body{min-width:0;flex:1}.quick-history-sub{font-size:9.5px;color:#81766c;margin-top:5px}.quick-history-row .record-metrics{margin-top:0}.quick-history-row .btn{flex:0 0 auto}.class-session-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:7px;align-items:center;flex:1 1 100%}.class-session-row select{height:40px;font-size:12px}.class-session-actions{display:none;flex:1 1 100%;align-items:center;justify-content:flex-end;gap:7px;padding-top:2px}.class-session-actions.show{display:flex}.session-meta{font-size:9px;color:#8b8076}.current-class-badge{padding:6px 9px;border-radius:999px;background:#eee5d8;color:#5d4935;font-size:10px;font-weight:900;white-space:nowrap}.quick-goal-wrap{display:none;margin-top:9px;align-items:center;justify-content:space-between;gap:12px;border:1px solid #e2d7c9;background:#faf6f0;border-radius:13px;padding:10px 12px}.quick-goal-wrap.show{display:flex}.quick-goal-wrap b{font-size:11.5px}.quick-goal-wrap span{display:block;font-size:10px;color:var(--muted);margin-top:2px;line-height:1.45}.goal-key{display:inline-block!important;width:10px;height:10px;border:2px solid #8a55a8;border-radius:50%;vertical-align:-1px;margin:0 5px 0 0!important;background:#fff}.chart-click-hint{font-weight:800;color:#684c2e}.settings-dual{display:grid;gap:8px}
+.mini-feedback{display:flex;align-items:center;gap:7px;white-space:nowrap}.mini-feedback b{font-size:10px;color:#6b5a49}.mini-feedback .toggle{transform:scale(.88);transform-origin:right center}
+.class-context-strip{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border:1px solid #e5dbcf;background:#faf6f0;border-radius:14px;padding:10px 12px}.class-context-strip .label{font-size:10px;color:#84786d;font-weight:800}.class-context-strip .spacer{flex:1}.class-manager{display:grid;gap:10px}.class-manager-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}.class-manager-row.actions-row{grid-template-columns:minmax(0,1fr) auto auto}.class-manager input,.class-manager select{height:42px;font-size:13px;padding-right:10px}.backup-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.backup-info{margin-top:9px;border:1px solid #e5dbcf;background:#faf6f0;border-radius:12px;padding:9px 10px;font-size:10px;line-height:1.5;color:#6d6258}.import-preview{display:none;margin-top:9px;border:1px solid #d9cbb9;background:#fffaf2;border-radius:12px;padding:10px}.import-preview.show{display:block}.import-preview b{font-size:11px}.import-preview p{font-size:10px;color:#6b6057;line-height:1.5;margin:4px 0 0}.export-json{margin-top:8px;min-height:150px;max-height:260px;font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;font-size:9.5px;line-height:1.45;white-space:pre;overflow:auto;background:#fff;border-radius:10px}.export-status{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px}.export-status .hint{margin:0}
+.modal-backdrop{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(40,32,24,.42);backdrop-filter:blur(2px)}.modal-backdrop.open{display:flex}.app-dialog{width:min(420px,100%);background:#fffdf9;border:1px solid #e2d6c8;border-radius:18px;padding:17px;box-shadow:0 24px 70px rgba(45,34,23,.28)}.app-dialog h3{font-size:14px;margin:0;color:#47382a}.app-dialog p{font-size:11px;line-height:1.55;color:#74695f;margin:7px 0 0}.app-dialog input{height:43px;margin-top:11px;font-size:14px;padding-right:10px}.app-dialog .actions{justify-content:flex-end}
+@media(max-width:720px){header{position:static}.headrow{display:block}.tabs{margin-top:10px}.grid,.grid-4,.grid-3,.record-form{grid-template-columns:repeat(2,minmax(0,1fr))}.results{grid-template-columns:repeat(2,minmax(0,1fr))}.record-form .wide{grid-column:1/-1}.panel{padding:14px}.chart-card{padding:8px}.profile-row,.profile-save-row{grid-template-columns:1fr}.profile-row .btn,.profile-save-row .btn{width:100%}.class-session-row{grid-template-columns:auto 1fr}.class-session-row select{grid-column:2}.class-session-row .session-new,.class-session-row .session-more{grid-column:auto}.class-session-actions{justify-content:stretch}.class-session-actions .btn{flex:1}.quick-history-row{align-items:flex-start;flex-wrap:wrap}.quick-history-body{flex-basis:70%}.class-manager-row,.class-manager-row.actions-row,.backup-grid{grid-template-columns:1fr}.class-manager-row .btn{width:100%}.mini-feedback b{display:none}}
+@media(max-width:440px){main{padding:10px}.grid,.grid-4,.grid-3,.record-form{grid-template-columns:1fr}.record-form .wide{grid-column:auto}.record-top{display:block}.record-top>.actions{margin-top:8px!important}.brand p{display:none}.metric .v{font-size:19px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="headrow">
+    <div class="brand"><h1>Coffee Brewing Control</h1><p>Quick calculator · Class records · Target feedback</p></div>
+    <nav class="tabs" aria-label="주요 화면">
+      <button class="tab active" data-page="quick">Quick</button>
+      <button class="tab" data-page="class">Class</button>
+      <button class="tab" data-page="chart">Chart</button>
+      <button class="tab" data-page="settings">설정</button>
+    </nav>
+  </div>
+</header>
+<main>
+<div class="storage-warning" id="storageWarning"><b>저장소 확인 필요</b> · 이 환경에서 영구 저장소 쓰기를 확인하지 못했습니다. 현재 탭에서는 계속 사용할 수 있지만 버전 전환 전에 설정 → 백업에서 JSON을 복사해 두는 것을 권장합니다.</div>
+<section id="quick" class="page active stack">
+  <div class="panel">
+    <div class="panel-head"><div><h2>빠른 측정</h2><p>한 번의 추출을 바로 계산하고 차트에서 확인합니다.</p></div></div>
+    <details class="quick-meta-details" id="quickMetaDetails">
+      <summary><div class="quick-meta-summary-main"><b>실험 정보</b><span class="quick-meta-summary-text" id="qMetaSummary">선택 · 이름과 노트</span></div></summary>
+      <div class="quick-meta">
+        <div><label>실험 이름 <span style="font-weight:650;color:#95897d">· 선택</span></label><input id="qExperimentName" type="text" maxlength="60" placeholder="예: 에티오피아 V60 분쇄도 테스트"></div>
+        <div class="quick-note-box">
+          <div class="quick-note-head"><b>실험 노트 · 선택</b></div>
+          <button class="quick-note-view empty" id="qNoteView" type="button">클릭해서 한 줄 노트를 남길 수 있습니다.</button>
+          <div class="quick-note-edit" id="qNoteEdit"><textarea id="qNoteInput" rows="1" maxlength="180" placeholder="예: 1차 대비 분쇄도를 조금씩 조여가며 비교"></textarea><div class="actions"><button class="btn small" id="qNoteSave" type="button">저장</button><button class="btn secondary small" id="qNoteCancel" type="button">취소</button></div></div>
+        </div>
+      </div>
+    </details>
+    <div class="grid">
+      <div><label>원두량 · Dose</label><div class="field"><input id="qDose" type="number" inputmode="decimal" step="0.1" value="20"><span class="unit">g</span></div></div>
+      <div><label>물량 · Brew water</label><div class="field"><input id="qWater" type="number" inputmode="decimal" step="0.1" value="300"><span class="unit">g</span></div></div>
+      <div><label>추출된 액체량 · Beverage</label><div class="field"><input id="qBev" type="number" inputmode="decimal" step="0.1" placeholder="비우면 자동"><span class="unit">g</span></div><div class="hint" id="qBevHint"></div></div>
+      <div><label>측정 TDS · Strength</label><div class="field"><input id="qTds" type="number" inputmode="decimal" step="0.01" value="1.53"><span class="unit">%</span></div></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><div><h2>결과</h2><p id="quickTargetLabel"></p></div><div class="mini-feedback"><b>피드백</b><label class="toggle" title="Quick 방향 가이드 ON/OFF"><input id="qFeedbackToggle" type="checkbox"><span class="slider"></span></label></div></div>
+    <div class="results">
+      <div class="metric hero"><div class="k">Extraction Yield</div><div class="v" id="qEyOut">—</div><div class="s">추출수율</div></div>
+      <div class="metric"><div class="k">Strength</div><div class="v" id="qTdsOut">—</div><div class="s">TDS</div></div>
+      <div class="metric"><div class="k">Brew Ratio</div><div class="v" id="qRatioOut">—</div><div class="s">원두 : 투입수</div></div>
+      <div class="metric"><div class="k">Dissolved Solids</div><div class="v" id="qSolidsOut">—</div><div class="s" id="qBevOut">—</div></div>
+    </div>
+    <div class="status" id="qStatus"><div class="status-dot"></div><div><b id="qStatusTitle">—</b><span id="qStatusDesc">—</span></div></div>
+    <div class="actions"><button class="btn" id="qSaveResult">추출 결과 저장</button><button class="btn" id="qGoChart">차트에서 보기</button><button class="btn secondary" id="qReset">기본값</button></div>
+    <div class="quick-history-wrap" id="qHistoryWrap" style="display:none">
+      <div class="quick-history-head"><b>Quick 추출 기록</b><button class="btn danger small" id="qClearHistory">기록 전체 삭제</button></div>
+      <div class="quick-history-list" id="qHistoryList"></div>
+    </div>
+  </div>
+</section>
+
+<section id="class" class="page stack">
+  <div class="class-context-strip">
+    <span class="label">현재 반</span><span class="current-class-badge" id="currentClassBadge">—</span><span class="spacer"></span><button class="btn ghost small" id="goClassSettings">반 설정</button>
+    <div class="class-session-row">
+      <span class="label">현재 실습</span>
+      <select id="classSessionSelect" aria-label="현재 실습 선택"></select>
+      <button class="btn secondary small session-new" id="newClassSession">+ 새 실습</button>
+      <button class="btn ghost small session-more" id="sessionMore" aria-label="실습 관리">⋯</button>
+    </div>
+    <div class="class-session-actions" id="sessionActions"><span class="session-meta" id="sessionMeta"></span><button class="btn ghost small" id="renameClassSession">이름 변경</button><button class="btn danger small" id="deleteClassSession">실습 삭제</button></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><div><h2>수강생 선택</h2><p>현재 실습 안에서 학생별로 1차, 2차, 3차… 추출 기록을 누적합니다.</p></div><div class="switchline" style="padding:7px 9px;border:0;background:transparent"><div><b>자동 피드백</b></div><label class="toggle"><input id="classFeedbackToggle" type="checkbox"><span class="slider"></span></label></div></div>
+    <div id="studentBar" class="student-bar"></div>
+    <div id="classNoStudents" class="empty" style="display:none">등록된 수강생이 없습니다.<br>설정에서 이름을 추가하면 바로 사용할 수 있습니다.<div class="actions" style="justify-content:center"><button class="btn secondary" id="goStudentSettings">수강생 설정</button></div></div>
+  </div>
+
+  <div class="panel" id="classEntryPanel">
+    <div class="form-title"><b id="classFormTitle">새 추출 기록</b><span class="attempt-badge" id="nextAttemptBadge">1차</span></div>
+    <div class="record-form">
+      <div><label>원두량</label><div class="field"><input id="cDose" type="number" step="0.1" value="20"><span class="unit">g</span></div></div>
+      <div><label>물량</label><div class="field"><input id="cWater" type="number" step="0.1" value="300"><span class="unit">g</span></div></div>
+      <div><label>추출된 액체량</label><div class="field"><input id="cBev" type="number" step="0.1" placeholder="비우면 자동"><span class="unit">g</span></div><div class="hint" id="cBevHint"></div></div>
+      <div><label>TDS</label><div class="field"><input id="cTds" type="number" step="0.01" placeholder="예: 1.35"><span class="unit">%</span></div></div>
+      <div class="wide"><label>추출 노트</label><textarea id="cNote" rows="1" maxlength="160" placeholder="예: 분쇄 2클릭 가늘게 · 3푸어 · 물온도 92℃"></textarea></div>
+    </div>
+    <div class="actions"><button class="btn" id="saveRecord">추출 기록 추가</button><button class="btn secondary" id="cancelEdit" style="display:none">수정 취소</button></div>
+  </div>
+
+  <div class="panel" id="classRecordsPanel">
+    <div class="panel-head"><div><h2 id="recordListTitle">추출 기록</h2><p>측정값, 타겟 판정, 강사 피드백을 한 기록 안에서 관리합니다.</p></div></div>
+    <div id="recordList" class="record-list"></div>
+  </div>
+</section>
+
+<section id="chart" class="page stack">
+  <div class="panel">
+    <div class="panel-head"><div><h2>차트 표시</h2><p>Quick은 저장 기록과 현재 입력값을 함께 표시하고, Class는 선택한 기록만 표시합니다.</p></div><div class="mode-chip"><button id="chartModeQuick" class="active">Quick</button><button id="chartModeClass">Class</button></div></div>
+    <div class="switchline"><div><b id="chartFeedbackTitle">자동 타겟 피드백 표시</b><span id="chartFeedbackDesc">점 상세와 Hover에 조정 방향을 표시합니다.</span></div><label class="toggle"><input id="chartFeedbackToggle" type="checkbox"><span class="slider"></span></label></div>
+    <div id="quickGoalWrap" class="quick-goal-wrap"><div><b>Quick 목표점</b><span id="quickGoalText">차트의 원하는 위치를 클릭하면 목표점을 지정할 수 있습니다.</span></div><button class="btn ghost small" id="clearQuickGoal">목표점 지우기</button></div>
+    <div id="classFilterWrap" style="display:none;margin-top:9px">
+      <div class="actions" style="margin-top:0"><button class="btn secondary" id="toggleFilter">표시할 수강생 / 회차 선택</button><span class="hint" id="filterSummary" style="margin:0"></span></div>
+      <div id="filterPanel" class="filter-panel"></div>
+    </div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-stage">
+      <div class="chart-head"><div><h2 id="chartTitle">Brewing Control Chart</h2><p id="chartContext">X = Extraction Yield · Y = TDS</p></div><div class="badge" id="chartBadge">—</div></div>
+      <div id="chartWarning" class="chart-warning"></div>
+      <svg id="chartSvg" viewBox="0 0 820 850" aria-label="Coffee brewing control chart"></svg>
+      <div id="chartTooltip" class="chart-tooltip"></div>
+      <div id="chartLegend" class="legend"></div>
+      <div class="chart-output-actions"><button class="btn ghost small" id="copyChartImage">이미지 복사</button><button class="btn ghost small" id="saveChartImage">PNG 저장</button><button class="btn ghost small" id="shareChartImage" style="display:none">공유</button><span class="hint">Tooltip과 좌표 미리보기는 이미지에서 제외됩니다.</span></div>
+      <div id="chartDetail" class="detail-card"></div>
+      <div class="footnote">대각선은 설정된 흡수계수를 이용한 <b>투입수 기준 Brew Ratio</b> 참고선입니다. 실제 Beverage를 직접 입력한 기록은 실제 보유수량 차이 때문에 비율선에서 벗어날 수 있습니다.</div>
+    </div>
+  </div>
+</section>
+
+<section id="settings" class="page stack">
+  <div class="panel">
+    <div class="panel-head"><div><h2>설정</h2><p>필요한 항목만 펼쳐서 수정합니다. 프로필을 불러온 뒤에도 모든 값은 자유롭게 바꿀 수 있습니다.</p></div></div>
+    <div class="settings-accordion">
+      <details class="settings-box" id="targetSettings" open>
+        <summary><div><div class="settings-summary-title">추출 타겟 설정</div><div class="settings-summary-sub" id="targetSummary">—</div></div></summary>
+        <div class="settings-body">
+          <div class="grid-3">
+            <div><label>타겟 이름</label><input id="sTargetName" type="text" value="추출 타겟" style="padding-right:10px;font-size:14px"></div>
+            <div><label>EY 최소</label><div class="field"><input id="sEyMin" type="number" step="0.1"><span class="unit">%</span></div></div>
+            <div><label>EY 최대</label><div class="field"><input id="sEyMax" type="number" step="0.1"><span class="unit">%</span></div></div>
+            <div><label>TDS 최소</label><div class="field"><input id="sTdsMin" type="number" step="0.01"><span class="unit">%</span></div></div>
+            <div><label>TDS 최대</label><div class="field"><input id="sTdsMax" type="number" step="0.01"><span class="unit">%</span></div></div>
+            <div><label>흡수계수</label><div class="field"><input id="sAbsorption" type="number" step="0.1"><span class="unit">×</span></div></div>
+          </div>
+          <div class="actions"><button class="btn" id="applyTargetSettings">타겟 적용</button><button class="btn secondary" id="resetTargetFields">기본 타겟 불러오기</button></div>
+        </div>
+      </details>
+
+      <details class="settings-box" id="chartSettings">
+        <summary><div><div class="settings-summary-title">차트 설정</div><div class="settings-summary-sub" id="chartSettingsSummary">—</div></div></summary>
+        <div class="settings-body">
+          <div class="grid-3">
+            <div><label>EY 최소</label><input id="sChartEyMin" type="number" step="0.1"></div>
+            <div><label>EY 최대</label><input id="sChartEyMax" type="number" step="0.1"></div>
+            <div><label>EY 눈금 간격</label><input id="sChartEyStep" type="number" step="0.1"></div>
+            <div><label>TDS 최소</label><input id="sChartTdsMin" type="number" step="0.01"></div>
+            <div><label>TDS 최대</label><input id="sChartTdsMax" type="number" step="0.01"></div>
+            <div><label>TDS 눈금 간격</label><input id="sChartTdsStep" type="number" step="0.01"></div>
+            <div><label>Ratio 시작 · 1:</label><input id="sRatioMin" type="number" step="0.5"></div>
+            <div><label>Ratio 끝 · 1:</label><input id="sRatioMax" type="number" step="0.5"></div>
+            <div><label>Ratio 간격</label><input id="sRatioStep" type="number" step="0.5"></div>
+          </div>
+          <div class="actions"><button class="btn" id="applyChartSettings">차트 적용</button><button class="btn secondary" id="resetChartFields">기본 차트 불러오기</button></div>
+          <div class="hint">눈금 간격은 축의 숫자와 주 Grid 간격입니다. 너무 촘촘한 값은 가독성을 위해 제한됩니다.</div>
+        </div>
+      </details>
+
+      <details class="settings-box" id="profileSettings" open>
+        <summary><div><div class="settings-summary-title">브루잉 프로필</div><div class="settings-summary-sub" id="profileSummary">기본 차트 · Classic Filter</div></div></summary>
+        <div class="settings-body">
+          <div class="profile-row"><select id="profileSelect"></select><button class="btn" id="loadProfile">불러오기</button></div>
+          <div class="profile-save-row"><input id="newProfileName" type="text" maxlength="40" placeholder="새 프로필 이름"><button class="btn secondary" id="saveNewProfile">현재 설정 저장</button></div>
+          <div class="actions"><button class="btn ghost small" id="overwriteProfile">선택 프로필 덮어쓰기</button><button class="btn danger small" id="deleteProfile">선택 프로필 삭제</button></div>
+          <div class="profile-status" id="profileStatus">프로필은 타겟·차트 범위·Ratio·흡수계수를 한 번에 저장합니다.</div>
+        </div>
+      </details>
+
+      <details class="settings-box" id="feedbackSettings">
+        <summary><div><div class="settings-summary-title">표시 및 자동 피드백</div><div class="settings-summary-sub" id="feedbackSummary">—</div></div></summary>
+        <div class="settings-body">
+          <div class="settings-dual">
+            <div class="switchline"><div><b>Quick 방향 가이드</b><span>목표점이 없으면 추출 타겟, 목표점이 있으면 지정 좌표로 가는 조정 방향을 표시합니다.</span></div><label class="toggle"><input id="sQuickFeedback" type="checkbox"><span class="slider"></span></label></div>
+            <div class="switchline"><div><b>Class 자동 타겟 피드백</b><span>Class 기록 카드와 Chart 상세·Hover의 자동 조정 제안만 켜고 끕니다. 강사 피드백은 항상 별개로 유지됩니다.</span></div><label class="toggle"><input id="sClassFeedback" type="checkbox"><span class="slider"></span></label></div>
+          </div>
+        </div>
+      </details>
+
+      <details class="settings-box" id="classSettings">
+        <summary><div><div class="settings-summary-title">반 관리</div><div class="settings-summary-sub" id="classSummary">—</div></div></summary>
+        <div class="settings-body">
+          <div class="class-manager">
+            <div class="class-manager-row"><select id="sClassSelect" aria-label="저장된 반 선택"></select><button class="btn" id="sLoadClass">불러오기</button></div>
+            <div class="class-manager-row actions-row"><input id="sClassName" type="text" maxlength="40" placeholder="현재 반 이름"><button class="btn ghost" id="sRenameClass">이름 변경</button><button class="btn danger" id="sDeleteClass">반 삭제</button></div>
+            <div class="class-manager-row"><input id="sNewClassName" type="text" maxlength="40" placeholder="새 반 이름을 입력하세요"><button class="btn secondary" id="sCreateClass">새 반 추가</button></div>
+          </div>
+          <div class="hint" style="margin-top:8px">반을 바꾸면 해당 반의 수강생 명단과 실습 세션이 함께 전환됩니다. 실습별 추출 기록·강사 피드백은 서로 분리되어 저장됩니다.</div>
+        </div>
+      </details>
+
+      <details class="settings-box" id="studentSettings">
+        <summary><div><div class="settings-summary-title">현재 반 수강생 관리</div><div class="settings-summary-sub" id="studentSummary">—</div></div></summary>
+        <div class="settings-body">
+          <div class="add-student"><input id="newStudentName" type="text" maxlength="30" placeholder="수강생 이름"><button class="btn" id="addStudent">추가</button></div>
+          <div id="studentManage" class="student-manage" style="margin-top:8px"></div>
+          <details id="excludedStudentDetails" class="excluded-students" style="display:none">
+            <summary>제외된 수강생 <span id="excludedStudentCount">0명</span></summary>
+            <div id="excludedStudentManage" class="student-manage"></div>
+          </details>
+        </div>
+      </details>
+
+      <details class="settings-box" id="dataSettings">
+        <summary><div><div class="settings-summary-title">현재 반 데이터</div><div class="settings-summary-sub">자동 저장</div></div></summary>
+        <div class="settings-body">
+          <div class="hint">현재 반의 수강생과 실습별 기록은 자동 저장됩니다. 아래 삭제는 현재 선택한 실습의 기록에만 적용되며 다른 실습은 유지됩니다.</div>
+          <div class="actions"><button class="btn danger" id="clearClassData">현재 실습의 모든 추출 기록 지우기</button></div>
+        </div>
+      </details>
+
+      <details class="settings-box" id="backupSettings">
+        <summary><div><div class="settings-summary-title">데이터 백업 및 복원</div><div class="settings-summary-sub" id="backupSummary">전체 앱 데이터 · JSON</div></div></summary>
+        <div class="settings-body">
+          <div class="backup-grid"><button class="btn" id="exportData">전체 데이터 내보내기</button><button class="btn secondary" id="chooseImportData">백업 데이터 가져오기</button></div>
+          <input id="importDataFile" type="file" accept="application/json,.json" style="display:none">
+          <div class="backup-info">모든 반, 실습 세션, 수강생 기록, 강사 피드백, Quick 기록·실험 정보, 브루잉 프로필, 타겟·차트 설정을 한 파일로 백업합니다. 가져오기는 현재 브라우저의 전체 데이터를 교체합니다.</div>
+          <div class="import-preview" id="exportPreview"><b>백업 JSON 준비됨</b><p id="exportPreviewText"></p><textarea id="exportJsonText" class="export-json" readonly spellcheck="false" aria-label="백업 JSON"></textarea><div class="export-status"><button class="btn small" id="saveExportFile">백업 파일 저장</button><button class="btn secondary small" id="copyExportJson">JSON 복사</button><button class="btn ghost small" id="closeExportPreview">닫기</button><span class="hint">다운로드가 제한된 환경에서는 JSON 복사를 사용할 수 있습니다.</span></div></div>
+          <div class="import-preview" id="importPreview"><b id="importPreviewTitle">백업 확인</b><p id="importPreviewText"></p><div class="actions"><button class="btn" id="applyImportData">가져오기 적용</button><button class="btn secondary" id="cancelImportData">취소</button></div></div>
+        </div>
+      </details>
+
+      <div class="public-info">
+        <div class="meta"><b>Coffee Brewing Control v4.3.5</b><br>Local-first · single-file web app</div>
+        <div class="actions"><button class="btn ghost small" id="openAbout">About &amp; References</button><button class="btn ghost small" id="openChangelog">Changelog</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<div id="appDialog" class="modal-backdrop" aria-hidden="true">
+  <div class="app-dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+    <h3 id="dialogTitle">확인</h3><p id="dialogMessage"></p><input id="dialogInput" type="text" maxlength="80" style="display:none">
+    <div class="actions"><button class="btn secondary" id="dialogCancel">취소</button><button class="btn" id="dialogConfirm">확인</button></div>
+  </div>
+</div>
+<div id="chartImageModal" class="modal-backdrop" aria-hidden="true">
+  <div class="app-dialog chart-image-dialog" role="dialog" aria-modal="true" aria-labelledby="chartImageModalTitle">
+    <h3 id="chartImageModalTitle">차트 이미지</h3><p id="chartImageModalMessage">이미지 미리보기입니다.</p>
+    <div id="chartSvgPreview" class="chart-svg-preview" aria-label="Brewing Control Chart 미리보기"></div>
+    <img id="chartImagePreview" class="chart-image-preview hidden" alt="내보낼 Brewing Control Chart PNG 미리보기">
+    <div id="chartImageInfo" class="chart-image-info">저장이 제한된 환경에서도 미리보기는 앱 안에서 확인할 수 있습니다. 모바일 로컬 파일에서는 이미지를 길게 눌러 ‘이미지 복사’를 사용할 수 있습니다.</div>
+    <div class="actions"><button class="btn" id="previewCopyChartImage">이미지 복사</button><button class="btn secondary" id="previewSaveChartImage">PNG 저장</button><button class="btn ghost" id="previewShareChartImage" style="display:none">공유</button><button class="btn ghost" id="closeChartImageModal">닫기</button></div>
+  </div>
+</div>
+
+<div id="aboutModal" class="modal-backdrop" aria-hidden="true">
+  <div class="app-dialog info-dialog" role="dialog" aria-modal="true" aria-labelledby="aboutModalTitle">
+    <h3 id="aboutModalTitle">About &amp; References</h3>
+    <p>This tool is designed for coffee brewing education, repeated brew testing, and comparative analysis. It visualizes brew strength (TDS), extraction yield, and brew ratio relationships using the brewing control chart framework originating from E. E. Lockhart's work.</p>
+    <p>The built-in <b>Classic Filter</b> profile uses a default reference range of <b>18–22% extraction yield</b> and <b>1.15–1.35% TDS</b>, informed by published SCA brewing materials. This range is provided as a starting reference only.</p>
+    <p>Target ranges, chart scales, brew ratios, and liquid-retention assumptions are configurable. User-defined targets and chart ranges should not be interpreted as established sensory-quality standards or physical limits.</p>
+    <p>When beverage mass is not entered, the tool estimates it from brew water and the configured liquid-retention value. Calculated extraction yield therefore depends on the measurements and assumptions provided by the user.</p>
+    <div class="notice"><b>Independent project.</b> This project is independently developed and is not affiliated with or endorsed by the Specialty Coffee Association. No SCA logo or SCA chart artwork is included.</div>
+    <h4>Data &amp; privacy</h4>
+    <p>Brew records, class data, profiles, and settings are stored locally in the browser by this application. The application does not transmit entered brew or class data to an application backend. This does not cover ordinary hosting access logs or actions explicitly initiated by the user, such as export or sharing. JSON export is available for manual backup and transfer.</p>
+    <h4>References</h4>
+    <div class="reference">E. E. Lockhart. <i>The Soluble Solids in Beverage Coffee as an Index to Cup Quality.</i> Coffee Brewing Institute, 1957.</div>
+    <div class="reference">Specialty Coffee Association. <i>Coffee Brewing Control Chart</i>, Version 3, revised March 2019.</div>
+    <div class="actions"><button class="btn secondary" id="closeAbout">닫기</button></div>
+  </div>
+</div>
+
+<div id="changelogModal" class="modal-backdrop" aria-hidden="true">
+  <div class="app-dialog info-dialog" role="dialog" aria-modal="true" aria-labelledby="changelogModalTitle">
+    <h3 id="changelogModalTitle">Changelog</h3>
+    <p>Earlier development history is condensed to major user-facing and architectural milestones.</p>
+
+    <div class="version-block"><h4>v4.3.5 · Public-release preparation</h4><ul>
+      <li>Renamed user-facing terminology to Coffee Brewing Control / Brewing Control Chart.</li>
+      <li>Added About &amp; References, privacy/context notes, an in-app changelog, and visible app version information.</li>
+      <li>Refined chart zoning into semantic Strong/Weak and Under/Over overlay bands while keeping the sage target and smoky-plum brew-ratio lines.</li>
+      <li>Kept legacy storage and backup identifiers for backward compatibility.</li>
+    </ul></div>
+
+    <div class="version-block"><h4>v4.3.4.1</h4><ul>
+      <li>Added current class/session context to Class chart filters.</li>
+      <li>Made roster exclusion reversible while preserving historical records and student IDs.</li>
+    </ul></div>
+
+    <div class="version-block"><h4>v4.3.4</h4><ul>
+      <li>Added reusable Class practice sessions with independent per-session records.</li>
+      <li>Added schema v2 migration and preserved earlier Class records as migrated sessions.</li>
+      <li>Updated Class chart/export context to the active session.</li>
+    </ul></div>
+
+    <div class="version-block"><h4>v4.3.3</h4><ul>
+      <li>Added Quick experiment name/note, ΔEY/ΔTDS tooltips, desktop/mobile chart interaction, and PNG chart output.</li>
+      <li>Added copy/save/share workflows with in-app preview fallback for restricted environments.</li>
+    </ul></div>
+
+    <div class="version-block"><h4>v4.3.2</h4><ul>
+      <li>Separated live Quick input from committed saved attempts.</li>
+      <li>Added live-point styling, saved-to-live preview paths, and dynamic per-attempt feedback.</li>
+    </ul></div>
+
+    <div class="version-block"><h4>v4.3.1</h4><ul>
+      <li>Strengthened JSON backup export with visible preview, clipboard fallback, and OS save-dialog support where available.</li>
+    </ul></div>
+
+    <div class="version-block"><h4>v4.3</h4><ul>
+      <li>Added full JSON export/import, schema versioning, and a storage-adapter layer.</li>
+      <li>Moved class administration into Settings and replaced browser prompt/confirm dialogs with in-app dialogs.</li>
+    </ul></div>
+
+    <div class="version-block"><h4>v4.2</h4><ul>
+      <li>Added saved Quick attempt paths, target-point guidance, independent Quick/Class feedback controls, and multiple classes.</li>
+    </ul></div>
+
+    <div class="version-block"><h4>v4</h4><ul>
+      <li>Separated brew notes from instructor feedback.</li>
+      <li>Added dynamic target classification, Class progression arrows, configurable chart bounds/ratio lines, and brewing profiles.</li>
+    </ul></div>
+
+    <div class="version-block"><h4>v3</h4><ul>
+      <li>Added target-relative STRONG / WEAK / UNDER / OVER chart regions and point hover details.</li>
+      <li>Replaced the earlier Golden Cup chart label with the neutral TARGET label while keeping the target range configurable.</li>
+    </ul></div>
+
+    <div class="version-block"><h4>v2</h4><ul>
+      <li>Introduced separate Quick and Class workflows, student rosters, sequential records, chart filtering, and browser-local persistence.</li>
+    </ul></div>
+
+    <div class="version-block"><h4>Initial prototype</h4><ul>
+      <li>Single-file browser calculator for brew measurements, extraction yield, TDS, dissolved solids, and brew ratio.</li>
+      <li>Added automatic beverage-mass estimation and the first live brewing-control chart.</li>
+    </ul></div>
+
+    <div class="actions"><button class="btn secondary" id="closeChangelog">닫기</button></div>
+  </div>
+</div>
+
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id), $$=sel=>Array.from(document.querySelectorAll(sel));
+const STORAGE_KEY='coffeeBrewControlClassroomV2'; // legacy key retained so existing browser data continues to load
+const APP_SCHEMA_VERSION=2;
+const APP_VERSION='4.3.5';
+const BACKUP_FORMAT='coffee-brew-control-backup'; // legacy identifier retained for backup compatibility
+const COLORS=['#3157d5','#c85245','#2f7a52','#8a55a8','#d28a22','#2c8a9b','#7d6b35','#b24d84'];
+const GOAL_COLOR='#8a55a8';
+const LIVE_COLOR='#2c8a9b';
+const CHART_TARGET_COLOR='#b9d4c2';
+const CHART_RATIO_COLOR='#75657f';
+const CHART_BAND_COLORS={
+  strong:'#c9afa9',
+  weak:'#aebfcc',
+  under:'#b7aed0',
+  over:'#d4c0a6'
+};
+const CLASSIC_PROFILE={
+  id:'builtin-classic',name:'기본 차트 · Classic Filter',builtin:true,
+  settings:{targetName:'추출 타겟',eyMin:18,eyMax:22,tdsMin:1.15,tdsMax:1.35,absorption:2.0,chartEyMin:14,chartEyMax:26,chartEyStep:2,chartTdsMin:.8,chartTdsMax:1.6,chartTdsStep:.1,ratioMin:10,ratioMax:24,ratioStep:1}
+};
+const DEFAULT_CLASS_ID='class_default';
+const DEFAULT_SESSION_ID='session_default';
+const DEFAULT={
+  schemaVersion:APP_SCHEMA_VERSION,
+  settings:{...CLASSIC_PROFILE.settings,showQuickFeedback:true,showClassFeedback:true},
+  profiles:[],activeProfileId:'builtin-classic',
+  classes:[{id:DEFAULT_CLASS_ID,name:'기본 반',students:[],excludedStudents:[],sessions:[{id:DEFAULT_SESSION_ID,name:'기본 실습',createdAt:new Date().toISOString(),records:{},studentNames:{}}],activeSessionId:DEFAULT_SESSION_ID}],activeClassId:DEFAULT_CLASS_ID,
+  quick:{dose:20,water:300,bev:'',tds:1.53},quickMeta:{name:'',note:''},quickHistory:[],quickGoal:null,storageUpdatedAt:0
+};
+let state=null;
+let currentStudentId=null;
+let editingRecordId=null;
+let editingTeacherFeedbackId=null;
+let chartMode='quick';
+let chartSelection={};
+let selectedPointKey=null;
+let pendingImportState=null;
+let chartTooltipPinned=false,chartTooltipType=null,chartTooltipKey=null,lastPointerType='mouse';
+let pendingChartImageBlob=null,pendingChartImageUrl='',pendingChartImageFilename='';
+
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function id(){return 'id_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8)}
+function n(v){const x=parseFloat(v);return Number.isFinite(x)?x:NaN}
+function pos(v){return Number.isFinite(v)&&v>0}
+function fmt(v,d=2){return Number.isFinite(v)?v.toFixed(d):'—'}
+function trimNum(v,d=2){if(!Number.isFinite(v))return '—';return Number(v.toFixed(d)).toString()}
+function esc(s=''){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),1800)}
+function normalizeRecord(r={}){return {id:r.id||id(),dose:r.dose,water:r.water,bev:r.bev??'',tds:r.tds,note:String(r.note||''),teacherFeedback:String(r.teacherFeedback||'')}}
+function normalizeStudents(students){return Array.isArray(students)?students.filter(st=>st&&typeof st==='object').map(st=>({id:st.id||id(),name:(st.name||'이름 없음').trim()||'이름 없음'})):[]}
+function normalizeSessionRecords(records){
+  const out={};if(!records||typeof records!=='object'||Array.isArray(records))return out;
+  Object.entries(records).forEach(([sid,arr])=>{if(Array.isArray(arr))out[sid]=arr.filter(r=>r&&typeof r==='object').map(normalizeRecord)});return out
+}
+function makeSession(name='기본 실습'){return {id:id(),name:String(name||'기본 실습').trim()||'기본 실습',createdAt:new Date().toISOString(),records:{},studentNames:{}}}
+function migrateLegacyClass(c){
+  const rawStudents=Array.isArray(c?.students)?c.students:[],students=normalizeStudents(rawStudents);
+  const sess=makeSession('기존 기록');
+  rawStudents.forEach((st,i)=>{const sid=students[i]?.id;if(!sid)return;const arr=Array.isArray(st.records)?st.records.map(normalizeRecord):[];if(arr.length)sess.records[sid]=arr;sess.studentNames[sid]=students[i].name});
+  return {id:c?.id||id(),name:(c?.name||'이름 없는 반').trim()||'이름 없는 반',students,excludedStudents:[],sessions:[sess],activeSessionId:sess.id}
+}
+function normalizeClassV2(c){
+  const students=normalizeStudents(c?.students),excludedStudents=normalizeStudents(c?.excludedStudents),sessions=Array.isArray(c?.sessions)&&c.sessions.length?c.sessions.filter(x=>x&&typeof x==='object').map(ss=>({id:ss.id||id(),name:(ss.name||'이름 없는 실습').trim()||'이름 없는 실습',createdAt:ss.createdAt||new Date().toISOString(),records:normalizeSessionRecords(ss.records),studentNames:ss.studentNames&&typeof ss.studentNames==='object'&&!Array.isArray(ss.studentNames)?Object.fromEntries(Object.entries(ss.studentNames).map(([k,v])=>[k,String(v||'이름 없음')])):{}})): [makeSession('기본 실습')];
+  const names=Object.fromEntries(students.map(s=>[s.id,s.name]));sessions.forEach(ss=>{Object.keys(ss.records).forEach(sid=>{if(!ss.studentNames[sid])ss.studentNames[sid]=names[sid]||'이름 없음'})});
+  let activeSessionId=c?.activeSessionId;if(!sessions.some(s=>s.id===activeSessionId))activeSessionId=sessions[0].id;
+  const activeIds=new Set(students.map(s=>s.id)),cleanExcluded=excludedStudents.filter(s=>!activeIds.has(s.id));return {id:c?.id||id(),name:(c?.name||'이름 없는 반').trim()||'이름 없는 반',students,excludedStudents:cleanExcluded,sessions,activeSessionId}
+}
+const STORAGE_RECOVERY_KEY=STORAGE_KEY+'__recovery';
+const StorageAdapter={
+  memoryRaw:null,lastReadSource:'none',lastWrite:{persistent:false,session:false},
+  stamp(raw){try{const x=JSON.parse(raw);return Number.isFinite(Number(x?.storageUpdatedAt))?Number(x.storageUpdatedAt):0}catch(e){return -1}},
+  get(store,key){try{return store.getItem(key)}catch(e){return null}},
+  setVerified(store,key,raw){try{store.setItem(key,raw);return store.getItem(key)===raw}catch(e){return false}},
+  read(){
+    const candidates=[];
+    const add=(raw,source,priority)=>{if(typeof raw==='string'&&raw.length)candidates.push({raw,source,priority,stamp:this.stamp(raw)})};
+    try{add(this.get(localStorage,STORAGE_KEY),'local',50);add(this.get(localStorage,STORAGE_RECOVERY_KEY),'local-recovery',40)}catch(e){}
+    try{add(this.get(sessionStorage,STORAGE_KEY),'session',30);add(this.get(sessionStorage,STORAGE_RECOVERY_KEY),'session-recovery',20)}catch(e){}
+    add(this.memoryRaw,'memory',10);
+    if(!candidates.length){this.lastReadSource='none';return null}
+    candidates.sort((a,b)=>b.stamp-a.stamp||b.priority-a.priority);const best=candidates[0];this.lastReadSource=best.source;this.memoryRaw=best.raw;return best.raw
+  },
+  write(data){
+    const raw=JSON.stringify(data);this.memoryRaw=raw;
+    let localPrimary=false,localRecovery=false,sessionPrimary=false,sessionRecovery=false;
+    try{localPrimary=this.setVerified(localStorage,STORAGE_KEY,raw);localRecovery=this.setVerified(localStorage,STORAGE_RECOVERY_KEY,raw)}catch(e){}
+    try{sessionPrimary=this.setVerified(sessionStorage,STORAGE_KEY,raw);sessionRecovery=this.setVerified(sessionStorage,STORAGE_RECOVERY_KEY,raw)}catch(e){}
+    this.lastWrite={persistent:localPrimary||localRecovery,session:sessionPrimary||sessionRecovery,localPrimary,localRecovery,sessionPrimary,sessionRecovery};return this.lastWrite
+  }
+};
+function normalizeState(s={}){
+  if(!s||typeof s!=='object')throw new Error('invalid state');
+  const sourceVersion=Number.isFinite(Number(s.schemaVersion))?Number(s.schemaVersion):0;
+  if(sourceVersion>APP_SCHEMA_VERSION)throw new Error('newer schema');
+  const legacyShow=s.settings?.showFeedback;
+  const settings={...DEFAULT.settings,...(s.settings||{})};
+  if(settings.targetName==='Golden Cup')settings.targetName='추출 타겟';
+  if(typeof s.settings?.showQuickFeedback!=='boolean')settings.showQuickFeedback=typeof legacyShow==='boolean'?legacyShow:true;
+  if(typeof s.settings?.showClassFeedback!=='boolean')settings.showClassFeedback=typeof legacyShow==='boolean'?legacyShow:true;
+  delete settings.showFeedback;
+  let classes=[];
+  if(Array.isArray(s.classes)&&s.classes.length){
+    const alreadyV2=sourceVersion>=2||s.classes.some(c=>Array.isArray(c?.sessions));
+    classes=s.classes.map(c=>alreadyV2?normalizeClassV2(c):migrateLegacyClass(c));
+  }else if(Array.isArray(s.students)){
+    classes=[migrateLegacyClass({id:'class_migrated',name:'기본 반',students:s.students})];
+  }else classes=clone(DEFAULT.classes);
+  let activeClassId=s.activeClassId;
+  if(!classes.some(c=>c.id===activeClassId))activeClassId=classes[0].id;
+  const qh=Array.isArray(s.quickHistory)?s.quickHistory.map(r=>({id:r.id||id(),dose:r.dose,water:r.water,bev:r.bev??'',tds:r.tds})):[];
+  const qg=s.quickGoal&&Number.isFinite(n(s.quickGoal.ey))&&Number.isFinite(n(s.quickGoal.tds))?{ey:n(s.quickGoal.ey),tds:n(s.quickGoal.tds)}:null;
+  const profiles=Array.isArray(s.profiles)?s.profiles.filter(p=>p&&typeof p==='object').map(p=>({id:p.id||id(),name:(p.name||'사용자 프로필').trim()||'사용자 프로필',builtin:false,settings:{...CLASSIC_PROFILE.settings,...(p.settings||{})}})):[];
+  return {schemaVersion:APP_SCHEMA_VERSION,settings,profiles,activeProfileId:s.activeProfileId??null,classes,activeClassId,quick:{...DEFAULT.quick,...(s.quick||{})},quickMeta:{name:String(s.quickMeta?.name||''),note:String(s.quickMeta?.note||'')},quickHistory:qh,quickGoal:qg,storageUpdatedAt:Number.isFinite(Number(s.storageUpdatedAt))?Number(s.storageUpdatedAt):0};
+}
+function load(){
+  const raw=StorageAdapter.read();if(!raw)return clone(DEFAULT);
+  try{return normalizeState(JSON.parse(raw))}catch(e){return clone(DEFAULT)}
+}
+let storageWarningShown=false;
+function updateStorageWarning(result=StorageAdapter.lastWrite){
+  const box=$('storageWarning');if(!box)return;
+  const persistent=!!result?.persistent;box.classList.toggle('show',!persistent);
+  if(!persistent&&!storageWarningShown){storageWarningShown=true;toast(result?.session?'영구 저장소 확인 실패 · 현재 탭에는 임시 저장 중':'저장소 쓰기 확인 실패 · 백업을 권장합니다')}
+}
+function save(){state.schemaVersion=APP_SCHEMA_VERSION;state.storageUpdatedAt=Date.now();const result=StorageAdapter.write(state);updateStorageWarning(result);return result.persistent}
+function openDialog({title='확인',message='',inputValue=null,placeholder='',confirmText='확인',danger=false,onConfirm}){
+  const box=$('appDialog'),inp=$('dialogInput'),btn=$('dialogConfirm');$('dialogTitle').textContent=title;$('dialogMessage').textContent=message||'';
+  const hasInput=inputValue!==null;inp.style.display=hasInput?'block':'none';inp.value=hasInput?String(inputValue):'';inp.placeholder=placeholder||'';btn.textContent=confirmText;btn.className='btn'+(danger?' danger':'');
+  box.classList.add('open');box.setAttribute('aria-hidden','false');dialogConfirmHandler=typeof onConfirm==='function'?onConfirm:null;
+  requestAnimationFrame(()=>{(hasInput?inp:btn).focus();if(hasInput)inp.select()});
+}
+let dialogConfirmHandler=null;
+function closeDialog(){const box=$('appDialog');box.classList.remove('open');box.setAttribute('aria-hidden','true');dialogConfirmHandler=null}
+$('dialogCancel').onclick=closeDialog;$('appDialog').addEventListener('click',e=>{if(e.target===$('appDialog'))closeDialog()});
+$('dialogConfirm').onclick=()=>{const inp=$('dialogInput'),hasInput=inp.style.display!=='none',value=hasInput?inp.value:undefined,fn=dialogConfirmHandler;if(fn&&fn(value)===false)return;closeDialog()};
+$('dialogInput').addEventListener('keydown',e=>{if(e.key==='Enter'){$('dialogConfirm').click()}else if(e.key==='Escape')closeDialog()});
+function closeInfoModal(id){const box=$(id);if(!box)return;box.classList.remove('open');box.setAttribute('aria-hidden','true')}
+function openInfoModal(id){const box=$(id);if(!box)return;box.classList.add('open');box.setAttribute('aria-hidden','false')}
+$('openAbout').onclick=()=>openInfoModal('aboutModal');$('closeAbout').onclick=()=>closeInfoModal('aboutModal');$('aboutModal').addEventListener('click',e=>{if(e.target===$('aboutModal'))closeInfoModal('aboutModal')});
+$('openChangelog').onclick=()=>openInfoModal('changelogModal');$('closeChangelog').onclick=()=>closeInfoModal('changelogModal');$('changelogModal').addEventListener('click',e=>{if(e.target===$('changelogModal'))closeInfoModal('changelogModal')});
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('appDialog').classList.contains('open'))closeDialog();else if($('chartImageModal').classList.contains('open'))closeChartImagePreview();else if($('aboutModal').classList.contains('open'))closeInfoModal('aboutModal');else if($('changelogModal').classList.contains('open'))closeInfoModal('changelogModal')});
+state=load();
+currentStudentId=currentClass()?.students?.[0]?.id||null;
+function currentClass(){return state.classes.find(c=>c.id===state.activeClassId)||state.classes[0]||null}
+function students(){return currentClass()?.students||[]}
+function excludedStudents(){return currentClass()?.excludedStudents||[]}
+function currentSession(){const c=currentClass();return c?.sessions?.find(s=>s.id===c.activeSessionId)||c?.sessions?.[0]||null}
+function sessionRecords(sid,create=false){const ss=currentSession();if(!ss)return[];if(!Array.isArray(ss.records?.[sid])){if(!create)return[];ss.records=ss.records&&typeof ss.records==='object'?ss.records:{};ss.records[sid]=[]}return ss.records[sid]}
+function sessionStudentName(sid){return students().find(s=>s.id===sid)?.name||excludedStudents().find(s=>s.id===sid)?.name||currentSession()?.studentNames?.[sid]||'이름 없음'}
+function sessionChartStudents(){const ss=currentSession(),active=students(),seen=new Set(),out=[];active.forEach(s=>{seen.add(s.id);out.push({id:s.id,name:s.name,current:true})});Object.keys(ss?.records||{}).forEach(sid=>{if(!seen.has(sid)&&sessionRecords(sid).length){seen.add(sid);out.push({id:sid,name:ss.studentNames?.[sid]||'이름 없음',current:false})}});return out}
+function currentStudent(){return students().find(s=>s.id===currentStudentId)||null}
+function ensureCurrentClass(){if(!state.classes.length){const ss=makeSession('기본 실습');state.classes=[{id:id(),name:'기본 반',students:[],excludedStudents:[],sessions:[ss],activeSessionId:ss.id}];state.activeClassId=state.classes[0].id}if(!state.classes.some(c=>c.id===state.activeClassId))state.activeClassId=state.classes[0].id;ensureCurrentSession()}
+function ensureCurrentSession(){const c=currentClass();if(!c)return null;if(!Array.isArray(c.sessions)||!c.sessions.length)c.sessions=[makeSession('기본 실습')];if(!c.sessions.some(s=>s.id===c.activeSessionId))c.activeSessionId=c.sessions[0].id;return currentSession()}
+function ensureCurrentStudent(){const arr=students();if(!arr.some(s=>s.id===currentStudentId))currentStudentId=arr[0]?.id||null}
+function autoBeverage(dose,water){return pos(dose)&&pos(water)?Math.max(0,water-state.settings.absorption*dose):NaN}
+function calcRecord(rec){
+  const dose=n(rec.dose),water=n(rec.water),tds=n(rec.tds),manual=n(rec.bev),auto=autoBeverage(dose,water),bev=pos(manual)?manual:auto;
+  const solids=pos(bev)&&Number.isFinite(tds)?bev*tds/100:NaN;
+  const ey=pos(dose)&&Number.isFinite(solids)?solids/dose*100:NaN;
+  const ratio=pos(dose)&&pos(water)?water/dose:NaN;
+  return {...rec,dose,water,tds,bev,manualBev:pos(manual),autoBev:auto,solids,ey,ratio};
+}
+function updateQuickMetaUI(){
+  $('qExperimentName').value=state.quickMeta?.name||'';
+  const name=(state.quickMeta?.name||'').trim(),note=state.quickMeta?.note||'',view=$('qNoteView');view.textContent=note||'클릭해서 한 줄 노트를 남길 수 있습니다.';view.classList.toggle('empty',!note);
+  const summary=$('qMetaSummary');if(summary)summary.textContent=name?(note?`${name} · 노트 있음`:name):(note?'이름 없음 · 노트 있음':'선택 · 이름과 노트')
+}
+function openQuickNoteEditor(){$('qNoteInput').value=state.quickMeta?.note||'';$('qNoteView').style.display='none';$('qNoteEdit').classList.add('open');requestAnimationFrame(()=>$('qNoteInput').focus())}
+function closeQuickNoteEditor(){$('qNoteEdit').classList.remove('open');$('qNoteView').style.display='block'}
+$('qExperimentName').addEventListener('input',()=>{state.quickMeta.name=$('qExperimentName').value;save();const summary=$('qMetaSummary'),note=state.quickMeta?.note||'';if(summary)summary.textContent=state.quickMeta.name.trim()?(note?`${state.quickMeta.name.trim()} · 노트 있음`:state.quickMeta.name.trim()):(note?'이름 없음 · 노트 있음':'선택 · 이름과 노트');if(chartMode==='quick')updateChartContext()});
+$('qNoteView').onclick=openQuickNoteEditor;
+$('qNoteSave').onclick=()=>{state.quickMeta.note=$('qNoteInput').value.trim();save();closeQuickNoteEditor();updateQuickMetaUI();toast('Quick 실험 노트를 저장했습니다')};
+$('qNoteCancel').onclick=()=>{closeQuickNoteEditor();updateQuickMetaUI()};
+$('qNoteInput').addEventListener('keydown',e=>{if(e.key==='Escape'){$('qNoteCancel').click()}});
+function liveQuickRecord(){return {dose:n($('qDose').value),water:n($('qWater').value),bev:$('qBev').value,tds:n($('qTds').value)}}
+function quickLivePoint(){return {...calcRecord(liveQuickRecord()),studentName:'Quick',attempt:null,key:'quick_live',note:'',teacherFeedback:'',isLive:true}}
+function quickHistoryPoints(){return state.quickHistory.map((r,i)=>({...calcRecord(r),studentName:'Quick',attempt:i+1,key:'qh_'+r.id,note:'',teacherFeedback:'',isLive:false}))}
+function validQuickPoint(p){return !!p&&Number.isFinite(p.ey)&&Number.isFinite(p.tds)}
+function quickValidHistoryPoints(){return quickHistoryPoints().filter(validQuickPoint)}
+function quickChartPoints(){const hist=quickValidHistoryPoints(),live=quickLivePoint();return validQuickPoint(live)?[...hist,live]:hist}
+function quickGoalGuideSource(){const live=quickLivePoint();if(validQuickPoint(live))return live;const hist=quickValidHistoryPoints();return hist.length?hist[hist.length-1]:null}
+function axisState(v,min,max){return v<min?'low':v>max?'high':'in'}
+function classificationFor(d){
+  const s=state.settings;if(!Number.isFinite(d.ey)||!Number.isFinite(d.tds))return {label:'측정값 필요',cls:'combo'};
+  const x=axisState(d.ey,s.eyMin,s.eyMax),y=axisState(d.tds,s.tdsMin,s.tdsMax);
+  if(x==='in'&&y==='in')return {label:'TARGET',cls:'target'};
+  const parts=[];if(y==='high')parts.push('STRONG');if(y==='low')parts.push('WEAK');if(x==='low')parts.push('UNDER');if(x==='high')parts.push('OVER');
+  let cls='combo';if(parts.length===1)cls=parts[0].toLowerCase();return {label:parts.join(' · '),cls};
+}
+function directionFeedback(xs,ys,insideTitle='타겟 안'){
+  if(xs==='in'&&ys==='in')return {arrow:'✓',title:insideTitle,text:'현재 목표 조건에 도달했습니다.',rec:'맛과 재현성을 확인해 다음 조정을 결정하세요.'};
+  const map={
+    'low_high':{arrow:'↘',title:'수율 ↑ · 농도 ↓',text:'오른쪽 아래 방향으로 이동해야 합니다.',rec:'우선 물량 ↑. 또는 추출을 조금 더 진행하면서 최종 농도를 낮추는 방향.'},
+    'high_low':{arrow:'↖',title:'수율 ↓ · 농도 ↑',text:'왼쪽 위 방향으로 이동해야 합니다.',rec:'우선 물량 ↓ 또는 원두량 ↑. 필요하면 분쇄를 조금 굵게.'},
+    'low_low':{arrow:'↗',title:'수율 ↑ · 농도 ↑',text:'오른쪽 위 방향으로 이동해야 합니다.',rec:'분쇄를 가늘게 / 물온도 ↑ / 푸어링으로 접촉·교반 ↑.'},
+    'high_high':{arrow:'↙',title:'수율 ↓ · 농도 ↓',text:'왼쪽 아래 방향으로 이동해야 합니다.',rec:'분쇄를 굵게 / 물온도 ↓ / 푸어링의 접촉·교반 ↓.'},
+    'low_in':{arrow:'→',title:'수율 ↑',text:'농도는 목표 범위에 있고 수율만 올리면 됩니다.',rec:'분쇄를 가늘게 / 물온도 ↑ / 푸어링으로 추출시간·교반 ↑.'},
+    'high_in':{arrow:'←',title:'수율 ↓',text:'농도는 목표 범위에 있고 수율만 낮추면 됩니다.',rec:'분쇄를 굵게 / 물온도 ↓ / 푸어링으로 추출시간·교반 ↓.'},
+    'in_low':{arrow:'↑',title:'농도 ↑',text:'수율은 목표 범위에 있고 농도만 올리면 됩니다.',rec:'원두량 ↑ 또는 물량 ↓. 수율도 함께 움직일 수 있으니 재측정.'},
+    'in_high':{arrow:'↓',title:'농도 ↓',text:'수율은 목표 범위에 있고 농도만 낮추면 됩니다.',rec:'물량 ↑ 또는 원두량 ↓. 수율도 함께 움직일 수 있으니 재측정.'}
+  };
+  return map[xs+'_'+ys]||{arrow:'·',title:'조정 확인',text:'현재 값과 목표를 비교하세요.',rec:''};
+}
+function feedbackForRange(d){
+  const s=state.settings;if(!Number.isFinite(d.ey)||!Number.isFinite(d.tds))return {arrow:'·',title:'측정값 필요',text:'원두량, 물량, TDS를 확인해 주세요.',rec:''};
+  const xs=axisState(d.ey,s.eyMin,s.eyMax),ys=axisState(d.tds,s.tdsMin,s.tdsMax);
+  const f=directionFeedback(xs,ys,`${s.targetName} 안`);if(xs==='in'&&ys==='in')f.text='현재 설정한 타겟 범위 안입니다.';return f;
+}
+function feedbackForGoal(d,goal){
+  if(!goal)return feedbackForRange(d);
+  if(!Number.isFinite(d.ey)||!Number.isFinite(d.tds))return {arrow:'·',title:'측정값 필요',text:'원두량, 물량, TDS를 확인해 주세요.',rec:''};
+  const ex=.03,ty=.006;
+  const xs=d.ey<goal.ey-ex?'low':d.ey>goal.ey+ex?'high':'in';
+  const ys=d.tds<goal.tds-ty?'low':d.tds>goal.tds+ty?'high':'in';
+  const f=directionFeedback(xs,ys,'목표점 도달');
+  if(xs==='in'&&ys==='in')f.text=`지정 목표점(EY ${fmt(goal.ey,2)}% · TDS ${fmt(goal.tds,2)}%)에 거의 도달했습니다.`;
+  else f.text=`지정 목표점까지 EY ${(goal.ey-d.ey)>=0?'+':''}${fmt(goal.ey-d.ey,2)}%p · TDS ${(goal.tds-d.tds)>=0?'+':''}${fmt(goal.tds-d.tds,2)}%p 변화가 필요합니다.`;
+  return f;
+}
+function quickFeedbackFor(d){return state.quickGoal?feedbackForGoal(d,state.quickGoal):feedbackForRange(d)}
+function statusForQuick(d){const f=quickFeedbackFor(d),inside=f.arrow==='✓';return {cls:inside?'good':(f.arrow==='↙'||f.arrow==='↓'||f.arrow==='←'?'warn':'bad'),title:f.title,desc:f.text+' '+f.rec}}
+function classFeedbackFor(d){return feedbackForRange(d)}
+function chartFeedbackForPoint(p){return chartMode==='quick'?quickFeedbackFor(p):classFeedbackFor(p)}
+function classFeedbackVisible(){return !!state.settings.showClassFeedback}
+function quickFeedbackVisible(){return !!state.settings.showQuickFeedback}
+
+function showPage(pid){$$('.page').forEach(p=>p.classList.toggle('active',p.id===pid));$$('.tab').forEach(t=>t.classList.toggle('active',t.dataset.page===pid));if(pid==='chart')renderChart();if(pid==='class')renderClass();if(pid==='settings')renderSettings()}
+$$('.tab').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+
+function renderQuick(){
+  const q=liveQuickRecord();state.quick={dose:$('qDose').value,water:$('qWater').value,bev:$('qBev').value,tds:$('qTds').value};save();
+  const d=calcRecord(q);$('qBevHint').innerHTML=Number.isFinite(d.autoBev)?`자동: 물량 − (${fmt(state.settings.absorption,1)} × 원두량) = ${fmt(d.autoBev,1)} g <span class="auto">AUTO</span>`:'자동 계산값 없음';
+  $('qEyOut').textContent=Number.isFinite(d.ey)?fmt(d.ey,2)+'%':'—';$('qTdsOut').textContent=Number.isFinite(d.tds)?fmt(d.tds,2)+'%':'—';$('qRatioOut').textContent=Number.isFinite(d.ratio)?'1 : '+fmt(d.ratio,2):'—';$('qSolidsOut').textContent=Number.isFinite(d.solids)?fmt(d.solids,3)+' g':'—';$('qBevOut').textContent=Number.isFinite(d.bev)?`${fmt(d.bev,1)} g · ${d.manualBev?'직접':'자동'}`:'—';
+  $('quickTargetLabel').textContent=`${state.settings.targetName}  |  EY ${fmt(state.settings.eyMin,1)}–${fmt(state.settings.eyMax,1)}% · TDS ${fmt(state.settings.tdsMin,2)}–${fmt(state.settings.tdsMax,2)}%`;
+  const st=statusForQuick(d),box=$('qStatus');box.style.display=quickFeedbackVisible()?'flex':'none';box.className='status '+st.cls;$('qStatusTitle').textContent=st.title;
+  const goal=state.quickGoal?`목표점 EY ${fmt(state.quickGoal.ey,2)}% / TDS ${fmt(state.quickGoal.tds,2)}% · `:'';
+  $('qStatusDesc').textContent='현재 측정값 기준 · '+goal+st.desc;
+  renderQuickHistory();
+}
+function renderQuickHistory(){
+  const wrap=$('qHistoryWrap'),list=$('qHistoryList');wrap.style.display=state.quickHistory.length?'block':'none';list.innerHTML='';
+  state.quickHistory.forEach((r,i)=>{const d=calcRecord(r),cl=classificationFor(d),f=quickFeedbackFor(d),row=document.createElement('div');row.className='quick-history-row';row.innerHTML=`<div class="quick-history-no">${i+1}차</div><div class="quick-history-body"><div class="record-metrics"><span class="pill">EY ${fmt(d.ey,2)}%</span><span class="pill">TDS ${fmt(d.tds,2)}%</span><span class="pill">1:${fmt(d.ratio,2)}</span><span class="pill ${cl.cls}">${esc(cl.label)}</span></div><div class="quick-history-sub">${fmt(d.dose,1)}g / ${fmt(d.water,1)}g · Beverage ${fmt(d.bev,1)}g${d.manualBev?'':' (auto)'}</div>${quickFeedbackVisible()?`<div class="feedback"><div><span class="arrow">${f.arrow}</span> <b>${esc(f.title)}</b></div><p>${esc(f.text)}</p><p class="rec">${esc(f.rec)}</p></div>`:''}</div><button class="btn danger small" data-qdel="${r.id}">삭제</button>`;list.appendChild(row)});
+  list.querySelectorAll('[data-qdel]').forEach(b=>b.onclick=()=>deleteQuickRecord(b.dataset.qdel));
+}
+function saveQuickResult(){const rec=liveQuickRecord(),d=calcRecord(rec);if(!pos(d.dose)||!pos(d.water)||!pos(d.tds)||!pos(d.bev)||!Number.isFinite(d.ey)){toast('저장할 측정값을 확인해 주세요');return}state.quickHistory.push({id:id(),dose:rec.dose,water:rec.water,bev:rec.bev?rec.bev:'',tds:rec.tds});save();selectedPointKey=null;renderQuick();renderChart();toast(`${state.quickHistory.length}차 추출 결과를 저장했습니다`)}
+function deleteQuickRecord(rid){const i=state.quickHistory.findIndex(r=>r.id===rid);if(i<0)return;state.quickHistory.splice(i,1);selectedPointKey=null;save();renderQuick();renderChart();toast('Quick 기록을 삭제했습니다')}
+$('qSaveResult').onclick=saveQuickResult;
+$('qClearHistory').onclick=()=>{if(!state.quickHistory.length)return;openDialog({title:'Quick 기록 전체 삭제',message:'저장된 Quick 추출 기록을 모두 삭제할까요?',confirmText:'전체 삭제',danger:true,onConfirm:()=>{state.quickHistory=[];selectedPointKey=null;save();renderQuick();renderChart();toast('Quick 기록을 모두 삭제했습니다')}})};
+['qDose','qWater','qBev','qTds'].forEach(x=>$(x).addEventListener('input',()=>{renderQuick();if(chartMode==='quick')renderChart()}));
+$('qReset').onclick=()=>{$('qDose').value=20;$('qWater').value=300;$('qBev').value='';$('qTds').value=1.53;renderQuick();if(chartMode==='quick')renderChart()};
+$('qGoChart').onclick=()=>{chartMode='quick';selectedPointKey=null;setChartModeButtons();showPage('chart')};
+
+function renderClassSession(){
+  ensureCurrentClass();ensureCurrentSession();const c=currentClass(),ss=currentSession();$('currentClassBadge').textContent=c?.name||'—';
+  const sel=$('classSessionSelect');sel.innerHTML=(c?.sessions||[]).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('');if(ss)sel.value=ss.id;
+  const created=ss?.createdAt?new Date(ss.createdAt):null;$('sessionMeta').textContent=created&&!Number.isNaN(created.getTime())?`생성 ${created.toLocaleDateString()}`:'';$('deleteClassSession').disabled=(c?.sessions?.length||0)<=1;
+}
+function resetClassUiAfterSwitch(){currentStudentId=currentClass()?.students?.[0]?.id||null;editingRecordId=null;editingTeacherFeedbackId=null;chartSelection={};selectedPointKey=null;initChartSelections();fillClassFormFromLast();$('sessionActions').classList.remove('show')}
+function switchClass(cid){if(!state.classes.some(c=>c.id===cid))return;state.activeClassId=cid;ensureCurrentSession();resetClassUiAfterSwitch();save();renderClass();renderSettings();renderChart();toast(`${currentClass().name}을 불러왔습니다`)}
+function createClass(name){const v=String(name||'').trim();if(!v){toast('새 반 이름을 입력해 주세요');return false}const ss=makeSession('기본 실습'),c={id:id(),name:v,students:[],excludedStudents:[],sessions:[ss],activeSessionId:ss.id};state.classes.push(c);state.activeClassId=c.id;resetClassUiAfterSwitch();save();renderClass();renderSettings();renderChart();toast(`${v} 반을 만들었습니다`);return true}
+function renameCurrentClass(name){const c=currentClass(),v=String(name||'').trim();if(!c)return false;if(!v){toast('반 이름을 입력해 주세요');return false}c.name=v;save();renderClass();renderSettings();renderChart();toast('반 이름을 변경했습니다');return true}
+function deleteCurrentClass(){const c=currentClass();if(!c)return;if(state.classes.length<=1){toast('마지막 반은 삭제할 수 없습니다');return}openDialog({title:'반 삭제',message:`${c.name} 반과 모든 실습·수강생·추출 기록·강사 피드백을 삭제할까요?`,confirmText:'반 삭제',danger:true,onConfirm:()=>{state.classes=state.classes.filter(x=>x.id!==c.id);state.activeClassId=state.classes[0].id;ensureCurrentSession();resetClassUiAfterSwitch();save();renderClass();renderSettings();renderChart();toast('반을 삭제했습니다')}})}
+function switchSession(sid){const c=currentClass();if(!c?.sessions?.some(s=>s.id===sid))return;c.activeSessionId=sid;resetClassUiAfterSwitch();save();renderClass();renderSettings();renderChart();toast(`${currentSession().name} 실습을 불러왔습니다`)}
+function createSession(name){const c=currentClass(),v=String(name||'').trim();if(!c||!v){toast('실습 이름을 입력해 주세요');return false}const ss=makeSession(v);c.sessions.push(ss);c.activeSessionId=ss.id;resetClassUiAfterSwitch();save();renderClass();renderSettings();renderChart();toast(`${v} 실습을 만들었습니다`);return true}
+function renameCurrentSession(name){const ss=currentSession(),v=String(name||'').trim();if(!ss)return false;if(!v){toast('실습 이름을 입력해 주세요');return false}ss.name=v;save();renderClass();renderSettings();renderChart();toast('실습 이름을 변경했습니다');return true}
+function deleteCurrentSession(){const c=currentClass(),ss=currentSession();if(!c||!ss)return;if(c.sessions.length<=1){toast('마지막 실습은 삭제할 수 없습니다');return}const count=Object.values(ss.records||{}).reduce((a,x)=>a+(Array.isArray(x)?x.length:0),0);openDialog({title:'실습 삭제',message:`${ss.name} 실습과 그 안의 추출 기록 ${count}개를 삭제할까요? 다른 실습과 수강생 명단은 유지됩니다.`,confirmText:'실습 삭제',danger:true,onConfirm:()=>{c.sessions=c.sessions.filter(x=>x.id!==ss.id);c.activeSessionId=c.sessions[0].id;resetClassUiAfterSwitch();save();renderClass();renderSettings();renderChart();toast('실습을 삭제했습니다')}})}
+$('classSessionSelect').onchange=e=>switchSession(e.target.value);
+$('newClassSession').onclick=()=>openDialog({title:'새 실습',message:'새 실습 이름을 입력하세요. 수강생 명단은 그대로 사용하고 기록은 1차부터 새로 시작합니다.',inputValue:'',placeholder:'예: 9/17 수율 조정',confirmText:'만들기',onConfirm:createSession});
+$('sessionMore').onclick=()=>$('sessionActions').classList.toggle('show');
+$('renameClassSession').onclick=()=>{const ss=currentSession();if(ss)openDialog({title:'실습 이름 변경',message:'새 실습 이름을 입력하세요.',inputValue:ss.name,confirmText:'변경',onConfirm:renameCurrentSession})};
+$('deleteClassSession').onclick=deleteCurrentSession;
+
+function renderStudentBar(){
+  const arr=students(),bar=$('studentBar');bar.innerHTML='';arr.forEach(s=>{const b=document.createElement('button');b.className='student-chip'+(s.id===currentStudentId?' active':'');b.textContent=s.name;b.onclick=()=>{currentStudentId=s.id;editingRecordId=null;editingTeacherFeedbackId=null;fillClassFormFromLast();renderClass()};bar.appendChild(b)});
+  $('classNoStudents').style.display=arr.length?'none':'block';$('classEntryPanel').style.display=arr.length?'block':'none';$('classRecordsPanel').style.display=arr.length?'block':'none';
+}
+function fillClassFormFromLast(){const s=currentStudent();if(!s){$('cDose').value=20;$('cWater').value=300;$('cBev').value='';$('cTds').value='';$('cNote').value='';updateClassBevHint();return}const arr=sessionRecords(s.id),last=arr[arr.length-1];$('cDose').value=last?.dose||20;$('cWater').value=last?.water||300;$('cBev').value='';$('cTds').value='';$('cNote').value='';updateClassBevHint()}
+function updateClassBevHint(){const a=autoBeverage(n($('cDose').value),n($('cWater').value));$('cBevHint').innerHTML=Number.isFinite(a)?`자동 ${fmt(a,1)} g <span class="auto">AUTO</span>`:'자동 계산값 없음'}
+['cDose','cWater'].forEach(x=>$(x).addEventListener('input',updateClassBevHint));
+function renderTeacherFeedback(r){
+  if(editingTeacherFeedbackId===r.id)return `<div class="teacher-feedback teacher-feedback-edit"><div class="teacher-feedback-head"><b>강사 피드백</b><span class="hint" style="margin:0">Ctrl/⌘+Enter 저장 · Esc 취소</span></div><textarea id="teacherFeedbackEditor" maxlength="400" placeholder="이 추출에 대해 강사가 남길 피드백">${esc(r.teacherFeedback||'')}</textarea><div class="actions"><button class="btn small" data-teacher-save="${r.id}">저장</button><button class="btn secondary small" data-teacher-cancel="${r.id}">취소</button></div></div>`;
+  const text=(r.teacherFeedback||'').trim();return `<div class="teacher-feedback"><div class="teacher-feedback-head"><b>강사 피드백</b><span class="hint" style="margin:0">클릭하여 편집</span></div><button class="teacher-feedback-view ${text?'':'empty'}" data-teacher-edit="${r.id}">${text?esc(text):'피드백을 입력하려면 여기를 클릭하세요.'}</button></div>`;
+}
+function renderClass(){
+  ensureCurrentClass();ensureCurrentSession();ensureCurrentStudent();renderClassSession();renderStudentBar();syncFeedbackControls();const s=currentStudent();if(!s)return;
+  const records=sessionRecords(s.id,true),ss=currentSession();ss.studentNames=ss.studentNames||{};ss.studentNames[s.id]=s.name;$('recordListTitle').textContent=`${s.name} · ${ss.name} · 추출 기록`;$('nextAttemptBadge').textContent=editingRecordId?`${records.findIndex(r=>r.id===editingRecordId)+1}차 수정`:`${records.length+1}차`;
+  $('classFormTitle').textContent=editingRecordId?'추출 기록 수정':'새 추출 기록';$('saveRecord').textContent=editingRecordId?'수정 저장':'추출 기록 추가';$('cancelEdit').style.display=editingRecordId?'inline-block':'none';
+  const list=$('recordList');list.innerHTML='';if(!records.length){list.innerHTML='<div class="empty">현재 실습에는 아직 기록이 없습니다.<br>첫 측정값을 입력하면 1차 기록이 만들어집니다.</div>';return}
+  records.forEach((r,i)=>{const d=calcRecord(r),f=classFeedbackFor(d),cl=classificationFor(d),card=document.createElement('div');card.className='record-card';card.innerHTML=`<div class="record-top"><div class="record-title"><div class="attempt-no">${i+1}</div><div class="record-main"><b>${esc(s.name)} · ${i+1}차</b><span>${fmt(d.dose,1)}g / ${fmt(d.water,1)}g · Beverage ${fmt(d.bev,1)}g${d.manualBev?'':' (auto)'}</span></div></div><div class="actions" style="margin:0"><button class="btn ghost small" data-edit="${r.id}">수정</button><button class="btn danger small" data-del="${r.id}">삭제</button></div></div><div class="record-metrics"><span class="pill">EY ${fmt(d.ey,2)}%</span><span class="pill">TDS ${fmt(d.tds,2)}%</span><span class="pill">1:${fmt(d.ratio,2)}</span><span class="pill ${cl.cls}">${esc(cl.label)}</span></div>${r.note?`<div class="note"><b>추출 노트</b>${esc(r.note)}</div>`:''}${renderTeacherFeedback(r)}${classFeedbackVisible()?`<div class="feedback"><div><span class="arrow">${f.arrow}</span> <b>${esc(f.title)}</b></div><p>${esc(f.text)}</p><p class="rec">${esc(f.rec)}</p></div>`:''}`;list.appendChild(card)});
+  list.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editRecord(b.dataset.edit));list.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>deleteRecord(b.dataset.del));
+  list.querySelectorAll('[data-teacher-edit]').forEach(b=>b.onclick=()=>{editingTeacherFeedbackId=b.dataset.teacherEdit;renderClass();requestAnimationFrame(()=>{const ta=$('teacherFeedbackEditor');if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)}})});
+  list.querySelectorAll('[data-teacher-save]').forEach(b=>b.onclick=()=>saveTeacherFeedback(b.dataset.teacherSave));list.querySelectorAll('[data-teacher-cancel]').forEach(b=>b.onclick=()=>{editingTeacherFeedbackId=null;renderClass()});
+  const ta=$('teacherFeedbackEditor');if(ta)ta.addEventListener('keydown',e=>{if(e.key==='Escape'){editingTeacherFeedbackId=null;renderClass()}else if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();saveTeacherFeedback(editingTeacherFeedbackId)}});
+}
+function saveTeacherFeedback(rid){const s=currentStudent(),r=sessionRecords(s?.id).find(x=>x.id===rid),ta=$('teacherFeedbackEditor');if(!r||!ta)return;r.teacherFeedback=ta.value.trim();editingTeacherFeedbackId=null;save();renderClass();renderChart();toast('강사 피드백을 저장했습니다')}
+function editRecord(rid){const s=currentStudent(),r=sessionRecords(s?.id).find(x=>x.id===rid);if(!r)return;editingRecordId=rid;editingTeacherFeedbackId=null;$('cDose').value=r.dose;$('cWater').value=r.water;$('cBev').value=r.bev??'';$('cTds').value=r.tds;$('cNote').value=r.note||'';updateClassBevHint();renderClass();$('classEntryPanel').scrollIntoView({behavior:'smooth',block:'start'})}
+function deleteRecord(rid){const s=currentStudent();if(!s)return;const records=sessionRecords(s.id),idx=records.findIndex(r=>r.id===rid);if(idx<0)return;openDialog({title:'추출 기록 삭제',message:`${idx+1}차 기록을 삭제할까요? 삭제 후 회차 번호는 자동으로 다시 매겨집니다.`,confirmText:'삭제',danger:true,onConfirm:()=>{records.splice(idx,1);editingRecordId=null;editingTeacherFeedbackId=null;save();initChartSelectionForStudent(s);renderClass();renderChart();renderSettingsSummaries();toast('기록을 삭제했습니다')}})}
+$('saveRecord').onclick=()=>{const s=currentStudent();if(!s)return;const records=sessionRecords(s.id,true),rec={dose:n($('cDose').value),water:n($('cWater').value),bev:$('cBev').value?n($('cBev').value):'',tds:n($('cTds').value),note:$('cNote').value.trim()};const d=calcRecord(rec);if(!pos(rec.dose)||!pos(rec.water)||!pos(rec.tds)||!pos(d.bev)){toast('원두량, 물량, TDS를 확인해 주세요');return}currentSession().studentNames=currentSession().studentNames||{};currentSession().studentNames[s.id]=s.name;if(editingRecordId){const i=records.findIndex(r=>r.id===editingRecordId);if(i>=0)records[i]={...records[i],...rec};editingRecordId=null;toast('수정했습니다')}else{records.push({id:id(),teacherFeedback:'',...rec});toast(`${records.length}차 기록을 추가했습니다`)}save();initChartSelectionForStudent(s,true);fillClassFormFromLast();renderClass();renderChart();renderSettingsSummaries()};
+$('cancelEdit').onclick=()=>{editingRecordId=null;fillClassFormFromLast();renderClass()};$('goStudentSettings').onclick=()=>{showPage('settings');$('studentSettings').open=true};$('goClassSettings').onclick=()=>{showPage('settings');$('classSettings').open=true};
+
+function syncFeedbackControls(){
+  $('qFeedbackToggle').checked=quickFeedbackVisible();$('classFeedbackToggle').checked=classFeedbackVisible();$('sQuickFeedback').checked=quickFeedbackVisible();$('sClassFeedback').checked=classFeedbackVisible();$('chartFeedbackToggle').checked=chartMode==='quick'?quickFeedbackVisible():classFeedbackVisible();
+}
+function setQuickFeedback(v){state.settings.showQuickFeedback=!!v;save();syncFeedbackControls();renderQuick();renderChart();renderSettingsSummaries()}
+function setClassFeedback(v){state.settings.showClassFeedback=!!v;save();syncFeedbackControls();renderClass();renderChart();renderSettingsSummaries()}
+$('qFeedbackToggle').onchange=e=>setQuickFeedback(e.target.checked);$('classFeedbackToggle').onchange=e=>setClassFeedback(e.target.checked);$('sQuickFeedback').onchange=e=>setQuickFeedback(e.target.checked);$('sClassFeedback').onchange=e=>setClassFeedback(e.target.checked);$('chartFeedbackToggle').onchange=e=>chartMode==='quick'?setQuickFeedback(e.target.checked):setClassFeedback(e.target.checked);
+
+function initChartSelectionForStudent(s,selectNew=false){if(!s)return;const records=sessionRecords(s.id);chartSelection[s.id]=chartSelection[s.id]||{};records.forEach(r=>{if(!(r.id in chartSelection[s.id]))chartSelection[s.id][r.id]=true});Object.keys(chartSelection[s.id]).forEach(rid=>{if(!records.some(r=>r.id===rid))delete chartSelection[s.id][rid]});if(selectNew&&records.length)chartSelection[s.id][records[records.length-1].id]=true}
+function initChartSelections(){sessionChartStudents().forEach(s=>initChartSelectionForStudent(s))}
+function setChartModeButtons(){
+  $('chartModeQuick').classList.toggle('active',chartMode==='quick');$('chartModeClass').classList.toggle('active',chartMode==='class');$('classFilterWrap').style.display=chartMode==='class'?'block':'none';$('quickGoalWrap').classList.toggle('show',chartMode==='quick');
+  if(chartMode==='quick'){$('chartFeedbackTitle').textContent='Quick 방향 가이드 표시';$('chartFeedbackDesc').textContent='목표점이 없으면 추출 타겟, 목표점이 있으면 지정 좌표로 가는 조정 방향을 표시합니다.'}else{$('chartFeedbackTitle').textContent='Class 자동 타겟 피드백 표시';$('chartFeedbackDesc').textContent='점 상세와 Hover에 추출 타겟 기준 조정 방향을 표시합니다. 강사 피드백과는 별개입니다.'}
+  syncFeedbackControls();
+}
+$('chartModeQuick').onclick=()=>{chartMode='quick';selectedPointKey=null;setChartModeButtons();renderChart()};$('chartModeClass').onclick=()=>{chartMode='class';selectedPointKey=null;setChartModeButtons();renderChart()};$('toggleFilter').onclick=()=>{$('filterPanel').classList.toggle('open')};
+function selectedClassPoints(){const out=[];sessionChartStudents().forEach((s,si)=>{initChartSelectionForStudent(s);sessionRecords(s.id).forEach((r,ri)=>{if(chartSelection[s.id]?.[r.id]){const d=calcRecord(r);if(Number.isFinite(d.ey)&&Number.isFinite(d.tds))out.push({...d,studentId:s.id,studentName:s.name,studentIndex:si,attempt:ri+1,key:s.id+'_'+r.id,note:r.note||'',teacherFeedback:r.teacherFeedback||''})}})});return out}
+function renderFilter(){
+  const p=$('filterPanel');p.innerHTML='';const actions=document.createElement('div');actions.className='filter-actions';actions.innerHTML='<button class="btn ghost small" data-fa="all">전체</button><button class="btn ghost small" data-fa="latest">각 학생 최근만</button><button class="btn ghost small" data-fa="none">전체 숨김</button>';p.appendChild(actions);
+  sessionChartStudents().forEach(s=>{initChartSelectionForStudent(s);const records=sessionRecords(s.id),box=document.createElement('div');box.className='filter-student';const checks=records.map((r,i)=>`<label class="checkchip"><input type="checkbox" data-sid="${s.id}" data-rid="${r.id}" ${chartSelection[s.id]?.[r.id]?'checked':''}>${i+1}차</label>`).join('');box.innerHTML=`<div class="filter-row"><span class="filter-name">${esc(s.name)}${s.current?'':' · 과거 명단'}</span>${checks||'<span class="hint">기록 없음</span>'}</div>`;p.appendChild(box)});
+  p.querySelectorAll('input[data-sid]').forEach(ch=>ch.onchange=()=>{chartSelection[ch.dataset.sid][ch.dataset.rid]=ch.checked;renderChart(false)});p.querySelectorAll('[data-fa]').forEach(b=>b.onclick=()=>{const mode=b.dataset.fa;sessionChartStudents().forEach(s=>{initChartSelectionForStudent(s);const records=sessionRecords(s.id);records.forEach((r,i)=>chartSelection[s.id][r.id]=mode==='all'||(mode==='latest'&&i===records.length-1))});renderChart()});$('filterSummary').textContent=`${currentClass()?.name||'—'} · ${currentSession()?.name||'—'} · ${selectedClassPoints().length}개 기록 표시 중`;
+}
+function signed(v,d=2){if(!Number.isFinite(v))return '—';const z=Math.abs(v)<.0000001?0:v;return `${z>0?'+':''}${z.toFixed(d)}`}
+function deltaForPoint(p){
+  let prev=null,label='';
+  if(chartMode==='quick'){
+    const hist=quickValidHistoryPoints();
+    if(p.isLive&&hist.length){prev=hist[hist.length-1];label=`vs ${prev.attempt}차`}
+    else if(p.attempt>1){prev=hist.find(x=>x.attempt===p.attempt-1)||null;label=`vs ${p.attempt-1}차`}
+  }else if(p.attempt>1){const raw=sessionRecords(p.studentId)[p.attempt-2];if(raw){prev=calcRecord(raw);label=`vs ${p.attempt-1}차`}}
+  if(!prev||!Number.isFinite(prev.ey)||!Number.isFinite(prev.tds))return null;
+  const dey=p.ey-prev.ey,dtds=p.tds-prev.tds;if(Math.abs(dey)<.005&&Math.abs(dtds)<.005)return null;
+  return {label,dey,dtds};
+}
+function deltaHtml(p){const d=deltaForPoint(p);return d?`<div class="tip-delta">${esc(d.label)} · ΔEY ${signed(d.dey,2)}%p · ΔTDS ${signed(d.dtds,2)}%p</div>`:''}
+function tooltipHtml(p){const f=chartFeedbackForPoint(p),cl=classificationFor(p),title=chartMode==='class'?`${esc(p.studentName)} · ${p.attempt}차`:(p.attempt?`Quick · ${p.attempt}차`:'Quick · 현재값'),showF=chartMode==='quick'?quickFeedbackVisible():classFeedbackVisible();return `<b>${title}</b><div>EY ${fmt(p.ey,2)}% · TDS ${fmt(p.tds,2)}% · 1:${fmt(p.ratio,2)}</div><div class="muted">${esc(cl.label)} · ${fmt(p.dose,1)}g / ${fmt(p.water,1)}g · Beverage ${fmt(p.bev,1)}g</div>${deltaHtml(p)}${p.note?`<div class="muted">노트 · ${esc(p.note)}</div>`:''}${p.teacherFeedback?`<div class="tip-teacher"><b>강사 피드백</b><br>${esc(p.teacherFeedback)}</div>`:''}${showF?`<div class="tip-feedback">${f.arrow} ${esc(f.title)} · ${esc(f.rec)}</div>`:''}`}
+function goalTooltipHtml(touch=false){if(!state.quickGoal)return '';return `<b>TARGET POINT</b><div>EY ${fmt(state.quickGoal.ey,2)}% · TDS ${fmt(state.quickGoal.tds,3)}%</div><div class="tip-action">${touch?'다시 탭하면 목표점 삭제':'클릭하면 목표점 삭제'}</div>`}
+function coordTooltipHtml(c){return `<b>좌표 미리보기</b><div>EY ${fmt(c.ey,2)}% · TDS ${fmt(c.tds,3)}%</div><div class="muted">클릭하면 목표점 지정</div>`}
+function showTooltipHtml(html,e,{pinned=false,type=null,key=null}={}){const tip=$('chartTooltip'),card=tip.closest('.chart-card'),r=card.getBoundingClientRect();tip.innerHTML=html;tip.classList.add('show');chartTooltipPinned=pinned;chartTooltipType=type;chartTooltipKey=key;let x=e.clientX-r.left,y=e.clientY-r.top;tip.style.left=x+'px';tip.style.top=y+'px';requestAnimationFrame(()=>positionTooltip(x,y,r))}
+function showChartTooltip(p,e,pinned=false){showTooltipHtml(tooltipHtml(p),e,{pinned,type:'point',key:p.key})}
+function showGoalTooltip(e,pinned=false){showTooltipHtml(goalTooltipHtml(pinned),e,{pinned,type:'goal',key:'quick_goal'})}
+function showCoordTooltip(c,e){showTooltipHtml(coordTooltipHtml(c),e,{pinned:false,type:'coord',key:null})}
+function positionTooltip(x,y,r){const tip=$('chartTooltip'),tr=tip.getBoundingClientRect();let lx=x,ty=y;if(tr.right>r.right-8)lx=Math.max(8,x-tr.width-24);if(tr.bottom>r.bottom-8)ty=Math.max(8,y-tr.height-24);tip.style.left=lx+'px';tip.style.top=ty+'px'}
+function moveChartTooltip(e){const tip=$('chartTooltip');if(!tip.classList.contains('show')||chartTooltipPinned)return;const card=tip.closest('.chart-card'),r=card.getBoundingClientRect();let x=e.clientX-r.left,y=e.clientY-r.top;tip.style.left=x+'px';tip.style.top=y+'px';positionTooltip(x,y,r)}
+function hideChartTooltip(force=false){if(chartTooltipPinned&&!force)return;$('chartTooltip').classList.remove('show');chartTooltipPinned=false;chartTooltipType=null;chartTooltipKey=null}
+function touchLike(){return lastPointerType==='touch'||lastPointerType==='pen'}
+function chartCoordsFromClient(clientX,clientY){const svg=$('chartSvg'),r=svg.getBoundingClientRect(),W=820,H=850,m={l:82,r:34,t:48,b:86},sx=(clientX-r.left)/r.width*W,sy=(clientY-r.top)/r.height*H;if(sx<m.l||sx>W-m.r||sy<m.t||sy>H-m.b)return null;const b=chartBounds();return {ey:b.xmin+(sx-m.l)/(W-m.l-m.r)*(b.xmax-b.xmin),tds:b.ymax-(sy-m.t)/(H-m.t-m.b)*(b.ymax-b.ymin)}}
+function renderQuickGoalControl(){
+  const txt=$('quickGoalText'),btn=$('clearQuickGoal');if(state.quickGoal){txt.innerHTML=`<span class="goal-key"></span>목표점 EY <b>${fmt(state.quickGoal.ey,2)}%</b> · TDS <b>${fmt(state.quickGoal.tds,2)}%</b> · 현재 측정값을 우선해 점선 화살표로 연결합니다.`;btn.style.display='inline-block'}else{txt.innerHTML='<span class="chart-click-hint">차트의 원하는 위치를 클릭</span>하면 목표점을 지정할 수 있습니다. 목표점이 없으면 추출 타겟으로 가이드합니다.';btn.style.display='none'}
+}
+$('clearQuickGoal').onclick=()=>{state.quickGoal=null;selectedPointKey=null;save();renderQuick();renderChart();toast('Quick 목표점을 지웠습니다')};
+function updateChartContext(){const name=(state.quickMeta?.name||'').trim();$('chartTitle').textContent='Brewing Control Chart';$('chartContext').textContent=chartMode==='quick'?(name?`${name} · X = Extraction Yield · Y = TDS`:'Quick · X = Extraction Yield · Y = TDS'):`${currentClass()?.name||'Class'} · ${currentSession()?.name||'실습'} · X = Extraction Yield · Y = TDS`}
+function renderChart(rebuildFilter=true){
+  setChartModeButtons();renderQuickGoalControl();if(rebuildFilter&&chartMode==='class')renderFilter();else if(chartMode==='class')$('filterSummary').textContent=`${currentClass()?.name||'—'} · ${currentSession()?.name||'—'} · ${selectedClassPoints().length}개 기록 표시 중`;
+  const pts=chartMode==='quick'?quickChartPoints():selectedClassPoints();
+  updateChartContext();
+  if(chartMode==='quick'){const live=pts.find(p=>p.isLive),saved=pts.filter(p=>!p.isLive).length;$('chartBadge').textContent=live?`${saved} saved · LIVE ${fmt(live.ey,2)}% · ${fmt(live.tds,2)}%`:`${saved} saved`}else $('chartBadge').textContent=`${pts.length} points`;
+  drawChart(pts);renderChartLegend(pts);renderChartDetail(pts.find(p=>p.key===selectedPointKey)||null);
+}
+function chartBounds(){const s=state.settings;return{xmin:s.chartEyMin,xmax:s.chartEyMax,ymin:s.chartTdsMin,ymax:s.chartTdsMax,xstep:s.chartEyStep,ystep:s.chartTdsStep}}
+function tickValues(min,max,step){const vals=[];if(!(step>0))return vals;const start=Math.ceil((min-1e-9)/step)*step;for(let v=start,count=0;v<=max+1e-9&&count<60;v+=step,count++)vals.push(+v.toFixed(6));return vals}
+function addArrowTriangle(add,x1,y1,x2,y2,color,opacity=.88){const dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy);if(len<28)return;const t=.56,cx=x1+dx*t,cy=y1+dy*t,ux=dx/len,uy=dy/len,px=-uy,py=ux,size=8;const tip=[cx+ux*size,cy+uy*size],base1=[cx-ux*size*.7+px*size*.65,cy-uy*size*.7+py*size*.65],base2=[cx-ux*size*.7-px*size*.65,cy-uy*size*.7-py*size*.65];add('polygon',{points:`${tip[0]},${tip[1]} ${base1[0]},${base1[1]} ${base2[0]},${base2[1]}`,fill:color,opacity,stroke:'#fff','stroke-width':1})}
+function drawChart(pts){
+  hideChartTooltip(true);const svg=$('chartSvg');svg.innerHTML='';svg.style.cursor=chartMode==='quick'?'crosshair':'default';const NS='http://www.w3.org/2000/svg';const add=(tag,a={},text='')=>{const e=document.createElementNS(NS,tag);Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v));if(text)e.textContent=text;svg.appendChild(e);return e};
+  const W=820,H=850,m={l:82,r:34,t:48,b:86},b=chartBounds(),plotW=W-m.l-m.r,plotH=H-m.t-m.b,X=x=>m.l+(x-b.xmin)/(b.xmax-b.xmin)*plotW,Y=y=>H-m.b-(y-b.ymin)/(b.ymax-b.ymin)*plotH,s=state.settings;
+  add('rect',{x:0,y:0,width:W,height:H,fill:'#fff'});add('rect',{x:m.l,y:m.t,width:plotW,height:plotH,fill:'#fffdfb',stroke:'#d9d1c8','stroke-width':1});
+  const xl=X(b.xmin),xa=X(s.eyMin),xb=X(s.eyMax),xr=X(b.xmax),yt=Y(b.ymax),ya=Y(s.tdsMax),yb=Y(s.tdsMin),yd=Y(b.ymin);
+
+  // Semantic background bands: vertical strength bands + horizontal extraction bands.
+  // Corner regions are intentionally created by overlapping the two meanings.
+  const bands=[
+    [m.l,m.t,plotW,Math.max(0,Math.min(H-m.b,ya)-m.t),CHART_BAND_COLORS.strong,.15],
+    [m.l,Math.max(m.t,yb),plotW,Math.max(0,(H-m.b)-Math.max(m.t,yb)),CHART_BAND_COLORS.weak,.15],
+    [m.l,m.t,Math.max(0,Math.min(W-m.r,xa)-m.l),plotH,CHART_BAND_COLORS.under,.12],
+    [Math.max(m.l,xb),m.t,Math.max(0,(W-m.r)-Math.max(m.l,xb)),plotH,CHART_BAND_COLORS.over,.12]
+  ];
+  bands.forEach(([x,y,w,h,color,opacity])=>{if(w>0&&h>0)add('rect',{x,y,width:w,height:h,fill:color,opacity})});
+
+  const zones=[
+    [xl,yt,xa-xl,ya-yt,'STRONG · UNDER'],[xa,yt,xb-xa,ya-yt,'STRONG'],[xb,yt,xr-xb,ya-yt,'STRONG · OVER'],
+    [xl,ya,xa-xl,yb-ya,'UNDER'],[xb,ya,xr-xb,yb-ya,'OVER'],
+    [xl,yb,xa-xl,yd-yb,'WEAK · UNDER'],[xa,yb,xb-xa,yd-yb,'WEAK'],[xb,yb,xr-xb,yd-yb,'WEAK · OVER']
+  ];
+  zones.forEach(([x,y,w,h,label])=>{const xx=Math.max(m.l,x),yy=Math.max(m.t,y),rr=Math.min(W-m.r,x+w),bb=Math.min(H-m.b,y+h),cw=rr-xx,ch=bb-yy;if(cw<=0||ch<=0)return;if(cw>78&&ch>38)add('text',{x:xx+cw/2,y:yy+ch/2+4,'text-anchor':'middle','font-size':10,'font-weight':900,fill:'#6f6660',opacity:.68},label)});
+
+  const tx1=Math.max(m.l,X(s.eyMin)),tx2=Math.min(W-m.r,X(s.eyMax)),ty1=Math.max(m.t,Y(s.tdsMax)),ty2=Math.min(H-m.b,Y(s.tdsMin));if(tx2>tx1&&ty2>ty1)add('rect',{x:tx1,y:ty1,width:tx2-tx1,height:ty2-ty1,fill:CHART_TARGET_COLOR,opacity:.78,rx:5});
+  const xMajor=tickValues(b.xmin,b.xmax,b.xstep),yMajor=tickValues(b.ymin,b.ymax,b.ystep),xMinor=tickValues(b.xmin,b.xmax,b.xstep/2),yMinor=tickValues(b.ymin,b.ymax,b.ystep/2);
+  xMinor.forEach(x=>{if(xMajor.some(v=>Math.abs(v-x)<1e-6))return;add('line',{x1:X(x),y1:m.t,x2:X(x),y2:H-m.b,stroke:'#eee9e3','stroke-width':1})});yMinor.forEach(y=>{if(yMajor.some(v=>Math.abs(v-y)<1e-6))return;add('line',{x1:m.l,y1:Y(y),x2:W-m.r,y2:Y(y),stroke:'#eee9e3','stroke-width':1})});
+  xMajor.forEach(x=>{add('line',{x1:X(x),y1:m.t,x2:X(x),y2:H-m.b,stroke:'#d4cec7','stroke-width':1.15});add('text',{x:X(x),y:H-m.b+27,'text-anchor':'middle','font-size':12,fill:'#554f49'},trimNum(x,2))});yMajor.forEach(y=>{add('line',{x1:m.l,y1:Y(y),x2:W-m.r,y2:Y(y),stroke:'#d4cec7','stroke-width':1.15});add('text',{x:m.l-12,y:Y(y)+4,'text-anchor':'end','font-size':12,fill:'#554f49'},Number(y).toFixed(Math.max(2,(String(s.chartTdsStep).split('.')[1]||'').length)))});
+  const a=s.absorption;for(let r=s.ratioMin,count=0;r<=s.ratioMax+1e-9&&count<50;r+=s.ratioStep,count++){const den=r-a;if(den<=0)continue;const x1=Math.max(b.xmin,b.ymin*den),x2=Math.min(b.xmax,b.ymax*den);if(x2<=x1)continue;const y1=x1/den,y2=x2/den;add('line',{x1:X(x1),y1:Y(y1),x2:X(x2),y2:Y(y2),stroke:CHART_RATIO_COLOR,'stroke-width':1.45,opacity:.72});const ratioLabel=`1:${trimNum(r,1)}`;if(Math.abs(y2-b.ymax)<.015)add('text',{x:X(x2),y:m.t-8,'text-anchor':'middle','font-size':8.5,fill:CHART_RATIO_COLOR,'font-weight':850},ratioLabel);else add('text',{x:W-m.r+5,y:Y(y2)+3,'text-anchor':'start','font-size':8.5,fill:CHART_RATIO_COLOR,'font-weight':850},ratioLabel)}
+  add('line',{x1:m.l,y1:H-m.b,x2:W-m.r,y2:H-m.b,stroke:'#332f2b','stroke-width':2});add('line',{x1:m.l,y1:m.t,x2:m.l,y2:H-m.b,stroke:'#332f2b','stroke-width':2});
+  add('text',{x:m.l+plotW/2,y:H-25,'text-anchor':'middle','font-size':16,'font-weight':950,fill:'#312d29'},'EXTRACTION YIELD (%)');add('text',{x:25,y:m.t+plotH/2,'text-anchor':'middle','font-size':16,'font-weight':950,fill:'#312d29',transform:`rotate(-90 25 ${m.t+plotH/2})`},'STRENGTH · TDS (%)');
+  const targetCx=(X(s.eyMin)+X(s.eyMax))/2,targetCy=(Y(s.tdsMin)+Y(s.tdsMax))/2;if(targetCx>m.l&&targetCx<W-m.r&&targetCy>m.t&&targetCy<H-m.b)add('text',{x:targetCx,y:targetCy+5,'text-anchor':'middle','font-size':15,'font-weight':900,'letter-spacing':'.8px',fill:'#5e4922'},'TARGET');
+  if(chartMode==='class'){
+    sessionChartStudents().forEach((stu,si)=>{const p=pts.filter(x=>x.studentId===stu.id).sort((a,b)=>a.attempt-b.attempt),color=COLORS[si%COLORS.length];for(let i=0;i<p.length-1;i++){const q1=p[i],q2=p[i+1],x1=X(q1.ey),y1=Y(q1.tds),x2=X(q2.ey),y2=Y(q2.tds);if([x1,y1,x2,y2].every(Number.isFinite)){add('line',{x1,y1,x2,y2,stroke:color,'stroke-width':2.5,opacity:.78});addArrowTriangle(add,x1,y1,x2,y2,color)}}});
+  }else{
+    const hist=pts.filter(p=>!p.isLive).sort((a,b)=>a.attempt-b.attempt),live=pts.find(p=>p.isLive);
+    for(let i=0;i<hist.length-1;i++){const q1=hist[i],q2=hist[i+1],x1=X(q1.ey),y1=Y(q1.tds),x2=X(q2.ey),y2=Y(q2.tds);add('line',{x1,y1,x2,y2,stroke:COLORS[0],'stroke-width':2.5,opacity:.8});addArrowTriangle(add,x1,y1,x2,y2,COLORS[0])}
+    if(hist.length&&live){const last=hist[hist.length-1],x1=X(last.ey),y1=Y(last.tds),x2=X(live.ey),y2=Y(live.tds),len=Math.hypot(x2-x1,y2-y1);if(len>=6){add('line',{x1,y1,x2,y2,stroke:COLORS[0],'stroke-width':1.9,'stroke-dasharray':'6 6',opacity:.48});addArrowTriangle(add,x1,y1,x2,y2,COLORS[0],.58)}}
+  }
+  if(chartMode==='quick'&&state.quickGoal){const source=quickGoalGuideSource(),x2=X(state.quickGoal.ey),y2=Y(state.quickGoal.tds);if(source){const x1=X(source.ey),y1=Y(source.tds);if([x1,y1,x2,y2].every(Number.isFinite)){add('line',{x1,y1,x2,y2,stroke:GOAL_COLOR,'stroke-width':2.2,'stroke-dasharray':'7 6',opacity:.86});addArrowTriangle(add,x1,y1,x2,y2,GOAL_COLOR,.95)}}if(x2>=m.l&&x2<=W-m.r&&y2>=m.t&&y2<=H-m.b){const gg=add('g',{'data-goal':'1',style:'cursor:pointer'}),hit=document.createElementNS(NS,'circle');Object.entries({cx:x2,cy:y2,r:22,fill:'transparent'}).forEach(([k,v])=>hit.setAttribute(k,v));gg.appendChild(hit);const outer=document.createElementNS(NS,'circle');Object.entries({cx:x2,cy:y2,r:10,fill:'#fff',stroke:GOAL_COLOR,'stroke-width':3}).forEach(([k,v])=>outer.setAttribute(k,v));gg.appendChild(outer);const inner=document.createElementNS(NS,'circle');Object.entries({cx:x2,cy:y2,r:3.2,fill:GOAL_COLOR}).forEach(([k,v])=>inner.setAttribute(k,v));gg.appendChild(inner);const label=document.createElementNS(NS,'text');Object.entries({x:x2+13,y:y2-12,'font-size':9,'font-weight':900,fill:GOAL_COLOR}).forEach(([k,v])=>label.setAttribute(k,v));label.textContent='GOAL';gg.appendChild(label);gg.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')showGoalTooltip(e,false)});gg.addEventListener('pointermove',e=>{if(e.pointerType==='mouse')moveChartTooltip(e)});gg.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')hideChartTooltip()});gg.addEventListener('click',e=>{e.stopPropagation();if(touchLike()){if(chartTooltipPinned){if(chartTooltipType==='goal'){state.quickGoal=null;selectedPointKey=null;hideChartTooltip(true);save();renderQuick();renderChart();toast('Quick 목표점을 지웠습니다')}else hideChartTooltip(true);return}showGoalTooltip(e,true);return}state.quickGoal=null;selectedPointKey=null;hideChartTooltip(true);save();renderQuick();renderChart();toast('Quick 목표점을 지웠습니다')})}}
+  const outside=pts.filter(p=>p.ey<b.xmin||p.ey>b.xmax||p.tds<b.ymin||p.tds>b.ymax);const goalOutside=chartMode==='quick'&&state.quickGoal&&(state.quickGoal.ey<b.xmin||state.quickGoal.ey>b.xmax||state.quickGoal.tds<b.ymin||state.quickGoal.tds>b.ymax);const warning=$('chartWarning');if(outside.length||goalOutside){warning.textContent=`${outside.length?outside.length+'개 측정값':''}${outside.length&&goalOutside?' · ':''}${goalOutside?'목표점':''}이 현재 차트 표시 범위 밖에 있습니다. 설정 → 차트 설정에서 범위를 조정할 수 있습니다.`;warning.classList.add('show')}else{warning.textContent='';warning.classList.remove('show')}
+  const renderPts=chartMode==='quick'?[...pts.filter(p=>p.isLive),...pts.filter(p=>!p.isLive)]:pts;
+  renderPts.forEach(p=>{const color=chartMode==='quick'?(p.isLive?LIVE_COLOR:COLORS[0]):COLORS[p.studentIndex%COLORS.length],px=X(p.ey),py=Y(p.tds);if(px<m.l||px>W-m.r||py<m.t||py>H-m.b)return;const g=add('g',{'data-key':p.key,style:'cursor:pointer'}),hit=document.createElementNS(NS,'circle');Object.entries({cx:px,cy:py,r:17,fill:'transparent'}).forEach(([k,v])=>hit.setAttribute(k,v));g.appendChild(hit);const c=document.createElementNS(NS,'circle');Object.entries({cx:px,cy:py,r:selectedPointKey===p.key?10.5:8.5,fill:color,stroke:'#fff','stroke-width':3}).forEach(([k,v])=>c.setAttribute(k,v));g.appendChild(c);if(chartMode==='class'||(chartMode==='quick'&&p.attempt)){const tx=document.createElementNS(NS,'text');Object.entries({x:px,y:py+3.5,'text-anchor':'middle','font-size':8.3,'font-weight':950,fill:'#fff'}).forEach(([k,v])=>tx.setAttribute(k,v));tx.textContent=String(p.attempt);g.appendChild(tx)}g.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')showChartTooltip(p,e,false)});g.addEventListener('pointermove',e=>{if(e.pointerType==='mouse')moveChartTooltip(e)});g.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')hideChartTooltip()});g.addEventListener('click',e=>{e.stopPropagation();if(touchLike()){if(chartTooltipPinned){hideChartTooltip(true);return}selectedPointKey=p.key;renderChartDetail(p);showChartTooltip(p,e,true);return}selectedPointKey=p.key;renderChartDetail(p);drawChart(pts)})});
+}
+$('chartSvg').addEventListener('pointerdown',e=>{lastPointerType=e.pointerType||'mouse'});
+$('chartSvg').addEventListener('pointermove',e=>{if(chartMode!=='quick'||e.pointerType!=='mouse'||chartTooltipPinned)return;if(e.target.closest?.('[data-key],[data-goal]'))return;const c=chartCoordsFromClient(e.clientX,e.clientY);if(c)showCoordTooltip(c,e);else hideChartTooltip()});
+$('chartSvg').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')hideChartTooltip()});
+$('chartSvg').addEventListener('click',e=>{if(chartMode!=='quick')return;if(e.target.closest?.('[data-key],[data-goal]'))return;if(touchLike()&&chartTooltipPinned){hideChartTooltip(true);return}const c=chartCoordsFromClient(e.clientX,e.clientY);if(!c)return;state.quickGoal={ey:+c.ey.toFixed(2),tds:+c.tds.toFixed(3)};selectedPointKey=null;save();renderQuick();renderChart();if(!touchLike())toast(`목표점 EY ${fmt(state.quickGoal.ey,2)}% · TDS ${fmt(state.quickGoal.tds,2)}%`)});
+function renderChartLegend(pts){const l=$('chartLegend');let html=`<span><i style="background:${CHART_TARGET_COLOR}"></i>${esc(state.settings.targetName)}</span>`;if(chartMode==='quick'){if(pts.some(p=>!p.isLive))html+='<span><i style="background:#3157d5;border-radius:50%"></i>저장 기록</span>';if(pts.some(p=>p.isLive))html+=`<span><i style="background:${LIVE_COLOR};border-radius:50%"></i>현재값</span>`;if(state.quickGoal)html+=`<span><i style="background:#fff;border:2px solid ${GOAL_COLOR};border-radius:50%"></i>목표점</span>`}else sessionChartStudents().forEach((s,i)=>{if(pts.some(p=>p.studentId===s.id))html+=`<span><i style="background:${COLORS[i%COLORS.length]};border-radius:50%"></i>${esc(s.name)}</span>`});l.innerHTML=html}
+function renderChartDetail(p){const box=$('chartDetail');if(!p){box.classList.remove('show');box.innerHTML='';return}const f=chartFeedbackForPoint(p),cl=classificationFor(p),showF=chartMode==='quick'?quickFeedbackVisible():classFeedbackVisible(),title=chartMode==='class'?`${esc(p.studentName)} · ${p.attempt}차`:(p.attempt?`Quick · ${p.attempt}차`:'Quick · 현재값'),d=deltaForPoint(p);box.classList.add('show');box.innerHTML=`<h3>${title} — EY ${fmt(p.ey,2)}% / TDS ${fmt(p.tds,2)}% / 1:${fmt(p.ratio,2)} · ${esc(cl.label)}</h3><p>${fmt(p.dose,1)}g / ${fmt(p.water,1)}g · Beverage ${fmt(p.bev,1)}g${p.note?` · 노트: ${esc(p.note)}`:''}</p>${d?`<p><b>${esc(d.label)}</b> · ΔEY ${signed(d.dey,2)}%p · ΔTDS ${signed(d.dtds,2)}%p</p>`:''}${p.teacherFeedback?`<p class="teacher-line"><b>강사 피드백</b> · ${esc(p.teacherFeedback)}</p>`:''}${showF?`<p><b>${f.arrow} ${esc(f.title)}</b> · ${esc(f.text)} ${esc(f.rec)}</p>`:''}`}
+
+
+function chartExportTitle(){const name=(state.quickMeta?.name||'').trim();if(chartMode==='quick')return name||'Quick Brewing Control Chart';return `${currentClass()?.name||'Class'} · ${currentSession()?.name||'실습'}`}
+function chartExportSubtitle(){return chartMode==='quick'?'Quick · Coffee Brewing Control':'Class · Coffee Brewing Control'}
+function chartLegendItems(pts){const items=[{label:state.settings.targetName,color:CHART_TARGET_COLOR,kind:'box'}];if(chartMode==='quick'){if(pts.some(p=>!p.isLive))items.push({label:'저장 기록',color:COLORS[0],kind:'dot'});if(pts.some(p=>p.isLive))items.push({label:'현재값',color:LIVE_COLOR,kind:'dot'});if(state.quickGoal)items.push({label:'목표점',color:GOAL_COLOR,kind:'ring'})}else sessionChartStudents().forEach((st,i)=>{if(pts.some(p=>p.studentId===st.id))items.push({label:st.name,color:COLORS[i%COLORS.length],kind:'dot'})});return items}
+function safeFilename(s){return String(s||'brew-control-chart').trim().replace(/[\\/:*?"<>|]+/g,'-').replace(/\s+/g,' ').slice(0,70)||'brew-control-chart'}
+function svgDataUrl(svgText){return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svgText)}
+function dataUrlToBlob(dataUrl){const [head,data]=dataUrl.split(','),mime=(head.match(/data:([^;]+)/)||[])[1]||'image/png';if(head.includes(';base64')){const bin=atob(data),arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);return new Blob([arr],{type:mime})}return new Blob([decodeURIComponent(data)],{type:mime})}
+function renderInlineChartPreview(){
+  const host=$('chartSvgPreview'),clone=$('chartSvg').cloneNode(true);clone.removeAttribute('style');clone.setAttribute('xmlns','http://www.w3.org/2000/svg');clone.style.width='100%';clone.style.height='auto';host.innerHTML='';host.appendChild(clone);host.classList.add('show');$('chartImagePreview').classList.add('hidden');$('chartImagePreview').removeAttribute('src')
+}
+async function buildChartPng(){
+  const pts=chartMode==='quick'?quickChartPoints():selectedClassPoints(),oldSel=selectedPointKey;hideChartTooltip(true);selectedPointKey=null;drawChart(pts);
+  const cloneSvg=$('chartSvg').cloneNode(true);cloneSvg.setAttribute('xmlns','http://www.w3.org/2000/svg');const svgText=new XMLSerializer().serializeToString(cloneSvg);selectedPointKey=oldSel;drawChart(pts);
+  const img=new Image(),src=svgDataUrl(svgText);
+  await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error('svg-rasterize'));img.src=src});
+  const scale=2,W=820*scale,chartH=850*scale,headerH=128*scale,legendH=150*scale,canvas=document.createElement('canvas');canvas.width=W;canvas.height=headerH+chartH+legendH;const ctx=canvas.getContext('2d');if(!ctx)throw new Error('canvas');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#2b2722';ctx.font=`900 ${28*scale}px system-ui,-apple-system,sans-serif`;ctx.fillText(chartExportTitle(),34*scale,45*scale);ctx.fillStyle='#766e66';ctx.font=`600 ${12*scale}px system-ui,-apple-system,sans-serif`;ctx.fillText(chartExportSubtitle(),34*scale,70*scale);ctx.fillText(`Target · EY ${fmt(state.settings.eyMin,1)}–${fmt(state.settings.eyMax,1)}% · TDS ${fmt(state.settings.tdsMin,2)}–${fmt(state.settings.tdsMax,2)}%`,34*scale,92*scale);
+  ctx.drawImage(img,0,headerH,W,chartH);
+  const items=chartLegendItems(pts);let ly=headerH+chartH+35*scale,x=34*scale;ctx.font=`700 ${11*scale}px system-ui,-apple-system,sans-serif`;items.forEach(it=>{const labelW=ctx.measureText(it.label).width,need=22*scale+labelW+28*scale;if(x+need>W-34*scale){x=34*scale;ly+=28*scale}ctx.save();if(it.kind==='ring'){ctx.fillStyle='#fff';ctx.strokeStyle=it.color;ctx.lineWidth=2.5*scale;ctx.beginPath();ctx.arc(x+6*scale,ly-4*scale,5*scale,0,Math.PI*2);ctx.fill();ctx.stroke()}else if(it.kind==='dot'){ctx.fillStyle=it.color;ctx.beginPath();ctx.arc(x+6*scale,ly-4*scale,5*scale,0,Math.PI*2);ctx.fill()}else{ctx.fillStyle=it.color;ctx.fillRect(x,ly-10*scale,12*scale,12*scale)}ctx.restore();ctx.fillStyle='#5f554c';ctx.fillText(it.label,x+18*scale,ly);x+=need});
+  const dataUrl=canvas.toDataURL('image/png');if(!dataUrl||dataUrl==='data:,')throw new Error('png-data');let blob=null;try{blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('png-blob')),'image/png'))}catch(e){blob=dataUrlToBlob(dataUrl)}return {blob,dataUrl,filename:`${safeFilename(chartExportTitle())}.png`}
+}
+function clearPendingChartImage(){pendingChartImageBlob=null;pendingChartImageFilename='';pendingChartImageUrl=''}
+async function prepareChartImage(){
+  clearPendingChartImage();renderInlineChartPreview();$('chartImageModalTitle').textContent=chartExportTitle();
+  const built=await buildChartPng();pendingChartImageBlob=built.blob;pendingChartImageFilename=built.filename;pendingChartImageUrl=built.dataUrl;$('chartImagePreview').src=built.dataUrl;$('chartImagePreview').classList.remove('hidden');$('chartSvgPreview').classList.remove('show');return built
+}
+function openChartImagePreview(message='차트 이미지를 만들었습니다.'){updateChartImageInfo();renderInlineChartPreview();$('chartImageModalTitle').textContent=chartExportTitle();$('chartImageModalMessage').textContent=message;$('chartImageModal').classList.add('open');$('chartImageModal').setAttribute('aria-hidden','false');if(pendingChartImageUrl){$('chartImagePreview').src=pendingChartImageUrl;$('chartImagePreview').classList.remove('hidden');$('chartSvgPreview').classList.remove('show')}}
+function setChartImageMessage(message){$('chartImageModalMessage').textContent=message}
+function updateChartImageInfo(){const info=$('chartImageInfo');if(!info)return;info.textContent=location.protocol==='content:'?'Android 로컬 파일에서는 브라우저 정책상 버튼으로 이미지 클립보드 쓰기가 제한됩니다. 미리보기 이미지를 길게 눌러 ‘이미지 복사’를 선택하세요.':'PNG가 표시되면 복사·저장·공유할 수 있습니다. 브라우저가 이미지 클립보드 쓰기를 제한하면 이미지를 길게 눌러 복사할 수 있습니다.'}
+function closeChartImagePreview(){$('chartImageModal').classList.remove('open');$('chartImageModal').setAttribute('aria-hidden','true');clearPendingChartImage();$('chartImagePreview').classList.add('hidden');$('chartImagePreview').removeAttribute('src');$('chartSvgPreview').innerHTML='';$('chartSvgPreview').classList.remove('show')}
+async function ensureChartImage(forceFresh=false){if(forceFresh)clearPendingChartImage();if(pendingChartImageUrl&&pendingChartImageBlob)return true;try{await prepareChartImage();return true}catch(e){openChartImagePreview('이 환경에서는 PNG 변환이 제한되었습니다. 차트 자체는 아래 미리보기에서 확인할 수 있습니다.');toast('PNG 변환이 제한되었습니다 · 차트 미리보기를 표시합니다');return false}}
+function clipboardImageCapability(){if(!window.isSecureContext)return 'secure';if(!navigator.clipboard||typeof navigator.clipboard.write!=='function')return 'api';if(!window.ClipboardItem)return 'item';return 'ok'}
+async function copyPendingChartImage(){
+  if(!pendingChartImageBlob){setChartImageMessage('복사할 PNG가 없습니다.');return false}
+  if(location.protocol==='content:'){setChartImageMessage('이미지를 길게 눌러 ‘이미지 복사’를 선택하세요.');updateChartImageInfo();return false}
+  const cap=clipboardImageCapability();if(cap!=='ok'){setChartImageMessage('이 브라우저에서는 버튼 이미지 복사가 제한됩니다. 미리보기 이미지를 길게 눌러 복사하세요.');return false}
+  try{await navigator.clipboard.write([new ClipboardItem({'image/png':pendingChartImageBlob})]);setChartImageMessage('차트 이미지를 클립보드에 복사했습니다.');toast('차트 이미지를 클립보드에 복사했습니다');return true}catch(e){setChartImageMessage('브라우저가 이미지 클립보드 쓰기를 허용하지 않았습니다. 미리보기 이미지를 길게 눌러 ‘이미지 복사’를 사용하세요.');return false}
+}
+async function copyChartImage(forceFresh=false){
+  if(forceFresh){const ok=await ensureChartImage(true);if(!ok)return false;return copyPendingChartImage()}
+  return copyPendingChartImage()
+}
+async function saveChartImage(forceFresh=false){const ok=await ensureChartImage(forceFresh);if(!ok)return false;try{if(window.isSecureContext&&typeof window.showSaveFilePicker==='function'){try{const handle=await window.showSaveFilePicker({suggestedName:pendingChartImageFilename,types:[{description:'PNG image',accept:{'image/png':['.png']}}]});const writable=await handle.createWritable();await writable.write(pendingChartImageBlob);await writable.close();setChartImageMessage('차트 PNG를 저장했습니다.');toast('차트 PNG를 저장했습니다');return true}catch(e){if(e?.name==='AbortError'){setChartImageMessage('이미지 저장을 취소했습니다.');toast('이미지 저장을 취소했습니다');return null}}}const a=document.createElement('a');a.href=pendingChartImageUrl;a.download=pendingChartImageFilename;a.rel='noopener';a.style.display='none';document.body.appendChild(a);a.click();a.remove();setChartImageMessage('PNG 다운로드를 요청했습니다. 다운로드가 차단되면 미리보기 이미지를 길게 눌러 저장할 수 있습니다.');toast('PNG 다운로드를 요청했습니다');return false}catch(e){setChartImageMessage('직접 저장이 제한된 환경입니다. 미리보기 이미지를 길게 눌러 저장하세요.');toast('직접 저장이 제한됩니다');return false}}
+async function shareChartImage(forceFresh=false){const ok=await ensureChartImage(forceFresh);if(!ok)return false;try{const file=new File([pendingChartImageBlob],pendingChartImageFilename,{type:'image/png'});if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){await navigator.share({title:chartExportTitle(),files:[file]});setChartImageMessage('공유 창으로 차트 이미지를 전달했습니다.');return true}}catch(e){if(e?.name==='AbortError')return null}setChartImageMessage('이 환경에서는 시스템 공유가 지원되지 않습니다. 이미지 복사 또는 PNG 저장을 사용하세요.');return false}
+async function runChartImageAction(action){openChartImagePreview('차트 출력을 준비하는 중입니다…');try{await action(true)}catch(e){openChartImagePreview('차트 출력 기능이 제한되었습니다. 아래 차트 미리보기로 내용을 확인할 수 있습니다.');toast('차트 출력이 제한되었습니다 · 미리보기를 표시합니다')}}
+$('copyChartImage').onclick=()=>runChartImageAction(copyChartImage);$('saveChartImage').onclick=()=>runChartImageAction(saveChartImage);$('shareChartImage').onclick=()=>runChartImageAction(shareChartImage);
+
+$('previewCopyChartImage').onclick=copyPendingChartImage;$('previewSaveChartImage').onclick=()=>saveChartImage(false);$('previewShareChartImage').onclick=()=>shareChartImage(false);$('closeChartImageModal').onclick=closeChartImagePreview;$('chartImageModal').addEventListener('click',e=>{if(e.target===$('chartImageModal'))closeChartImagePreview()});
+function updateShareButtons(){const supported=typeof navigator.share==='function';$('shareChartImage').style.display=supported?'inline-block':'none';$('previewShareChartImage').style.display=supported?'inline-block':'none'}
+
+function readTargetFields(){return {targetName:$('sTargetName').value.trim()||'추출 타겟',eyMin:n($('sEyMin').value),eyMax:n($('sEyMax').value),tdsMin:n($('sTdsMin').value),tdsMax:n($('sTdsMax').value),absorption:n($('sAbsorption').value)}}
+function readChartFields(){return {chartEyMin:n($('sChartEyMin').value),chartEyMax:n($('sChartEyMax').value),chartEyStep:n($('sChartEyStep').value),chartTdsMin:n($('sChartTdsMin').value),chartTdsMax:n($('sChartTdsMax').value),chartTdsStep:n($('sChartTdsStep').value),ratioMin:n($('sRatioMin').value),ratioMax:n($('sRatioMax').value),ratioStep:n($('sRatioStep').value)}}
+function validateTarget(v){return Number.isFinite(v.eyMin)&&Number.isFinite(v.eyMax)&&v.eyMin<v.eyMax&&Number.isFinite(v.tdsMin)&&Number.isFinite(v.tdsMax)&&v.tdsMin<v.tdsMax&&Number.isFinite(v.absorption)&&v.absorption>=0}
+function validateChart(v){if(!Number.isFinite(v.chartEyMin)||!Number.isFinite(v.chartEyMax)||v.chartEyMin>=v.chartEyMax||!pos(v.chartEyStep)||!Number.isFinite(v.chartTdsMin)||!Number.isFinite(v.chartTdsMax)||v.chartTdsMin>=v.chartTdsMax||!pos(v.chartTdsStep)||!Number.isFinite(v.ratioMin)||!Number.isFinite(v.ratioMax)||v.ratioMin>=v.ratioMax||!pos(v.ratioStep))return false;if((v.chartEyMax-v.chartEyMin)/v.chartEyStep>40||(v.chartTdsMax-v.chartTdsMin)/v.chartTdsStep>40||(v.ratioMax-v.ratioMin)/v.ratioStep>35)return false;return true}
+function profilePayload(){const s=state.settings;return {targetName:s.targetName,eyMin:s.eyMin,eyMax:s.eyMax,tdsMin:s.tdsMin,tdsMax:s.tdsMax,absorption:s.absorption,chartEyMin:s.chartEyMin,chartEyMax:s.chartEyMax,chartEyStep:s.chartEyStep,chartTdsMin:s.chartTdsMin,chartTdsMax:s.chartTdsMax,chartTdsStep:s.chartTdsStep,ratioMin:s.ratioMin,ratioMax:s.ratioMax,ratioStep:s.ratioStep}}
+function profilePayloadFromFields(){const t=readTargetFields(),c=readChartFields();if(!validateTarget(t)||!validateChart(c))return null;return {...t,...c}}
+function allProfiles(){return [CLASSIC_PROFILE,...state.profiles]}
+function currentProfileName(){const p=allProfiles().find(p=>p.id===state.activeProfileId);return p?p.name:'사용자 수정 설정'}
+function classRecordCount(c){return (c?.sessions||[]).reduce((a,ss)=>a+Object.values(ss.records||{}).reduce((b,x)=>b+(Array.isArray(x)?x.length:0),0),0)}
+function currentSessionRecordCount(){const ss=currentSession();return Object.values(ss?.records||{}).reduce((a,x)=>a+(Array.isArray(x)?x.length:0),0)}
+function renderSettingsSummaries(){const s=state.settings,arr=students(),cc=currentClass(),ss=currentSession();$('targetSummary').textContent=`${s.targetName} · EY ${trimNum(s.eyMin,1)}–${trimNum(s.eyMax,1)}% · TDS ${trimNum(s.tdsMin,2)}–${trimNum(s.tdsMax,2)}%`;$('chartSettingsSummary').textContent=`EY ${trimNum(s.chartEyMin,2)}–${trimNum(s.chartEyMax,2)} / ${trimNum(s.chartEyStep,2)} · TDS ${trimNum(s.chartTdsMin,2)}–${trimNum(s.chartTdsMax,2)} / ${trimNum(s.chartTdsStep,2)} · 1:${trimNum(s.ratioMin,1)}–1:${trimNum(s.ratioMax,1)}`;$('profileSummary').textContent=currentProfileName();$('feedbackSummary').textContent=`Quick ${s.showQuickFeedback?'ON':'OFF'} · Class ${s.showClassFeedback?'ON':'OFF'}`;$('classSummary').textContent=`현재 ${cc?.name||'—'} · 실습 ${cc?.sessions?.length||0}개 · 저장된 반 ${state.classes.length}개`;$('studentSummary').textContent=`${cc?.name||'—'} · 현재 ${arr.length}명${excludedStudents().length?` · 제외 ${excludedStudents().length}명`:''} · 현재 실습 ${currentSessionRecordCount()} records`;$('backupSummary').textContent=`App v${APP_VERSION} · Schema v${APP_SCHEMA_VERSION} · 반 ${state.classes.length}개 · 실습 ${state.classes.reduce((a,c)=>a+(c.sessions?.length||0),0)}개 · 프로필 ${state.profiles.length}개 · 저장소 ${StorageAdapter.lastWrite.persistent?'확인':'점검 필요'}`}
+function updateProfileButtons(){const selected=allProfiles().find(p=>p.id===$('profileSelect').value);$('overwriteProfile').disabled=!!selected?.builtin;$('deleteProfile').disabled=!!selected?.builtin}
+function renderProfileSelect(){const sel=$('profileSelect'),current=sel.value;sel.innerHTML=allProfiles().map(p=>`<option value="${p.id}">${esc(p.name)}${p.builtin?'':' · 사용자'}</option>`).join('');if(state.activeProfileId&&allProfiles().some(p=>p.id===state.activeProfileId))sel.value=state.activeProfileId;else if(current&&allProfiles().some(p=>p.id===current))sel.value=current;else sel.value='builtin-classic';updateProfileButtons();$('profileStatus').innerHTML=state.activeProfileId?`현재 적용: <b>${esc(currentProfileName())}</b>`:'현재 설정은 저장된 프로필에서 수정된 상태입니다.'}
+function renderClassManager(){ensureCurrentClass();const cc=currentClass(),sel=$('sClassSelect');sel.innerHTML=state.classes.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');sel.value=cc.id;$('sClassName').value=cc.name;$('sDeleteClass').disabled=state.classes.length<=1}
+function renderSettings(){
+  ensureCurrentClass();const s=state.settings;$('sTargetName').value=s.targetName;$('sEyMin').value=s.eyMin;$('sEyMax').value=s.eyMax;$('sTdsMin').value=s.tdsMin;$('sTdsMax').value=s.tdsMax;$('sAbsorption').value=s.absorption;$('sChartEyMin').value=s.chartEyMin;$('sChartEyMax').value=s.chartEyMax;$('sChartEyStep').value=s.chartEyStep;$('sChartTdsMin').value=s.chartTdsMin;$('sChartTdsMax').value=s.chartTdsMax;$('sChartTdsStep').value=s.chartTdsStep;$('sRatioMin').value=s.ratioMin;$('sRatioMax').value=s.ratioMax;$('sRatioStep').value=s.ratioStep;syncFeedbackControls();renderSettingsSummaries();renderProfileSelect();renderClassManager();
+  const m=$('studentManage'),arr=students(),excluded=excludedStudents(),em=$('excludedStudentManage'),details=$('excludedStudentDetails'),excludedCount=$('excludedStudentCount');m.innerHTML='';if(!arr.length)m.innerHTML='<div class="hint">현재 반에 등록된 수강생이 없습니다.</div>';arr.forEach(stu=>{const total=(currentClass()?.sessions||[]).reduce((a,ss)=>a+(ss.records?.[stu.id]?.length||0),0),row=document.createElement('div');row.className='student-manage-row';row.innerHTML=`<div class="name">${esc(stu.name)} <span style="color:#91877e;font-size:9px">· 전체 ${total} records</span></div><button class="btn ghost small" data-rename="${stu.id}">이름</button><button class="btn danger small" data-remove="${stu.id}">명단 제외</button>`;m.appendChild(row)});m.querySelectorAll('[data-rename]').forEach(b=>b.onclick=()=>renameStudent(b.dataset.rename));m.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>removeStudent(b.dataset.remove));details.style.display=excluded.length?'block':'none';excludedCount.textContent=`${excluded.length}명`;em.innerHTML='';excluded.forEach(stu=>{const total=(currentClass()?.sessions||[]).reduce((a,ss)=>a+(ss.records?.[stu.id]?.length||0),0),row=document.createElement('div');row.className='student-manage-row';row.innerHTML=`<div class="name">${esc(stu.name)} <span style="color:#91877e;font-size:9px">· 보존 기록 ${total}개</span></div><button class="btn secondary small" data-restore="${stu.id}">명단 복원</button>`;em.appendChild(row)});em.querySelectorAll('[data-restore]').forEach(b=>b.onclick=()=>restoreStudent(b.dataset.restore));
+}
+$('applyTargetSettings').onclick=()=>{const v=readTargetFields();if(!validateTarget(v)){toast('타겟 최소/최대와 흡수계수를 확인해 주세요');return}state.settings={...state.settings,...v};state.activeProfileId=null;save();renderQuick();renderClass();renderChart();renderSettings();toast('추출 타겟을 적용했습니다')};
+$('resetTargetFields').onclick=()=>{const s=CLASSIC_PROFILE.settings;$('sTargetName').value=s.targetName;$('sEyMin').value=s.eyMin;$('sEyMax').value=s.eyMax;$('sTdsMin').value=s.tdsMin;$('sTdsMax').value=s.tdsMax;$('sAbsorption').value=s.absorption;toast('기본 타겟 값을 입력했습니다. 적용을 눌러 반영하세요')};
+$('applyChartSettings').onclick=()=>{const v=readChartFields();if(!validateChart(v)){toast('차트 범위·눈금·Ratio 간격을 확인해 주세요');return}state.settings={...state.settings,...v};state.activeProfileId=null;save();renderChart();renderSettings();toast('차트 설정을 적용했습니다')};
+$('resetChartFields').onclick=()=>{const s=CLASSIC_PROFILE.settings;$('sChartEyMin').value=s.chartEyMin;$('sChartEyMax').value=s.chartEyMax;$('sChartEyStep').value=s.chartEyStep;$('sChartTdsMin').value=s.chartTdsMin;$('sChartTdsMax').value=s.chartTdsMax;$('sChartTdsStep').value=s.chartTdsStep;$('sRatioMin').value=s.ratioMin;$('sRatioMax').value=s.ratioMax;$('sRatioStep').value=s.ratioStep;toast('기본 차트 값을 입력했습니다. 적용을 눌러 반영하세요')};
+$('profileSelect').onchange=updateProfileButtons;
+$('loadProfile').onclick=()=>{const p=allProfiles().find(x=>x.id===$('profileSelect').value);if(!p)return;state.settings={...state.settings,...clone(p.settings)};state.activeProfileId=p.id;save();renderQuick();renderClass();renderChart();renderSettings();toast(`${p.name}을 불러왔습니다`)};
+$('saveNewProfile').onclick=()=>{const name=$('newProfileName').value.trim();if(!name){toast('새 프로필 이름을 입력해 주세요');return}const payload=profilePayloadFromFields();if(!payload){toast('타겟 또는 차트 설정값을 확인해 주세요');return}state.settings={...state.settings,...payload};const p={id:id(),name,builtin:false,settings:clone(payload)};state.profiles.push(p);state.activeProfileId=p.id;$('newProfileName').value='';save();renderQuick();renderClass();renderChart();renderSettings();toast('현재 설정을 새 프로필로 저장했습니다')};
+$('overwriteProfile').onclick=()=>{const p=state.profiles.find(x=>x.id===$('profileSelect').value);if(!p)return;const payload=profilePayloadFromFields();if(!payload){toast('타겟 또는 차트 설정값을 확인해 주세요');return}openDialog({title:'프로필 덮어쓰기',message:`${p.name} 프로필을 현재 설정으로 덮어쓸까요?`,confirmText:'덮어쓰기',onConfirm:()=>{state.settings={...state.settings,...payload};p.settings=clone(payload);state.activeProfileId=p.id;save();renderQuick();renderClass();renderChart();renderSettings();toast('프로필을 업데이트했습니다')}})};
+$('deleteProfile').onclick=()=>{const idv=$('profileSelect').value,p=state.profiles.find(x=>x.id===idv);if(!p)return;openDialog({title:'프로필 삭제',message:`${p.name} 프로필을 삭제할까요?`,confirmText:'삭제',danger:true,onConfirm:()=>{state.profiles=state.profiles.filter(x=>x.id!==idv);if(state.activeProfileId===idv)state.activeProfileId=null;save();renderSettings();toast('프로필을 삭제했습니다')}})};
+$('sLoadClass').onclick=()=>switchClass($('sClassSelect').value);
+$('sCreateClass').onclick=()=>{if(createClass($('sNewClassName').value))$('sNewClassName').value=''};
+$('sNewClassName').addEventListener('keydown',e=>{if(e.key==='Enter')$('sCreateClass').click()});
+$('sRenameClass').onclick=()=>renameCurrentClass($('sClassName').value);
+$('sClassName').addEventListener('keydown',e=>{if(e.key==='Enter')$('sRenameClass').click()});
+$('sDeleteClass').onclick=deleteCurrentClass;
+$('addStudent').onclick=()=>{const name=$('newStudentName').value.trim();if(!name){toast('이름을 입력해 주세요');return}const stu={id:id(),name};students().push(stu);currentStudentId=stu.id;$('newStudentName').value='';save();initChartSelectionForStudent(stu);renderSettings();renderClass();renderChart();toast(`${name} 추가`)};$('newStudentName').addEventListener('keydown',e=>{if(e.key==='Enter')$('addStudent').click()});
+function renameStudent(sid){const s=students().find(x=>x.id===sid);if(!s)return;openDialog({title:'수강생 이름 변경',message:'새 이름을 입력하세요.',inputValue:s.name,confirmText:'변경',onConfirm:value=>{const v=String(value||'').trim();if(!v){toast('이름을 입력해 주세요');return false}s.name=v;(currentClass()?.sessions||[]).forEach(ss=>{if(ss.studentNames?.[sid])ss.studentNames[sid]=v});save();renderSettings();renderClass();renderChart();toast('수강생 이름을 변경했습니다')}})}
+function removeStudent(sid){const arr=students(),s=arr.find(x=>x.id===sid);if(!s)return;const total=(currentClass()?.sessions||[]).reduce((a,ss)=>a+(ss.records?.[sid]?.length||0),0);openDialog({title:'수강생 명단 제외',message:`${s.name}을 현재 수강생 명단에서 제외할까요? 기존 실습의 추출 기록 ${total}개와 강사 피드백은 삭제되지 않으며, 설정에서 언제든 명단으로 복원할 수 있습니다.`,confirmText:'명단 제외',danger:true,onConfirm:()=>{currentClass().students=arr.filter(x=>x.id!==sid);currentClass().excludedStudents=currentClass().excludedStudents||[];if(!currentClass().excludedStudents.some(x=>x.id===sid))currentClass().excludedStudents.push(s);delete chartSelection[sid];ensureCurrentStudent();save();renderSettings();renderClass();renderChart();toast('수강생을 현재 명단에서 제외했습니다')}})}
+function restoreStudent(sid){const cc=currentClass(),arr=excludedStudents(),s=arr.find(x=>x.id===sid);if(!cc||!s)return;cc.excludedStudents=arr.filter(x=>x.id!==sid);if(!cc.students.some(x=>x.id===sid))cc.students.push(s);currentStudentId=s.id;initChartSelectionForStudent(s);save();renderSettings();renderClass();renderChart();toast(`${s.name}을 현재 명단으로 복원했습니다`)}
+$('clearClassData').onclick=()=>{const ss=currentSession(),count=currentSessionRecordCount();if(!ss||!count){toast('현재 실습에 지울 기록이 없습니다');return}openDialog({title:'현재 실습 추출 기록 삭제',message:`${ss.name} 실습의 모든 수강생 추출 기록 ${count}개를 지울까요? 다른 실습과 수강생 명단은 유지됩니다.`,confirmText:'기록 삭제',danger:true,onConfirm:()=>{ss.records={};ss.studentNames={};chartSelection={};editingRecordId=null;editingTeacherFeedbackId=null;save();renderSettings();renderClass();renderChart();toast('현재 실습의 Class 기록을 지웠습니다')}})};
+
+function exportPayload(){return {format:BACKUP_FORMAT,schemaVersion:APP_SCHEMA_VERSION,exportedAt:new Date().toISOString(),app:'Coffee Brewing Control',data:clone(state)}}
+let pendingExportJson='',pendingExportFilename='';
+function prepareExportData(){
+  const payload=exportPayload(),day=new Date().toISOString().slice(0,10);
+  pendingExportJson=JSON.stringify(payload,null,2);
+  pendingExportFilename=`coffee-brewing-control-backup-${day}.json`;
+  $('exportJsonText').value=pendingExportJson;
+  $('exportPreviewText').textContent=`${pendingExportFilename} · ${importSummary(state)} · 파일 저장이 막히면 아래 JSON 복사를 사용하세요.`;
+  $('exportPreview').classList.add('show');
+}
+async function saveExportFile(){
+  if(!pendingExportJson)prepareExportData();
+  /* 가능한 환경에서는 OS 저장창을 우선 사용합니다. */
+  if(window.isSecureContext&&typeof window.showSaveFilePicker==='function'){
+    try{
+      const handle=await window.showSaveFilePicker({suggestedName:pendingExportFilename,types:[{description:'JSON backup',accept:{'application/json':['.json']}}]});
+      const writable=await handle.createWritable();
+      await writable.write(pendingExportJson);
+      await writable.close();
+      toast('백업 파일을 저장했습니다');
+      return true;
+    }catch(e){
+      if(e&&e.name==='AbortError'){toast('파일 저장을 취소했습니다');return null}
+      /* 임베디드/샌드박스 환경에서는 아래 다운로드 방식으로 폴백합니다. */
+    }
+  }
+  try{
+    const blob=new Blob([pendingExportJson],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download=pendingExportFilename;a.rel='noopener';a.style.display='none';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1500);
+    toast('백업 파일 다운로드를 요청했습니다. 보이지 않으면 JSON 복사를 사용하세요.');
+    return false;
+  }catch(e){
+    toast('이 환경에서는 직접 다운로드가 제한됩니다. JSON 복사를 사용하세요.');
+    return false;
+  }
+}
+async function copyExportJson(){
+  if(!pendingExportJson)prepareExportData();
+  try{
+    if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(pendingExportJson);toast('백업 JSON을 클립보드에 복사했습니다');return}
+  }catch(e){}
+  const ta=$('exportJsonText');ta.focus();ta.select();ta.setSelectionRange(0,ta.value.length);
+  try{const ok=document.execCommand('copy');toast(ok?'백업 JSON을 클립보드에 복사했습니다':'JSON이 선택되었습니다. Ctrl/Cmd+C로 복사해 주세요')}catch(e){toast('JSON이 선택되었습니다. Ctrl/Cmd+C로 복사해 주세요')}
+}
+async function downloadBackup(){prepareExportData();await saveExportFile()}
+function importSummary(st){const classCount=st.classes.length,sessionCount=st.classes.reduce((a,c)=>a+(c.sessions?.length||0),0),studentCount=st.classes.reduce((a,c)=>a+(c.students?.length||0),0),excludedCount=st.classes.reduce((a,c)=>a+(c.excludedStudents?.length||0),0),recordCount=st.classes.reduce((a,c)=>a+(c.sessions||[]).reduce((b,ss)=>b+Object.values(ss.records||{}).reduce((d,x)=>d+(Array.isArray(x)?x.length:0),0),0),0);return `반 ${classCount}개 · 실습 ${sessionCount}개 · 현재 수강생 ${studentCount}명${excludedCount?` · 명단 제외 ${excludedCount}명`:''} · Class 기록 ${recordCount}개 · Quick 기록 ${st.quickHistory.length}개 · 사용자 프로필 ${st.profiles.length}개`}
+$('exportData').onclick=downloadBackup;
+$('saveExportFile').onclick=saveExportFile;
+$('copyExportJson').onclick=copyExportJson;
+$('closeExportPreview').onclick=()=>{$('exportPreview').classList.remove('show')};
+$('chooseImportData').onclick=()=>{$('importDataFile').value='';$('importDataFile').click()};
+$('importDataFile').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{const raw=await file.text(),parsed=JSON.parse(raw);if(parsed?.format&&parsed.format!==BACKUP_FORMAT)throw new Error('format');const version=Number(parsed?.schemaVersion??parsed?.data?.schemaVersion??0);if(version>APP_SCHEMA_VERSION){toast('이 앱보다 새로운 버전의 백업입니다');return}pendingImportState=normalizeState(parsed?.data||parsed);$('importPreviewTitle').textContent=`${file.name} · 백업 확인`;$('importPreviewText').textContent=importSummary(pendingImportState)+' · 적용하면 현재 브라우저의 전체 데이터가 교체됩니다.';$('importPreview').classList.add('show')}catch(err){pendingImportState=null;$('importPreview').classList.remove('show');toast('유효한 Coffee Brewing Control 백업 파일이 아닙니다')}};
+$('cancelImportData').onclick=()=>{pendingImportState=null;$('importPreview').classList.remove('show');$('importDataFile').value=''};
+$('applyImportData').onclick=()=>{if(!pendingImportState)return;openDialog({title:'백업 데이터 복원',message:'현재 브라우저의 모든 반·기록·프로필·설정을 선택한 백업으로 교체합니다.',confirmText:'복원',danger:true,onConfirm:()=>{state=clone(pendingImportState);pendingImportState=null;ensureCurrentClass();ensureCurrentSession();currentStudentId=currentClass()?.students?.[0]?.id||null;editingRecordId=null;editingTeacherFeedbackId=null;chartMode='quick';chartSelection={};selectedPointKey=null;save();initChartSelections();$('importPreview').classList.remove('show');$('importDataFile').value='';$('qDose').value=state.quick.dose??20;$('qWater').value=state.quick.water??300;$('qBev').value=state.quick.bev??'';$('qTds').value=state.quick.tds??1.53;updateQuickMetaUI();renderQuick();renderSettings();renderClass();renderFilter();setChartModeButtons();renderChart();toast('백업 데이터를 복원했습니다')}})};
+
+function init(){
+  ensureCurrentClass();ensureCurrentSession();$('qDose').value=state.quick.dose??20;$('qWater').value=state.quick.water??300;$('qBev').value=state.quick.bev??'';$('qTds').value=state.quick.tds??1.53;updateQuickMetaUI();updateShareButtons();currentStudentId=students()[0]?.id||null;initChartSelections();renderQuick();updateStorageWarning();renderSettings();renderClass();renderFilter();renderChart();updateClassBevHint();
+}
+init();
+})();
+
+</script>
+</body>
+</html>
