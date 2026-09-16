@@ -154,7 +154,7 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
       <div id="chartLegend" class="legend"></div>
       <div class="chart-output-actions"><button class="btn ghost small" id="copyChartImage">이미지 복사</button><button class="btn ghost small" id="saveChartImage">PNG 저장</button><button class="btn ghost small" id="shareChartImage" style="display:none">공유</button><span class="hint">Tooltip과 좌표 미리보기는 이미지에서 제외됩니다.</span></div>
       <div id="chartDetail" class="detail-card"></div>
-      <div class="footnote">대각선은 설정된 흡수계수를 이용한 <b>투입수 기준 Brew Ratio</b> 참고선입니다. 실제 Beverage를 직접 입력한 기록은 실제 보유수량 차이 때문에 비율선에서 벗어날 수 있습니다.</div>
+      <div class="footnote">대각선은 설정된 흡수계수와 질량수지식을 이용한 <b>투입수 기준 Brew Ratio</b> 참고선입니다. 실제 Beverage를 직접 입력한 기록은 실제 액체 보유량 차이 때문에 비율선에서 벗어날 수 있습니다.</div>
     </div>
   </div>
 </section>
@@ -292,13 +292,14 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
     <p>This tool is designed for coffee brewing education, repeated brew testing, and comparative analysis. It visualizes brew strength (TDS), extraction yield, and brew ratio relationships using the brewing control chart framework originating from E. E. Lockhart's work.</p>
     <p>The built-in <b>Classic Filter</b> profile uses a default reference range of <b>18–22% extraction yield</b> and <b>1.15–1.35% TDS</b>, informed by published SCA brewing materials. This range is provided as a starting reference only.</p>
     <p>Target ranges, chart scales, brew ratios, and liquid-retention assumptions are configurable. User-defined targets and chart ranges should not be interpreted as established sensory-quality standards or physical limits.</p>
-    <p>When beverage mass is not entered, the tool estimates it from brew water and the configured liquid-retention value. Calculated extraction yield therefore depends on the measurements and assumptions provided by the user.</p>
+    <p>When beverage mass is not entered, the tool estimates it from brew water, measured TDS, and the configured liquid-retention value using a mass-balance relationship. The built-in Classic Filter uses 2.1 as its default liquid-retention reference; this value remains configurable. Calculated extraction yield therefore depends on the measurements and assumptions provided by the user.</p>
     <div class="notice"><b>Independent project.</b> This project is independently developed and is not affiliated with or endorsed by the Specialty Coffee Association. No SCA logo or SCA chart artwork is included.</div>
     <h4>Data &amp; privacy</h4>
     <p>Brew records, class data, profiles, and settings are stored locally in the browser by this application. The application does not transmit entered brew or class data to an application backend. This does not cover ordinary hosting access logs or actions explicitly initiated by the user, such as export or sharing. JSON export is available for manual backup and transfer.</p>
     <h4>References</h4>
     <div class="reference">E. E. Lockhart. <i>The Soluble Solids in Beverage Coffee as an Index to Cup Quality.</i> Coffee Brewing Institute, 1957.</div>
     <div class="reference">Specialty Coffee Association. <i>Coffee Brewing Control Chart</i>, Version 3, revised March 2019.</div>
+    <div class="reference">J.-X. Guinard et al. <i>A new Coffee Brewing Control Chart relating sensory properties and consumer liking to brew strength, extraction yield, and brew ratio.</i> Journal of Food Science 88(5), 2023. DOI 10.1111/1750-3841.16531.</div>
     <div class="actions"><button class="btn secondary" id="closeAbout">닫기</button></div>
   </div>
 </div>
@@ -312,6 +313,7 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
       <li>Renamed user-facing terminology to Coffee Brewing Control / Brewing Control Chart.</li>
       <li>Added About &amp; References, privacy/context notes, an in-app changelog, and visible app version information.</li>
       <li>Refined chart zoning into semantic Strong/Weak and Under/Over overlay bands while keeping the sage target and smoky-plum brew-ratio lines.</li>
+      <li>Corrected automatic beverage-mass estimation and Brew Ratio guide lines to use the full mass-balance relationship, and updated the Classic Filter liquid-retention default from 2.0 to 2.1.</li>
       <li>Kept legacy storage and backup identifiers for backward compatibility.</li>
     </ul></div>
 
@@ -393,7 +395,7 @@ const CHART_BAND_COLORS={
 };
 const CLASSIC_PROFILE={
   id:'builtin-classic',name:'기본 차트 · Classic Filter',builtin:true,
-  settings:{targetName:'추출 타겟',eyMin:18,eyMax:22,tdsMin:1.15,tdsMax:1.35,absorption:2.0,chartEyMin:14,chartEyMax:26,chartEyStep:2,chartTdsMin:.8,chartTdsMax:1.6,chartTdsStep:.1,ratioMin:10,ratioMax:24,ratioStep:1}
+  settings:{targetName:'추출 타겟',eyMin:18,eyMax:22,tdsMin:1.15,tdsMax:1.35,absorption:2.1,chartEyMin:14,chartEyMax:26,chartEyStep:2,chartTdsMin:.8,chartTdsMax:1.6,chartTdsStep:.1,ratioMin:10,ratioMax:24,ratioStep:1}
 };
 const DEFAULT_CLASS_ID='class_default';
 const DEFAULT_SESSION_ID='session_default';
@@ -529,9 +531,12 @@ function currentStudent(){return students().find(s=>s.id===currentStudentId)||nu
 function ensureCurrentClass(){if(!state.classes.length){const ss=makeSession('기본 실습');state.classes=[{id:id(),name:'기본 반',students:[],excludedStudents:[],sessions:[ss],activeSessionId:ss.id}];state.activeClassId=state.classes[0].id}if(!state.classes.some(c=>c.id===state.activeClassId))state.activeClassId=state.classes[0].id;ensureCurrentSession()}
 function ensureCurrentSession(){const c=currentClass();if(!c)return null;if(!Array.isArray(c.sessions)||!c.sessions.length)c.sessions=[makeSession('기본 실습')];if(!c.sessions.some(s=>s.id===c.activeSessionId))c.activeSessionId=c.sessions[0].id;return currentSession()}
 function ensureCurrentStudent(){const arr=students();if(!arr.some(s=>s.id===currentStudentId))currentStudentId=arr[0]?.id||null}
-function autoBeverage(dose,water){return pos(dose)&&pos(water)?Math.max(0,water-state.settings.absorption*dose):NaN}
+function autoBeverage(dose,water,tds){
+  const tf=tds/100,retained=state.settings.absorption*dose;
+  return pos(dose)&&pos(water)&&Number.isFinite(tds)&&tds>=0&&tds<100&&water>retained?Math.max(0,(water-retained)/(1-tf)):NaN;
+}
 function calcRecord(rec){
-  const dose=n(rec.dose),water=n(rec.water),tds=n(rec.tds),manual=n(rec.bev),auto=autoBeverage(dose,water),bev=pos(manual)?manual:auto;
+  const dose=n(rec.dose),water=n(rec.water),tds=n(rec.tds),manual=n(rec.bev),auto=autoBeverage(dose,water,tds),bev=pos(manual)?manual:auto;
   const solids=pos(bev)&&Number.isFinite(tds)?bev*tds/100:NaN;
   const ey=pos(dose)&&Number.isFinite(solids)?solids/dose*100:NaN;
   const ratio=pos(dose)&&pos(water)?water/dose:NaN;
@@ -606,7 +611,7 @@ $$('.tab').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
 
 function renderQuick(){
   const q=liveQuickRecord();state.quick={dose:$('qDose').value,water:$('qWater').value,bev:$('qBev').value,tds:$('qTds').value};save();
-  const d=calcRecord(q);$('qBevHint').innerHTML=Number.isFinite(d.autoBev)?`자동: 물량 − (${fmt(state.settings.absorption,1)} × 원두량) = ${fmt(d.autoBev,1)} g <span class="auto">AUTO</span>`:'자동 계산값 없음';
+  const d=calcRecord(q);$('qBevHint').innerHTML=Number.isFinite(d.autoBev)?`자동: [물량 − (${fmt(state.settings.absorption,1)} × 원두량)] ÷ (1 − TDS/100) = ${fmt(d.autoBev,1)} g <span class="auto">AUTO</span>`:(pos(d.dose)&&pos(d.water)&&!Number.isFinite(d.tds)?'TDS 입력 시 자동 계산':'자동 계산값 없음');
   $('qEyOut').textContent=Number.isFinite(d.ey)?fmt(d.ey,2)+'%':'—';$('qTdsOut').textContent=Number.isFinite(d.tds)?fmt(d.tds,2)+'%':'—';$('qRatioOut').textContent=Number.isFinite(d.ratio)?'1 : '+fmt(d.ratio,2):'—';$('qSolidsOut').textContent=Number.isFinite(d.solids)?fmt(d.solids,3)+' g':'—';$('qBevOut').textContent=Number.isFinite(d.bev)?`${fmt(d.bev,1)} g · ${d.manualBev?'직접':'자동'}`:'—';
   $('quickTargetLabel').textContent=`${state.settings.targetName}  |  EY ${fmt(state.settings.eyMin,1)}–${fmt(state.settings.eyMax,1)}% · TDS ${fmt(state.settings.tdsMin,2)}–${fmt(state.settings.tdsMax,2)}%`;
   const st=statusForQuick(d),box=$('qStatus');box.style.display=quickFeedbackVisible()?'flex':'none';box.className='status '+st.cls;$('qStatusTitle').textContent=st.title;
@@ -652,8 +657,8 @@ function renderStudentBar(){
   $('classNoStudents').style.display=arr.length?'none':'block';$('classEntryPanel').style.display=arr.length?'block':'none';$('classRecordsPanel').style.display=arr.length?'block':'none';
 }
 function fillClassFormFromLast(){const s=currentStudent();if(!s){$('cDose').value=20;$('cWater').value=300;$('cBev').value='';$('cTds').value='';$('cNote').value='';updateClassBevHint();return}const arr=sessionRecords(s.id),last=arr[arr.length-1];$('cDose').value=last?.dose||20;$('cWater').value=last?.water||300;$('cBev').value='';$('cTds').value='';$('cNote').value='';updateClassBevHint()}
-function updateClassBevHint(){const a=autoBeverage(n($('cDose').value),n($('cWater').value));$('cBevHint').innerHTML=Number.isFinite(a)?`자동 ${fmt(a,1)} g <span class="auto">AUTO</span>`:'자동 계산값 없음'}
-['cDose','cWater'].forEach(x=>$(x).addEventListener('input',updateClassBevHint));
+function updateClassBevHint(){const dose=n($('cDose').value),water=n($('cWater').value),tds=n($('cTds').value),a=autoBeverage(dose,water,tds);$('cBevHint').innerHTML=Number.isFinite(a)?`자동 ${fmt(a,1)} g · 질량수지 <span class="auto">AUTO</span>`:(pos(dose)&&pos(water)&&!Number.isFinite(tds)?'TDS 입력 시 자동 계산':'자동 계산값 없음')}
+['cDose','cWater','cTds'].forEach(x=>$(x).addEventListener('input',updateClassBevHint));
 function renderTeacherFeedback(r){
   if(editingTeacherFeedbackId===r.id)return `<div class="teacher-feedback teacher-feedback-edit"><div class="teacher-feedback-head"><b>강사 피드백</b><span class="hint" style="margin:0">Ctrl/⌘+Enter 저장 · Esc 취소</span></div><textarea id="teacherFeedbackEditor" maxlength="400" placeholder="이 추출에 대해 강사가 남길 피드백">${esc(r.teacherFeedback||'')}</textarea><div class="actions"><button class="btn small" data-teacher-save="${r.id}">저장</button><button class="btn secondary small" data-teacher-cancel="${r.id}">취소</button></div></div>`;
   const text=(r.teacherFeedback||'').trim();return `<div class="teacher-feedback"><div class="teacher-feedback-head"><b>강사 피드백</b><span class="hint" style="margin:0">클릭하여 편집</span></div><button class="teacher-feedback-view ${text?'':'empty'}" data-teacher-edit="${r.id}">${text?esc(text):'피드백을 입력하려면 여기를 클릭하세요.'}</button></div>`;
@@ -763,7 +768,7 @@ function drawChart(pts){
   const xMajor=tickValues(b.xmin,b.xmax,b.xstep),yMajor=tickValues(b.ymin,b.ymax,b.ystep),xMinor=tickValues(b.xmin,b.xmax,b.xstep/2),yMinor=tickValues(b.ymin,b.ymax,b.ystep/2);
   xMinor.forEach(x=>{if(xMajor.some(v=>Math.abs(v-x)<1e-6))return;add('line',{x1:X(x),y1:m.t,x2:X(x),y2:H-m.b,stroke:'#eee9e3','stroke-width':1})});yMinor.forEach(y=>{if(yMajor.some(v=>Math.abs(v-y)<1e-6))return;add('line',{x1:m.l,y1:Y(y),x2:W-m.r,y2:Y(y),stroke:'#eee9e3','stroke-width':1})});
   xMajor.forEach(x=>{add('line',{x1:X(x),y1:m.t,x2:X(x),y2:H-m.b,stroke:'#d4cec7','stroke-width':1.15});add('text',{x:X(x),y:H-m.b+27,'text-anchor':'middle','font-size':12,fill:'#554f49'},trimNum(x,2))});yMajor.forEach(y=>{add('line',{x1:m.l,y1:Y(y),x2:W-m.r,y2:Y(y),stroke:'#d4cec7','stroke-width':1.15});add('text',{x:m.l-12,y:Y(y)+4,'text-anchor':'end','font-size':12,fill:'#554f49'},Number(y).toFixed(Math.max(2,(String(s.chartTdsStep).split('.')[1]||'').length)))});
-  const a=s.absorption;for(let r=s.ratioMin,count=0;r<=s.ratioMax+1e-9&&count<50;r+=s.ratioStep,count++){const den=r-a;if(den<=0)continue;const x1=Math.max(b.xmin,b.ymin*den),x2=Math.min(b.xmax,b.ymax*den);if(x2<=x1)continue;const y1=x1/den,y2=x2/den;add('line',{x1:X(x1),y1:Y(y1),x2:X(x2),y2:Y(y2),stroke:CHART_RATIO_COLOR,'stroke-width':1.45,opacity:.72});const ratioLabel=`1:${trimNum(r,1)}`;if(Math.abs(y2-b.ymax)<.015)add('text',{x:X(x2),y:m.t-8,'text-anchor':'middle','font-size':8.5,fill:CHART_RATIO_COLOR,'font-weight':850},ratioLabel);else add('text',{x:W-m.r+5,y:Y(y2)+3,'text-anchor':'start','font-size':8.5,fill:CHART_RATIO_COLOR,'font-weight':850},ratioLabel)}
+  const a=s.absorption;for(let r=s.ratioMin,count=0;r<=s.ratioMax+1e-9&&count<50;r+=s.ratioStep,count++){const den=r-a;if(den<=0)continue;const xAtY=y=>y>=100?Infinity:y*den/(1-y/100),yAtX=x=>x/(den+x/100),x1=Math.max(b.xmin,xAtY(b.ymin)),x2=Math.min(b.xmax,xAtY(b.ymax));if(!Number.isFinite(x1)||!Number.isFinite(x2)||x2<=x1)continue;const steps=28,pts=[];for(let i=0;i<=steps;i++){const x=x1+(x2-x1)*i/steps,y=yAtX(x);if(x>=b.xmin-1e-9&&x<=b.xmax+1e-9&&y>=b.ymin-1e-9&&y<=b.ymax+1e-9)pts.push([X(x),Y(y)])}if(pts.length<2)continue;const path=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' ');add('path',{d:path,fill:'none',stroke:CHART_RATIO_COLOR,'stroke-width':1.45,opacity:.72});const y2=yAtX(x2),ratioLabel=`1:${trimNum(r,1)}`;if(Math.abs(y2-b.ymax)<.015)add('text',{x:X(x2),y:m.t-8,'text-anchor':'middle','font-size':8.5,fill:CHART_RATIO_COLOR,'font-weight':850},ratioLabel);else add('text',{x:W-m.r+5,y:Y(y2)+3,'text-anchor':'start','font-size':8.5,fill:CHART_RATIO_COLOR,'font-weight':850},ratioLabel)}
   add('line',{x1:m.l,y1:H-m.b,x2:W-m.r,y2:H-m.b,stroke:'#332f2b','stroke-width':2});add('line',{x1:m.l,y1:m.t,x2:m.l,y2:H-m.b,stroke:'#332f2b','stroke-width':2});
   add('text',{x:m.l+plotW/2,y:H-25,'text-anchor':'middle','font-size':16,'font-weight':950,fill:'#312d29'},'EXTRACTION YIELD (%)');add('text',{x:25,y:m.t+plotH/2,'text-anchor':'middle','font-size':16,'font-weight':950,fill:'#312d29',transform:`rotate(-90 25 ${m.t+plotH/2})`},'STRENGTH · TDS (%)');
   const targetCx=(X(s.eyMin)+X(s.eyMax))/2,targetCy=(Y(s.tdsMin)+Y(s.tdsMax))/2;if(targetCx>m.l&&targetCx<W-m.r&&targetCy>m.t&&targetCy<H-m.b)add('text',{x:targetCx,y:targetCy+5,'text-anchor':'middle','font-size':15,'font-weight':900,'letter-spacing':'.8px',fill:'#5e4922'},'TARGET');

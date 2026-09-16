@@ -11,6 +11,7 @@ The project was developed iteratively before its first public GitHub release. Ea
 - Renamed the chart title from **Brew Control Chart** to **Brewing Control Chart**.
 - Refined chart zoning into semantic **Strong / Weak** and **Under / Over** overlay bands; corner regions inherit both meanings.
 - Kept the target area in muted sage and brew-ratio lines in smoky plum to further distinguish the visual design from published SCA chart artwork.
+- Corrected automatic beverage-mass estimation and Brew Ratio guide lines to use the full mass-balance relationship, and updated the Classic Filter liquid-retention default from 2.0 to 2.1.
 - Corrected the visible HTML document version.
 
 ### Added
