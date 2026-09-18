@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <title>HM Digital BTR-1000 Web Serial Test</title>
+  <style>
+    :root {
+      --bg: #f7f2ea;
+      --panel: #fffdf9;
+      --panel-2: #f3eadf;
+      --text: #2e2822;
+      --muted: #766b61;
+      --line: #ddcfc0;
+      --brown: #7a4f20;
+      --brown-dark: #593817;
+      --green: #18864b;
+      --red: #c43d3d;
+      --amber: #a56b16;
+      --shadow: 0 10px 30px rgba(65, 43, 20, .08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 18px; }
+    header {
+      background: var(--brown);
+      color: white;
+      padding: 20px 22px;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+    header h1 { margin: 0 0 6px; font-size: clamp(21px, 4vw, 30px); }
+    header p { margin: 0; opacity: .85; font-size: 14px; }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+    .full { grid-column: 1 / -1; }
+    h2 { margin: 0 0 14px; font-size: 18px; }
+    h3 { margin: 18px 0 8px; font-size: 14px; color: var(--muted); }
+
+    .status-line { display: flex; gap: 9px; align-items: center; min-height: 28px; font-weight: 750; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex: 0 0 auto; }
+    .dot.connected { background: var(--green); }
+    .dot.disconnected, .dot.error { background: var(--red); }
+    .dot.connecting, .dot.measuring { background: var(--amber); }
+
+    .kv { display: grid; grid-template-columns: 150px 1fr; gap: 7px 12px; font-size: 14px; }
+    .kv > div:nth-child(odd) { color: var(--muted); }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+    .buttons { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
+    button {
+      appearance: none;
+      border: 1px solid var(--brown);
+      border-radius: 12px;
+      padding: 11px 14px;
+      background: var(--brown);
+      color: white;
+      font: inherit;
+      font-weight: 750;
+      cursor: pointer;
+    }
+    button.secondary { background: transparent; color: var(--brown); }
+    button.danger { background: transparent; border-color: var(--red); color: var(--red); }
+    button:disabled { opacity: .36; cursor: not-allowed; }
+
+    .notice {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      margin-top: 12px;
+    }
+    .notice.bad { border: 1px solid color-mix(in srgb, var(--red), transparent 65%); color: var(--red); }
+
+    .measurements { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .metric { border: 1px solid var(--line); border-radius: 14px; padding: 14px; background: var(--panel-2); }
+    .metric .label { color: var(--muted); font-size: 12px; margin-bottom: 5px; }
+    .metric .value { font-size: 24px; font-weight: 800; min-height: 34px; }
+
+    .logbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 9px; }
+    .log {
+      background: #171511;
+      color: #eee8df;
+      border-radius: 13px;
+      padding: 13px;
+      height: 230px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .tag {
+      display: inline-flex;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      border-radius: 999px;
+      padding: 4px 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 720px) {
+      .wrap { padding: 10px; }
+      header { border-radius: 14px; padding: 17px; }
+      .grid { grid-template-columns: 1fr; }
+      .full { grid-column: auto; }
+      .card { padding: 15px; border-radius: 14px; }
+      .kv { grid-template-columns: 110px 1fr; }
+      .measurements { grid-template-columns: 1fr; }
+      button { flex: 1 1 auto; }
+      .log { height: 190px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>HM Digital BTR-1000 Web Serial Test</h1>
+      <p>Windows Chrome / Android Chrome용 Bluetooth Classic SPP 직결 PoC</p>
+    </header>
+
+    <main class="grid">
+      <section class="card">
+        <h2>환경 진단</h2>
+        <div class="kv">
+          <div>Secure context</div><div id="secureContext">-</div>
+          <div>Web Serial</div><div id="serialSupport">-</div>
+          <div>브라우저</div><div id="browserInfo">-</div>
+          <div>SPP Service UUID</div><div><code>00001101-0000-1000-8000-00805f9b34fb</code></div>
+        </div>
+        <div id="supportNotice" class="notice"></div>
+      </section>
+
+      <section class="card">
+        <h2>연결</h2>
+        <div class="status-line">
+          <span id="statusDot" class="dot disconnected"></span>
+          <span id="statusText">Disconnected</span>
+        </div>
+        <div class="kv" style="margin-top:12px">
+          <div>Port type</div><div id="portType">-</div>
+          <div>Service class</div><div id="serviceClass">-</div>
+          <div>권한 받은 포트</div><div id="grantedCount">0</div>
+        </div>
+        <div class="buttons">
+          <button id="connectFiltered">SPP 기기 연결</button>
+          <button id="connectAny" class="secondary">모든 Serial 보기</button>
+          <button id="reopenGranted" class="secondary">기존 권한 포트 열기</button>
+          <button id="disconnect" class="danger" disabled>연결 해제</button>
+        </div>
+        <div class="notice">
+          Windows: 현재처럼 BTR1000을 OS에서 먼저 페어링한 상태가 가장 확실합니다.<br>
+          Android: 먼저 <b>SPP 기기 연결</b>을 눌러 목록에 장치가 나오는지 확인합니다. 안 나오면 Android Bluetooth 설정에서 BTR1000을 페어링한 뒤 다시 시도하세요.
+        </div>
+      </section>
+
+      <section class="card full">
+        <h2>측정 테스트</h2>
+        <div class="buttons" style="margin-top:0">
+          <button id="measure" disabled>Measure / START 전송</button>
+          <button id="sendRaw" class="secondary" disabled>START만 다시 전송</button>
+        </div>
+        <div class="notice">
+          전송 문자열: <code>^KEY START\r\n</code>. 측정값은 저장하지 않고 raw 수신 데이터와 파싱 결과만 표시합니다.
+        </div>
+
+        <h3>Parsed result</h3>
+        <div class="measurements">
+          <div class="metric"><div class="label">TDS</div><div class="value" id="tdsValue">-</div></div>
+          <div class="metric"><div class="label">Brix</div><div class="value" id="brixValue">-</div></div>
+          <div class="metric"><div class="label">Temperature</div><div class="value" id="tempValue">-</div></div>
+        </div>
+        <div style="margin-top:10px"><span id="parseStatus" class="tag">아직 수신 데이터 없음</span></div>
+      </section>
+
+      <section class="card full">
+        <div class="logbar">
+          <h2 style="margin:0">통신 로그</h2>
+          <div class="buttons" style="margin:0">
+            <button id="copyLog" class="secondary">로그 복사</button>
+            <button id="clearLog" class="secondary">지우기</button>
+          </div>
+        </div>
+        <div id="log" class="log"></div>
+      </section>
+    </main>
+  </div>
+
+<script>
+(() => {
+  'use strict';
+
+  const SPP_UUID = '00001101-0000-1000-8000-00805f9b34fb';
+  const START_COMMAND = '^KEY START\r\n';
+  const OPEN_OPTIONS = { baudRate: 9600 };
+
+  let port = null;
+  let reader = null;
+  let readLoopPromise = null;
+  let closing = false;
+  let rxBuffer = [];
+
+  const $ = (id) => document.getElementById(id);
+  const els = {
+    secureContext: $('secureContext'), serialSupport: $('serialSupport'), browserInfo: $('browserInfo'),
+    supportNotice: $('supportNotice'), statusDot: $('statusDot'), statusText: $('statusText'),
+    portType: $('portType'), serviceClass: $('serviceClass'), grantedCount: $('grantedCount'),
+    connectFiltered: $('connectFiltered'), connectAny: $('connectAny'), reopenGranted: $('reopenGranted'),
+    disconnect: $('disconnect'), measure: $('measure'), sendRaw: $('sendRaw'),
+    tdsValue: $('tdsValue'), brixValue: $('brixValue'), tempValue: $('tempValue'),
+    parseStatus: $('parseStatus'), log: $('log'), copyLog: $('copyLog'), clearLog: $('clearLog')
+  };
+
+  function stamp() {
+    return new Date().toLocaleTimeString('ko-KR', { hour12: false });
+  }
+
+  function log(message, type = 'INFO') {
+    const line = `[${stamp()}] [${type}] ${message}`;
+    els.log.textContent += (els.log.textContent ? '\n' : '') + line;
+    els.log.scrollTop = els.log.scrollHeight;
+    console.log(line);
+  }
+
+  function setStatus(state, label) {
+    els.statusDot.className = `dot ${state}`;
+    els.statusText.textContent = label;
+    const connected = state === 'connected' || state === 'measuring';
+    els.measure.disabled = !connected;
+    els.sendRaw.disabled = !connected;
+    els.disconnect.disabled = !connected && state !== 'connecting';
+  }
+
+  function hex(bytes) {
+    return Array.from(bytes, b => b.toString(16).padStart(2, '0').toUpperCase()).join(' ');
+  }
+
+  function printableText(bytes) {
+    const decoder = new TextDecoder('utf-8', { fatal: false });
+    return decoder.decode(bytes)
+      .replace(/\x02/g, '<STX>')
+      .replace(/\x03/g, '<ETX>')
+      .replace(/\r/g, '\\r')
+      .replace(/\n/g, '\\n');
+  }
+
+  function extractValue(obj, keys) {
+    for (const key of keys) {
+      if (obj && Object.prototype.hasOwnProperty.call(obj, key)) return obj[key];
+    }
+    return undefined;
+  }
+
+  function displayValue(value, suffix = '') {
+    if (value === undefined || value === null || value === '') return '-';
+    return `${value}${suffix}`;
+  }
+
+  function parseFrame(frameBytes) {
+    const text = new TextDecoder('utf-8').decode(Uint8Array.from(frameBytes)).trim();
+    log(`FRAME TEXT: ${text}`, 'RX');
+
+    if (/^(Air|Hi Range)$/i.test(text)) {
+      els.parseStatus.textContent = `기기 상태: ${text}`;
+      return;
+    }
+
+    try {
+      const obj = JSON.parse(text);
+      const tds = extractValue(obj, ['TDS', 'Tds', 'tds', 'CoffeeTDS']);
+      const brix = extractValue(obj, ['Brix', 'BRIX', 'brix']);
+      const tempC = extractValue(obj, ['Temp Value(C)', 'T(C)', 'Temp(C)', 'Temperature(C)', 'TempC']);
+      const tempF = extractValue(obj, ['Temp Value(F)', 'T(F)', 'Temp(F)', 'Temperature(F)', 'TempF']);
+
+      els.tdsValue.textContent = displayValue(tds, tds === undefined ? '' : ' %');
+      els.brixValue.textContent = displayValue(brix, brix === undefined ? '' : ' %');
+      if (tempC !== undefined) els.tempValue.textContent = displayValue(tempC, ' °C');
+      else if (tempF !== undefined) els.tempValue.textContent = displayValue(tempF, ' °F');
+      else els.tempValue.textContent = '-';
+
+      els.parseStatus.textContent = 'JSON 파싱 성공';
+      log(`PARSED: ${JSON.stringify(obj)}`, 'PARSE');
+    } catch (err) {
+      els.parseStatus.textContent = '프레임 수신됨 · JSON 파싱 실패 (로그 확인)';
+      log(`JSON parse failed: ${err.message}`, 'WARN');
+    }
+  }
+
+  function consumeBytes(bytes) {
+    for (const b of bytes) rxBuffer.push(b);
+
+    while (true) {
+      const start = rxBuffer.indexOf(0x02);
+      if (start < 0) {
+        if (rxBuffer.length > 8192) rxBuffer = rxBuffer.slice(-1024);
+        return;
+      }
+      if (start > 0) rxBuffer.splice(0, start);
+      const end = rxBuffer.indexOf(0x03, 1);
+      if (end < 0) return;
+
+      const frame = rxBuffer.slice(1, end);
+      rxBuffer.splice(0, end + 1);
+      parseFrame(frame);
+    }
+  }
+
+  async function updateGrantedPorts() {
+    if (!('serial' in navigator)) return;
+    try {
+      const ports = await navigator.serial.getPorts();
+      els.grantedCount.textContent = String(ports.length);
+      return ports;
+    } catch (err) {
+      log(`getPorts failed: ${err.name}: ${err.message}`, 'WARN');
+      return [];
+    }
+  }
+
+  function describePort(p) {
+    let info = {};
+    try { info = p.getInfo ? p.getInfo() : {}; } catch (_) {}
+    const bt = info.bluetoothServiceClassId;
+    if (bt !== undefined) {
+      els.portType.textContent = 'Bluetooth RFCOMM / Serial';
+      els.serviceClass.textContent = String(bt);
+    } else if (info.usbVendorId !== undefined) {
+      els.portType.textContent = 'USB Serial';
+      els.serviceClass.textContent = `VID ${info.usbVendorId} / PID ${info.usbProductId ?? '-'}`;
+    } else {
+      els.portType.textContent = 'Serial port';
+      els.serviceClass.textContent = '-';
+    }
+    log(`Port info: ${JSON.stringify(info)}`, 'INFO');
+  }
+
+  async function startReadLoop() {
+    if (!port || !port.readable) throw new Error('Readable stream이 없습니다.');
+    readLoopPromise = (async () => {
+      while (port && port.readable && !closing) {
+        reader = port.readable.getReader();
+        try {
+          while (!closing) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            if (!value || value.length === 0) continue;
+            log(`RX HEX : ${hex(value)}`, 'RX');
+            log(`RX TEXT: ${printableText(value)}`, 'RX');
+            consumeBytes(value);
+          }
+        } catch (err) {
+          if (!closing) log(`Read error: ${err.name}: ${err.message}`, 'ERROR');
+        } finally {
+          try { reader.releaseLock(); } catch (_) {}
+          reader = null;
+        }
+        if (!closing) await new Promise(r => setTimeout(r, 100));
+      }
+    })();
+  }
+
+  async function openPort(selectedPort) {
+    if (!selectedPort) return;
+    if (port) await closePort();
+    port = selectedPort;
+    closing = false;
+    rxBuffer = [];
+    setStatus('connecting', 'Connecting…');
+    describePort(port);
+    log(`Opening port (baudRate=${OPEN_OPTIONS.baudRate})…`);
+    try {
+      await port.open(OPEN_OPTIONS);
+      setStatus('connected', 'Connected');
+      log('Port opened.', 'OK');
+      await updateGrantedPorts();
+      startReadLoop();
+    } catch (err) {
+      log(`Open failed: ${err.name}: ${err.message}`, 'ERROR');
+      setStatus('error', 'Connection error');
+      try { await port.close(); } catch (_) {}
+      port = null;
+      throw err;
+    }
+  }
+
+  async function closePort() {
+    if (!port) {
+      setStatus('disconnected', 'Disconnected');
+      return;
+    }
+    closing = true;
+    log('Closing port…');
+    try {
+      if (reader) await reader.cancel();
+    } catch (_) {}
+    try {
+      if (readLoopPromise) await readLoopPromise;
+    } catch (_) {}
+    try {
+      await port.close();
+    } catch (err) {
+      log(`Close warning: ${err.name}: ${err.message}`, 'WARN');
+    }
+    port = null;
+    reader = null;
+    readLoopPromise = null;
+    closing = false;
+    setStatus('disconnected', 'Disconnected');
+    els.portType.textContent = '-';
+    els.serviceClass.textContent = '-';
+    log('Port closed.', 'OK');
+  }
+
+  async function requestFilteredPort() {
+    try {
+      log('Opening device chooser filtered by standard SPP UUID…');
+      const selected = await navigator.serial.requestPort({
+        filters: [{ bluetoothServiceClassId: SPP_UUID }]
+      });
+      await openPort(selected);
+    } catch (err) {
+      if (err.name === 'NotFoundError') log('Device chooser canceled or no matching device selected.', 'WARN');
+      else log(`Filtered connect failed: ${err.name}: ${err.message}`, 'ERROR');
+    }
+  }
+
+  async function requestAnyPort() {
+    try {
+      log('Opening unfiltered serial device chooser…');
+      const selected = await navigator.serial.requestPort();
+      await openPort(selected);
+    } catch (err) {
+      if (err.name === 'NotFoundError') log('Device chooser canceled.', 'WARN');
+      else log(`Connect failed: ${err.name}: ${err.message}`, 'ERROR');
+    }
+  }
+
+  async function reopenGrantedPort() {
+    const ports = await updateGrantedPorts();
+    if (!ports || ports.length === 0) {
+      log('이 사이트에 이미 권한이 부여된 serial port가 없습니다.', 'WARN');
+      return;
+    }
+    if (ports.length > 1) {
+      log(`권한 받은 포트가 ${ports.length}개입니다. 첫 번째 포트를 엽니다. 진단용 테스트에서는 다른 포트를 닫아두는 것을 권장합니다.`, 'WARN');
+    }
+    try { await openPort(ports[0]); } catch (_) {}
+  }
+
+  async function sendStart() {
+    if (!port || !port.writable) {
+      log('Writable port가 없습니다.', 'ERROR');
+      return;
+    }
+    const writer = port.writable.getWriter();
+    try {
+      setStatus('measuring', 'Measuring…');
+      const bytes = new TextEncoder().encode(START_COMMAND);
+      await writer.write(bytes);
+      log(`TX HEX : ${hex(bytes)}`, 'TX');
+      log('TX TEXT: ^KEY START\\r\\n', 'TX');
+      setTimeout(() => {
+        if (port) setStatus('connected', 'Connected');
+      }, 800);
+    } catch (err) {
+      log(`Write failed: ${err.name}: ${err.message}`, 'ERROR');
+      setStatus('error', 'Connection error');
+    } finally {
+      writer.releaseLock();
+    }
+  }
+
+  function initDiagnostics() {
+    els.secureContext.textContent = window.isSecureContext ? 'YES' : 'NO';
+    const supported = 'serial' in navigator;
+    els.serialSupport.textContent = supported ? '지원됨' : '지원 안 됨';
+    els.browserInfo.textContent = navigator.userAgent;
+
+    if (!window.isSecureContext) {
+      els.supportNotice.className = 'notice bad';
+      els.supportNotice.innerHTML = '<b>HTTPS가 아닙니다.</b> Web Serial은 보안 컨텍스트에서 사용해야 합니다. GitHub Pages(HTTPS)에 올려 테스트하세요.';
+    } else if (!supported) {
+      els.supportNotice.className = 'notice bad';
+      els.supportNotice.innerHTML = '<b>이 브라우저에서 navigator.serial을 사용할 수 없습니다.</b> 최신 Chrome/Chromium 계열로 열어 주세요. Android는 Chrome 148 이상이 필요합니다.';
+    } else {
+      els.supportNotice.className = 'notice';
+      els.supportNotice.textContent = 'Web Serial 사용 가능. 먼저 SPP 기기 연결을 시도하세요.';
+    }
+
+    els.connectFiltered.disabled = !supported || !window.isSecureContext;
+    els.connectAny.disabled = !supported || !window.isSecureContext;
+    els.reopenGranted.disabled = !supported || !window.isSecureContext;
+  }
+
+  els.connectFiltered.addEventListener('click', requestFilteredPort);
+  els.connectAny.addEventListener('click', requestAnyPort);
+  els.reopenGranted.addEventListener('click', reopenGrantedPort);
+  els.disconnect.addEventListener('click', closePort);
+  els.measure.addEventListener('click', sendStart);
+  els.sendRaw.addEventListener('click', sendStart);
+  els.clearLog.addEventListener('click', () => { els.log.textContent = ''; });
+  els.copyLog.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(els.log.textContent);
+      log('Log copied to clipboard.', 'OK');
+    } catch (err) {
+      log(`Clipboard copy failed: ${err.message}`, 'WARN');
+    }
+  });
+
+  if ('serial' in navigator) {
+    navigator.serial.addEventListener('connect', () => {
+      log('navigator.serial connect event received.', 'EVENT');
+      updateGrantedPorts();
+    });
+    navigator.serial.addEventListener('disconnect', (event) => {
+      log('navigator.serial disconnect event received.', 'EVENT');
+      if (port && (!event.target || event.target === port)) {
+        port = null;
+        setStatus('disconnected', 'Disconnected');
+      }
+      updateGrantedPorts();
+    });
+  }
+
+  window.addEventListener('beforeunload', () => {
+    try { if (reader) reader.cancel(); } catch (_) {}
+  });
+
+  initDiagnostics();
+  updateGrantedPorts();
+  setStatus('disconnected', 'Disconnected');
+  log('Test page ready.');
+})();
+</script>
+</body>
+</html>
