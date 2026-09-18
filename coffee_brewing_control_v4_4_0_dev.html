@@ -16,7 +16,7 @@ body{margin:0;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-
 button,input,select,textarea{font:inherit} button{cursor:pointer}
 .app{max-width:980px;margin:0 auto;min-height:100vh;background:rgba(255,253,249,.94);box-shadow:0 0 44px rgba(67,45,22,.12)}
 header{position:sticky;top:0;z-index:50;background:var(--coffee);color:#fff;padding:13px 16px 10px;box-shadow:0 2px 8px rgba(0,0,0,.16)}
-.headrow{display:flex;align-items:center;justify-content:space-between;gap:14px}.brand-home{display:block;border:0;background:transparent;color:inherit;padding:0;margin:0;font:inherit;font-size:18px;font-weight:900;letter-spacing:-.02em;text-align:left;cursor:pointer;border-radius:7px}.brand-home:hover{opacity:.9}.brand-home:focus-visible{outline:2px solid rgba(255,255,255,.88);outline-offset:3px}.brand p{font-size:10.5px;margin:3px 0 0;opacity:.76}
+.headrow{display:flex;align-items:center;justify-content:space-between;gap:14px}.head-tools{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}.device-connection-control{width:190px;height:42px;flex:0 0 190px;display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid rgba(255,255,255,.15);border-radius:12px;background:#573a1d;color:#fff;overflow:hidden;text-align:left;transition:background .15s,border-color .15s,opacity .15s}.device-connection-control[hidden]{display:none}.device-connection-control:not(:disabled):hover{background:#634321;border-color:rgba(255,255,255,.25)}.device-connection-control:not(:disabled):focus-visible{outline:2px solid rgba(255,255,255,.9);outline-offset:2px}.device-connection-control:disabled{cursor:default;opacity:1}.device-connection-dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;background:#cfc5b9;box-shadow:0 0 0 3px rgba(255,255,255,.07)}.device-connection-copy{min-width:0;line-height:1.05}.device-connection-state{display:block;font-size:10px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.device-connection-name{display:block;margin-top:4px;font-size:9px;font-weight:750;color:#dfd3c4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.device-connection-control.setup .device-connection-dot{background:var(--gold)}.device-connection-control.disconnected .device-connection-dot{background:#ef8d84}.device-connection-control.connecting .device-connection-dot{background:#f0c66a}.device-connection-control.connected .device-connection-dot{background:#83cf95}.brand-home{display:block;border:0;background:transparent;color:inherit;padding:0;margin:0;font:inherit;font-size:18px;font-weight:900;letter-spacing:-.02em;text-align:left;cursor:pointer;border-radius:7px}.brand-home:hover{opacity:.9}.brand-home:focus-visible{outline:2px solid rgba(255,255,255,.88);outline-offset:3px}.brand p{font-size:10.5px;margin:3px 0 0;opacity:.76}
 .tabs{display:flex;gap:3px;padding:3px;border-radius:999px;background:#573a1d;overflow:auto}.tab{white-space:nowrap;border:0;border-radius:999px;padding:8px 11px;background:transparent;color:#e8ddcf;font-weight:900;font-size:12px}.tab.active{background:#fff;color:var(--coffee)}
 main{padding:16px}.page{display:none}.page.active{display:block}.stack>*+*{margin-top:14px}
 .panel{background:var(--card);border:1px solid #e5dbcf;border-radius:20px;padding:17px;box-shadow:0 8px 22px rgba(80,54,28,.06)}
@@ -39,14 +39,15 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
 .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,14px);z-index:300;background:#2f2923;color:#fff;padding:10px 13px;border-radius:11px;font-size:11px;font-weight:850;opacity:0;pointer-events:none;transition:.2s;box-shadow:0 7px 22px rgba(0,0,0,.22)}.toast.show{opacity:1;transform:translate(-50%,0)}
 
 .quick-meta-details{margin-bottom:13px;border:1px solid #e5dbcf;background:#faf6f0;border-radius:14px;overflow:hidden}.quick-meta-details summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;cursor:pointer;user-select:none}.quick-meta-details summary::-webkit-details-marker{display:none}.quick-meta-details summary:after{content:'＋';flex:0 0 auto;font-weight:900;color:#846d54}.quick-meta-details[open] summary:after{content:'−'}.quick-meta-summary-main{min-width:0;display:flex;align-items:baseline;gap:8px}.quick-meta-summary-main b{font-size:11px;color:#5d4935;white-space:nowrap}.quick-meta-summary-text{min-width:0;color:#897b6e;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.quick-meta{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:0 12px 12px;border-top:1px solid #eee4d8}.quick-meta>div:first-child{padding-top:10px}.quick-meta input{height:42px;font-size:13px;padding-right:10px}.quick-note-box{border:1px dashed #d8c8b6;border-radius:11px;background:#fff;padding:9px 10px}.quick-note-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:3px}.quick-note-head b{font-size:10px;color:#765b3f}.quick-note-view{width:100%;border:0;background:transparent;text-align:left;padding:2px 0;color:#4f443a;font-size:11px;line-height:1.5}.quick-note-view.empty{color:#9d9184;font-style:italic}.quick-note-edit{display:none}.quick-note-edit.open{display:block}.quick-note-edit textarea{min-height:58px}.quick-note-edit .actions{margin-top:6px}.storage-warning{display:none;margin:0 0 12px;padding:10px 12px;border:1px solid #d9a54d;background:#fff7e6;border-radius:12px;color:#6e4b12;font-size:10.5px;line-height:1.5}.storage-warning.show{display:block}.storage-warning b{font-weight:900}
-.quick-history-wrap{margin-top:14px;padding-top:13px;border-top:1px solid #e7ddd1}.quick-history-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}.quick-history-head b{font-size:12px;color:#4e3d2d}.quick-history-list{display:grid;gap:8px}.quick-history-row{display:flex;align-items:center;gap:10px;padding:10px 11px;border:1px solid #e4dacf;background:#fff;border-radius:13px}.quick-history-no{flex:0 0 auto;display:grid;place-items:center;width:38px;height:28px;border-radius:999px;background:#eee3d5;color:#5c4328;font-size:10.5px;font-weight:950}.quick-history-body{min-width:0;flex:1}.quick-history-sub{font-size:9.5px;color:#81766c;margin-top:5px}.quick-history-row .record-metrics{margin-top:0}.quick-history-row .btn{flex:0 0 auto}.class-session-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:7px;align-items:center;flex:1 1 100%}.class-session-row select{height:40px;font-size:12px}.class-session-actions{display:none;flex:1 1 100%;align-items:center;justify-content:flex-end;gap:7px;padding-top:2px}.class-session-actions.show{display:flex}.session-meta{font-size:9px;color:#8b8076}.current-class-badge{padding:6px 9px;border-radius:999px;background:#eee5d8;color:#5d4935;font-size:10px;font-weight:900;white-space:nowrap}.quick-reference{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);column-gap:14px;height:16px;margin-top:4px;font-size:11px;color:var(--muted);line-height:1.4;overflow:hidden}.quick-reference-line{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.quick-reference-goal.is-empty{visibility:hidden}.quick-goal-wrap{display:none;margin-top:9px;height:62px;align-items:center;justify-content:space-between;gap:12px;border:1px solid #e2d7c9;background:#faf6f0;border-radius:13px;padding:10px 12px;overflow:hidden}.quick-goal-wrap.show{display:flex}.quick-goal-wrap>div{min-width:0;flex:1;overflow:hidden}.quick-goal-wrap b{font-size:11.5px}.quick-goal-wrap span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:10px;color:var(--muted);margin-top:2px;line-height:1.45}.quick-goal-wrap .btn{flex:0 0 auto}.goal-key{display:inline-block!important;width:10px;height:10px;border:2px solid #8a55a8;border-radius:50%;vertical-align:-1px;margin:0 5px 0 0!important;background:#fff}.chart-click-hint{font-weight:800;color:#684c2e}.settings-dual{display:grid;gap:8px}.measurement-device-grid{display:grid;grid-template-columns:minmax(220px,1fr) minmax(260px,1.25fr);gap:10px;align-items:start}.measurement-device-grid select{height:44px}.measurement-device-note{margin-top:7px;font-size:10px;line-height:1.5;color:#75695d}.measurement-connection-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:11px;padding-top:11px;border-top:1px solid #eee4d8}.measurement-connection-status{min-width:0;flex:1;font-size:10px;line-height:1.45;color:#75695d}.measurement-connection-status strong{color:#4f4134}.measurement-connection-status.error{color:#8c3933}.measurement-connection-status.ok{color:#2f633d}.measurement-troubleshooting{margin-top:10px;border:1px dashed #d8c8b6;border-radius:12px;background:#fcf9f5;overflow:hidden}.measurement-troubleshooting>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;cursor:pointer;background:#f8f2eb;color:#716357;font-size:10px;font-weight:850}.measurement-troubleshooting>summary::-webkit-details-marker{display:none}.measurement-troubleshooting>summary:after{content:'＋';font-weight:900;color:#927b65}.measurement-troubleshooting[open]>summary:after{content:'−'}.measurement-troubleshooting-body{padding:10px}.measurement-help-intro{font-size:10px;line-height:1.55;color:#6f6459;margin-bottom:9px}.measurement-help-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.measurement-help-card{border:1px solid #e8ddd1;border-radius:10px;background:#fff;padding:9px 10px}.measurement-help-card b{display:block;font-size:10.5px;color:#59493a;margin-bottom:5px}.measurement-help-card ul{margin:0;padding-left:16px;color:#70655b;font-size:9.5px;line-height:1.55}.measurement-help-card li+li{margin-top:3px}.measurement-help-common{margin-top:9px;padding-top:9px;border-top:1px solid #eadfd3;color:#75695d;font-size:9.5px;line-height:1.55}.measurement-help-common b{color:#59493a}.toggle input:disabled+.slider{opacity:.52;cursor:not-allowed}@media(max-width:700px){.measurement-device-grid{grid-template-columns:1fr}.measurement-connection-row{align-items:stretch}.measurement-connection-row .btn{width:100%}.measurement-connection-status{flex-basis:100%}.measurement-help-grid{grid-template-columns:1fr}}
+.quick-history-wrap{margin-top:14px;padding-top:13px;border-top:1px solid #e7ddd1}.quick-history-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}.quick-history-head b{font-size:12px;color:#4e3d2d}.quick-history-list{display:grid;gap:8px}.quick-history-row{display:flex;align-items:center;gap:10px;padding:10px 11px;border:1px solid #e4dacf;background:#fff;border-radius:13px}.quick-history-no{flex:0 0 auto;display:grid;place-items:center;width:38px;height:28px;border-radius:999px;background:#eee3d5;color:#5c4328;font-size:10.5px;font-weight:950}.quick-history-body{min-width:0;flex:1}.quick-history-sub{font-size:9.5px;color:#81766c;margin-top:5px}.quick-history-row .record-metrics{margin-top:0}.quick-history-row .btn{flex:0 0 auto}.class-session-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:7px;align-items:center;flex:1 1 100%}.class-session-row select{height:40px;font-size:12px}.class-session-actions{display:none;flex:1 1 100%;align-items:center;justify-content:flex-end;gap:7px;padding-top:2px}.class-session-actions.show{display:flex}.session-meta{font-size:9px;color:#8b8076}.current-class-badge{padding:6px 9px;border-radius:999px;background:#eee5d8;color:#5d4935;font-size:10px;font-weight:900;white-space:nowrap}.quick-reference{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);column-gap:14px;height:16px;margin-top:4px;font-size:11px;color:var(--muted);line-height:1.4;overflow:hidden}.quick-reference-line{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.quick-reference-goal.is-empty{visibility:hidden}.quick-goal-wrap{display:none;margin-top:9px;height:62px;align-items:center;justify-content:space-between;gap:12px;border:1px solid #e2d7c9;background:#faf6f0;border-radius:13px;padding:10px 12px;overflow:hidden}.quick-goal-wrap.show{display:flex}.quick-goal-wrap>div{min-width:0;flex:1;overflow:hidden}.quick-goal-wrap b{font-size:11.5px}.quick-goal-wrap span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:10px;color:var(--muted);margin-top:2px;line-height:1.45}.quick-goal-wrap .btn{flex:0 0 auto}.goal-key{display:inline-block!important;width:10px;height:10px;border:2px solid #8a55a8;border-radius:50%;vertical-align:-1px;margin:0 5px 0 0!important;background:#fff}.chart-click-hint{font-weight:800;color:#684c2e}.settings-dual{display:grid;gap:8px}.measurement-device-grid{display:grid;grid-template-columns:minmax(220px,1fr) minmax(260px,1.25fr);gap:10px;align-items:start}.measurement-device-grid select{height:44px}.measurement-device-note{margin-top:7px;font-size:10px;line-height:1.5;color:#75695d}.measurement-connection-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:11px;padding-top:11px;border-top:1px solid #eee4d8}.measurement-connection-status{min-width:0;flex:1;font-size:10px;line-height:1.45;color:#75695d}.measurement-connection-status strong{color:#4f4134}.measurement-connection-status.error{color:#8c3933}.measurement-connection-status.ok{color:#2f633d}.measurement-troubleshooting{margin-top:10px;border:1px dashed #d8c8b6;border-radius:12px;background:#fcf9f5;overflow:hidden}.measurement-troubleshooting>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;cursor:pointer;background:#f8f2eb;color:#716357;font-size:10px;font-weight:850}.measurement-troubleshooting>summary::-webkit-details-marker{display:none}.measurement-troubleshooting>summary:after{content:'＋';font-weight:900;color:#927b65}.measurement-troubleshooting[open]>summary:after{content:'−'}.measurement-troubleshooting-body{padding:10px}.measurement-help-intro{font-size:10px;line-height:1.55;color:#6f6459;margin-bottom:9px}.measurement-help-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.measurement-help-card{border:1px solid #e8ddd1;border-radius:10px;background:#fff;padding:9px 10px}.measurement-help-card b{display:block;font-size:10.5px;color:#59493a;margin-bottom:5px}.measurement-help-card ul{margin:0;padding-left:16px;color:#70655b;font-size:9.5px;line-height:1.55}.measurement-help-card li+li{margin-top:3px}.measurement-help-common{margin-top:9px;padding-top:9px;border-top:1px solid #eadfd3;color:#75695d;font-size:9.5px;line-height:1.55}.measurement-help-common b{color:#59493a}.toggle input:disabled+.slider{opacity:.52;cursor:not-allowed}.measurement-tds-action{display:flex;align-items:center;gap:7px;min-height:34px;margin-top:6px}.measurement-tds-action[hidden]{display:none}.measurement-tds-action .btn{min-width:112px}.measurement-tds-action .btn.measuring{opacity:.72}.measurement-tds-feedback{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9.5px;line-height:1.25;color:#7b7065}.measurement-tds-feedback.busy{color:#8b672d;font-weight:800}.measurement-tds-feedback.ok{color:#2f633d;font-weight:800}.measurement-tds-feedback.warn{color:#9b651d;font-weight:800}.measurement-tds-feedback.error{color:#8c3933;font-weight:800}@media(max-width:700px){.measurement-device-grid{grid-template-columns:1fr}.measurement-connection-row{align-items:stretch}.measurement-connection-row .btn{width:100%}.measurement-connection-status{flex-basis:100%}.measurement-help-grid{grid-template-columns:1fr}}
 .mini-feedback{display:flex;align-items:center;gap:7px;white-space:nowrap}.mini-feedback b{font-size:10px;color:#6b5a49}.mini-feedback .toggle{transform:scale(.88);transform-origin:right center}
 .class-context-strip{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border:1px solid #e5dbcf;background:#faf6f0;border-radius:14px;padding:10px 12px}.class-context-strip .label{font-size:10px;color:#84786d;font-weight:800}.class-context-strip .spacer{flex:1}.class-manager{display:grid;gap:10px}.class-manager-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}.class-manager-row.actions-row{grid-template-columns:minmax(0,1fr) auto auto}.class-manager input,.class-manager select{height:42px;font-size:13px;padding-right:10px}.backup-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.backup-info{margin-top:9px;border:1px solid #e5dbcf;background:#faf6f0;border-radius:12px;padding:9px 10px;font-size:10px;line-height:1.5;color:#6d6258}.import-preview{display:none;margin-top:9px;border:1px solid #d9cbb9;background:#fffaf2;border-radius:12px;padding:10px}.import-preview.show{display:block}.import-preview b{font-size:11px}.import-preview p{font-size:10px;color:#6b6057;line-height:1.5;margin:4px 0 0}.export-json{margin-top:8px;min-height:150px;max-height:260px;font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;font-size:9.5px;line-height:1.45;white-space:pre;overflow:auto;background:#fff;border-radius:10px}.export-status{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px}.export-status .hint{margin:0}
 .modal-backdrop{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(40,32,24,.42);backdrop-filter:blur(2px)}.modal-backdrop.open{display:flex}.app-dialog{width:min(420px,100%);background:#fffdf9;border:1px solid #e2d6c8;border-radius:18px;padding:17px;box-shadow:0 24px 70px rgba(45,34,23,.28)}.app-dialog h3{font-size:14px;margin:0;color:#47382a}.app-dialog p{font-size:11px;line-height:1.55;color:#74695f;margin:7px 0 0}.app-dialog input{height:43px;margin-top:11px;font-size:14px;padding-right:10px}.app-dialog .actions{justify-content:flex-end}
-@media(max-width:720px){header{position:static}.headrow{display:block}.tabs{margin-top:10px;width:max-content;max-width:100%;flex:0 0 auto}.grid,.grid-4,.grid-3,.record-form{grid-template-columns:repeat(2,minmax(0,1fr))}.results{grid-template-columns:repeat(2,minmax(0,1fr))}.record-form .wide{grid-column:1/-1}.panel{padding:14px}.chart-card{padding:8px}.profile-row,.profile-save-row{grid-template-columns:1fr}.profile-row .btn,.profile-save-row .btn{width:100%}.calculation-grid{grid-template-columns:1fr}.chart-warning{height:46px}.quick-reference{grid-template-columns:minmax(0,1fr);grid-template-rows:15px 15px;row-gap:2px;height:32px}.status-copy{min-height:44px}.quick-goal-wrap{height:72px}.class-session-row{grid-template-columns:auto 1fr}.class-session-row select{grid-column:2}.class-session-row .session-new,.class-session-row .session-more{grid-column:auto}.class-session-actions{justify-content:stretch}.class-session-actions .btn{flex:1}.quick-history-row{align-items:flex-start;flex-wrap:wrap}.quick-history-body{flex-basis:70%}.class-manager-row,.class-manager-row.actions-row,.backup-grid{grid-template-columns:1fr}.class-manager-row .btn{width:100%}}
+@media(max-width:720px){header{position:static}.headrow{display:block}.head-tools{margin-top:10px;width:100%;display:block}.tabs{margin-top:0;width:max-content;max-width:100%;min-width:0;flex:0 0 auto}.head-tools.device-visible{display:grid;grid-template-columns:minmax(0,1fr) 116px;gap:7px;align-items:center}.head-tools.device-visible .tabs{grid-column:1;grid-row:1;width:100%;flex:0 1 auto}.head-tools.device-visible .tab{padding-left:9px;padding-right:9px}.device-connection-control{grid-column:2;grid-row:1;width:116px;height:38px;flex-basis:116px;padding:5px 8px;border-radius:11px}.device-connection-state{font-size:9px}.device-connection-name{font-size:8px;margin-top:3px}.grid,.grid-4,.grid-3,.record-form{grid-template-columns:repeat(2,minmax(0,1fr))}.results{grid-template-columns:repeat(2,minmax(0,1fr))}.record-form .wide{grid-column:1/-1}.panel{padding:14px}.chart-card{padding:8px}.profile-row,.profile-save-row{grid-template-columns:1fr}.profile-row .btn,.profile-save-row .btn{width:100%}.calculation-grid{grid-template-columns:1fr}.chart-warning{height:46px}.quick-reference{grid-template-columns:minmax(0,1fr);grid-template-rows:15px 15px;row-gap:2px;height:32px}.status-copy{min-height:44px}.quick-goal-wrap{height:72px}.class-session-row{grid-template-columns:auto 1fr}.class-session-row select{grid-column:2}.class-session-row .session-new,.class-session-row .session-more{grid-column:auto}.class-session-actions{justify-content:stretch}.class-session-actions .btn{flex:1}.quick-history-row{align-items:flex-start;flex-wrap:wrap}.quick-history-body{flex-basis:70%}.class-manager-row,.class-manager-row.actions-row,.backup-grid{grid-template-columns:1fr}.class-manager-row .btn{width:100%}}
 @media(max-width:440px){main{padding:10px}.grid,.grid-4,.grid-3,.record-form{grid-template-columns:1fr}.record-form .wide{grid-column:auto}.record-top{display:block}.record-top>.actions{margin-top:8px!important}.brand p{display:none}.metric .v{font-size:19px}.chart-head{gap:7px}.badge{max-width:44%;font-size:9px;padding:5px 7px}.chart-warning{height:46px}.quick-goal-wrap{height:82px}.filter-student-list{grid-template-columns:fit-content(120px) minmax(0,1fr)}.filter-name-toggle{max-width:120px}}
 @media(max-width:407px){.status{height:96px}}
 @media(max-width:399px){.status{height:111px}}
+@media(max-width:360px){.head-tools.device-visible{grid-template-columns:minmax(0,1fr) 92px;gap:6px}.head-tools.device-visible .tab{padding-left:6px;padding-right:6px;font-size:10.5px}.device-connection-control{width:92px;flex-basis:92px;padding-left:7px;padding-right:7px}.device-connection-dot{width:8px;height:8px}.device-connection-state{font-size:8.5px}.device-connection-name{font-size:7.5px}}
 @media(max-width:340px){.quick-reference{font-size:10.5px}}
 </style>
 </head>
@@ -55,12 +56,18 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
 <header>
   <div class="headrow">
     <div class="brand"><button class="brand-home" id="brandHome" type="button" aria-label="Quick으로 이동">Coffee Brewing Control</button><p>Quick calculator · Class records · Target feedback</p></div>
-    <nav class="tabs" aria-label="주요 화면">
-      <button class="tab active" data-page="quick">Quick</button>
-      <button class="tab" data-page="class">Class</button>
-      <button class="tab" data-page="chart">Chart</button>
-      <button class="tab" data-page="settings">설정</button>
-    </nav>
+    <div class="head-tools">
+      <button class="device-connection-control" id="headerDeviceControl" type="button" hidden aria-live="polite" aria-atomic="true" aria-label="측정기 연결 상태">
+        <span class="device-connection-dot" aria-hidden="true"></span>
+        <span class="device-connection-copy"><strong class="device-connection-state" id="headerDeviceState">Disconnected</strong><span class="device-connection-name" id="headerDeviceName">—</span></span>
+      </button>
+      <nav class="tabs" aria-label="주요 화면">
+        <button class="tab active" data-page="quick">Quick</button>
+        <button class="tab" data-page="class">Class</button>
+        <button class="tab" data-page="chart">Chart</button>
+        <button class="tab" data-page="settings">설정</button>
+      </nav>
+    </div>
   </div>
 </header>
 <main>
@@ -83,7 +90,7 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
       <div><label>원두량 · Dose</label><div class="field"><input id="qDose" type="number" inputmode="decimal" step="0.1" value="20"><span class="unit">g</span></div></div>
       <div><label>물량 · Brew water</label><div class="field"><input id="qWater" type="number" inputmode="decimal" step="0.1" value="300"><span class="unit">g</span></div></div>
       <div><label>추출된 액체량 · Beverage</label><div class="field"><input id="qBev" type="number" inputmode="decimal" step="0.1" placeholder="비우면 자동"><span class="unit">g</span></div><div class="hint" id="qBevHint"></div></div>
-      <div><label>측정 TDS · Strength</label><div class="field"><input id="qTds" type="number" inputmode="decimal" step="0.01" value="1.53"><span class="unit">%</span></div></div>
+      <div><label>측정 TDS · Strength</label><div class="field"><input id="qTds" type="number" inputmode="decimal" step="0.01" value="1.53"><span class="unit">%</span></div><div class="measurement-tds-action" id="qMeasurementAction" hidden><button class="btn" id="qMeasureTds" type="button" disabled>Measure TDS</button><span class="measurement-tds-feedback" id="qMeasurementFeedback" role="status" aria-live="polite"></span></div></div>
     </div>
   </div>
   <div class="panel">
@@ -126,7 +133,7 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
       <div><label>원두량</label><div class="field"><input id="cDose" type="number" step="0.1" value="20"><span class="unit">g</span></div></div>
       <div><label>물량</label><div class="field"><input id="cWater" type="number" step="0.1" value="300"><span class="unit">g</span></div></div>
       <div><label>추출된 액체량</label><div class="field"><input id="cBev" type="number" step="0.1" placeholder="비우면 자동"><span class="unit">g</span></div><div class="hint" id="cBevHint"></div></div>
-      <div><label>TDS</label><div class="field"><input id="cTds" type="number" step="0.01" placeholder="예: 1.35"><span class="unit">%</span></div></div>
+      <div><label>TDS</label><div class="field"><input id="cTds" type="number" step="0.01" placeholder="예: 1.35"><span class="unit">%</span></div><div class="measurement-tds-action" id="cMeasurementAction" hidden><button class="btn" id="cMeasureTds" type="button" disabled>Measure TDS</button><span class="measurement-tds-feedback" id="cMeasurementFeedback" role="status" aria-live="polite"></span></div></div>
       <div class="wide"><label>추출 노트</label><textarea id="cNote" rows="1" maxlength="160" placeholder="예: 분쇄 2클릭 가늘게 · 3푸어 · 물온도 92℃"></textarea></div>
     </div>
     <div class="actions"><button class="btn" id="saveRecord">추출 기록 추가</button><button class="btn secondary" id="cancelEdit" style="display:none">수정 취소</button></div>
@@ -606,7 +613,7 @@ function pos(v){return Number.isFinite(v)&&v>0}
 function fmt(v,d=2){return Number.isFinite(v)?v.toFixed(d):'—'}
 function trimNum(v,d=2){if(!Number.isFinite(v))return '—';return Number(v.toFixed(d)).toString()}
 function esc(s=''){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
-function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),1800)}
+function toast(msg,duration=1800){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),Math.max(600,Number(duration)||1800))}
 const DEVICE_CONNECTION_STATES=Object.freeze({DISCONNECTED:'disconnected',CONNECTING:'connecting',CONNECTED:'connected'});
 const DEVICE_MEASUREMENT_STATES=Object.freeze({IDLE:'idle',MEASURING:'measuring'});
 const MEASUREMENT_RESULT_KINDS=Object.freeze({SUCCESS:'success',STATUS:'status',ERROR:'error',UNKNOWN:'unknown'});
@@ -645,7 +652,7 @@ class HMDigitalBTRAdapter extends MeasurementAdapter{
     this.measurementTimeoutMs=Number.isFinite(Number(options.measurementTimeoutMs))?Math.max(1,Number(options.measurementTimeoutMs)):HM_DIGITAL_MEASUREMENT_TIMEOUT_MS;
     this.stalePortRetryDelays=Array.isArray(options.stalePortRetryDelays)&&options.stalePortRetryDelays.length?options.stalePortRetryDelays.map(v=>Math.max(0,Number(v)||0)):[0,1000,2500,5500];
     this.maxRxBufferBytes=Number.isFinite(Number(options.maxRxBufferBytes))?Math.max(1024,Number(options.maxRxBufferBytes)):65536;
-    this.port=null;this._lastPort=null;this.reader=null;this._readLoopPromise=null;this._cleanupPromise=null;
+    this.port=null;this._lastPort=null;this.reader=null;this.writer=null;this._readLoopPromise=null;this._cleanupPromise=null;
     this._rxBuffer=[];this._pendingFrame=null;this._connected=false;this._closing=false;this._portGeneration=0;this._lossReportedGeneration=-1;
     this._serialDisconnectAttached=false;this._textEncoder=new TextEncoder();this._textDecoder=new TextDecoder();this.lastFrame=null;this.lastMeasurementResult=null;this.lastSuccessfulMeasurement=null;this.lastProtocolError=null;
     this._onSerialDisconnect=event=>{const eventPort=event?.target||event?.port||null;if(eventPort&&eventPort!==this.port)return;if(this.port)this._signalConnectionLost(new MeasurementDeviceError('connection-lost','Measurement device connection was lost.'),this._portGeneration)};
@@ -697,9 +704,12 @@ class HMDigitalBTRAdapter extends MeasurementAdapter{
     try{
       await this._openWithStaleRecovery(port);
       if(generation!==this._portGeneration)throw new MeasurementDeviceError('connection-cancelled','Connection attempt was superseded.');
-      this._connected=true;this._startReadLoop(port,generation);return {deviceDisplayName:this.deviceDisplayName};
+      this._connected=true;this._startReadLoop(port,generation);await this._delay(0);
+      if(generation!==this._portGeneration||!this._connected||this.port!==port)throw new MeasurementDeviceError('connection-lost','Measurement device connection was lost during startup.');
+      return {deviceDisplayName:this.deviceDisplayName};
     }catch(error){
-      if(this.port===port){try{await port.close()}catch(e){}this.port=null}
+      if(this._cleanupPromise)try{await this._cleanupPromise}catch(e){}
+      else if(this.port===port){try{await port.close()}catch(e){}this.port=null}
       this._connected=false;this._detachSerialDisconnectListener();
       throw error instanceof MeasurementDeviceError?error:new MeasurementDeviceError('port-open-failed','Unable to open the measurement-device serial port.',{cause:error});
     }
@@ -785,31 +795,43 @@ class HMDigitalBTRAdapter extends MeasurementAdapter{
     const ms=Number.isFinite(Number(timeoutMs))?Math.max(1,Number(timeoutMs)):this.measurementTimeoutMs;
     return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{if(!this._pendingFrame||this._pendingFrame.timer!==timer)return;this._pendingFrame=null;this._rxBuffer=[];reject(new MeasurementDeviceError('measurement-timeout',`No measurement response was received within ${ms} ms.`))},ms);this._pendingFrame={resolve,reject,timer}});
   }
+  async _writeWithTimeout(writer,data,timeoutMs){
+    const ms=Number.isFinite(Number(timeoutMs))?Math.max(1,Number(timeoutMs)):this.measurementTimeoutMs;let timer=null;
+    try{return await Promise.race([writer.write(data),new Promise((_,reject)=>{timer=setTimeout(()=>reject(new MeasurementDeviceError('write-timeout',`Measurement command write did not complete within ${ms} ms.`)),ms)})])}
+    finally{if(timer!==null)clearTimeout(timer)}
+  }
   _resolvePendingFrame(frame){const pending=this._pendingFrame;if(!pending)return false;this._pendingFrame=null;clearTimeout(pending.timer);pending.resolve(frame);return true}
   _rejectPendingFrame(error){const pending=this._pendingFrame;if(!pending)return false;this._pendingFrame=null;clearTimeout(pending.timer);pending.reject(error);return true}
   async measure(options={}){
     if(!this._connected||!this.port)throw new MeasurementDeviceError('not-connected','Measurement device is not connected.');
-    if(!this.port.writable){const error=new MeasurementDeviceError('write-unavailable','The measurement-device serial port is not writable.');this._signalConnectionLost(error,this._portGeneration);throw error}
-    const generation=this._portGeneration;this._rxBuffer=[];const framePromise=this._waitForNextFrame(options.timeoutMs);
+    if(!this.port.writable){const source=new MeasurementDeviceError('write-unavailable','The measurement-device serial port is not writable.');throw this._signalConnectionLost(source,this._portGeneration)||source}
+    const generation=this._portGeneration,timeoutMs=Number.isFinite(Number(options.timeoutMs))?Math.max(1,Number(options.timeoutMs)):this.measurementTimeoutMs;this._rxBuffer=[];const framePromise=this._waitForNextFrame(timeoutMs);void framePromise.catch(()=>{});
     let writer=null;
-    try{writer=this.port.writable.getWriter();await writer.write(this._textEncoder.encode(HM_DIGITAL_START_COMMAND))}
-    catch(cause){const error=cause instanceof MeasurementDeviceError?cause:new MeasurementDeviceError('write-failed','Failed to send the measurement command.',{cause});this._rejectPendingFrame(error);try{await framePromise}catch(e){}this._signalConnectionLost(error,generation);throw error}
-    finally{try{writer?.releaseLock()}catch(e){}}
+    try{writer=this.port.writable.getWriter();this.writer=writer;await this._writeWithTimeout(writer,this._textEncoder.encode(HM_DIGITAL_START_COMMAND),timeoutMs)}
+    catch(cause){
+      let error;if(this._lossReportedGeneration===generation)error=new MeasurementDeviceError('connection-lost','Measurement device connection was lost.',{cause});
+      else if(this._closing||generation!==this._portGeneration)error=new MeasurementDeviceError('measurement-cancelled','Measurement was cancelled because the device state changed.',{cause});
+      else error=cause instanceof MeasurementDeviceError?cause:new MeasurementDeviceError('write-failed','Failed to send the measurement command.',{cause});
+      this._rejectPendingFrame(error);try{await framePromise}catch(e){}
+      if(error.code==='measurement-cancelled')throw error;throw this._signalConnectionLost(error,generation)||error;
+    }finally{try{writer?.releaseLock()}catch(e){}if(this.writer===writer)this.writer=null}
     const frame=await framePromise;
     if(generation!==this._portGeneration||!this._connected||!this.port)throw new MeasurementDeviceError('measurement-cancelled','Measurement was cancelled because the device state changed.');
     const result=this._classifyMeasurementFrame(frame);this.lastMeasurementResult=result;if(result.kind===MEASUREMENT_RESULT_KINDS.SUCCESS)this.lastSuccessfulMeasurement=result;return result;
   }
   _signalConnectionLost(cause,generation){
-    if(this._closing||generation!==this._portGeneration||this._lossReportedGeneration===generation)return;
-    this._lossReportedGeneration=generation;this._connected=false;
     const error=cause instanceof MeasurementDeviceError&&cause.code==='connection-lost'?cause:new MeasurementDeviceError('connection-lost','Measurement device connection was lost.',{cause});
-    this._rejectPendingFrame(error);this.emit(MEASUREMENT_ADAPTER_EVENTS.CONNECTION_LOST,{error});void this._cleanupPort({rejectPending:false}).catch(()=>{});
+    if(this._closing||generation!==this._portGeneration||this._lossReportedGeneration===generation)return error;
+    this._lossReportedGeneration=generation;this._connected=false;
+    this._rejectPendingFrame(error);this.emit(MEASUREMENT_ADAPTER_EVENTS.CONNECTION_LOST,{error});void this._cleanupPort({rejectPending:false}).catch(()=>{});return error;
   }
   async _cleanupPort(options={}){
     if(this._cleanupPromise)return this._cleanupPromise;
-    const port=this.port;const readLoop=this._readLoopPromise;this._closing=true;this._connected=false;
+    const port=this.port,readLoop=this._readLoopPromise,writer=this.writer;this._closing=true;this._connected=false;
     if(options.rejectPending!==false)this._rejectPendingFrame(new MeasurementDeviceError('measurement-cancelled','Measurement was cancelled because the device disconnected.'));
     const promise=(async()=>{
+      try{if(writer)await writer.abort(new MeasurementDeviceError('measurement-cancelled','Measurement-device connection is closing.'))}catch(e){}
+      try{writer?.releaseLock()}catch(e){}if(this.writer===writer)this.writer=null;
       try{if(this.reader)await this.reader.cancel()}catch(e){}
       try{if(readLoop)await readLoop}catch(e){}
       try{if(port)await port.close()}catch(e){}
@@ -869,6 +891,7 @@ class MeasurementDeviceManager{
     if(event.type===MEASUREMENT_ADAPTER_EVENTS.DISPLAY_NAME_CHANGED)this._notify();
   }
   async connect(options={}){
+    if(this._disconnectPromise)await this._disconnectPromise;
     const adapter=this._requireAdapter();
     if(this.connectionState===DEVICE_CONNECTION_STATES.CONNECTED)return this.getSnapshot();
     if(this._connectPromise)return this._connectPromise;
@@ -881,7 +904,9 @@ class MeasurementDeviceManager{
     this._connectPromise=promise;try{return await promise}finally{if(this._connectPromise===promise)this._connectPromise=null}
   }
   async reconnect(options={}){
+    if(this._disconnectPromise)await this._disconnectPromise;
     const adapter=this._requireAdapter();
+    if(this.connectionState===DEVICE_CONNECTION_STATES.CONNECTED)return this.getSnapshot();
     if(this._connectPromise)return this._connectPromise;
     const generation=++this._connectionGeneration;this.lastError=null;this.connectionState=DEVICE_CONNECTION_STATES.CONNECTING;this.measurementState=DEVICE_MEASUREMENT_STATES.IDLE;this._notify();
     const promise=(async()=>{try{
@@ -1113,8 +1138,107 @@ function showPage(pid){$$('.page').forEach(p=>p.classList.toggle('active',p.id==
 $$('.tab').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
 $('brandHome').onclick=()=>showPage('quick');
 
+const measurementUiFeedback={quick:{kind:'',text:''},class:{kind:'',text:''}};
+function measurementFeedbackElement(source){return $(source==='class'?'cMeasurementFeedback':'qMeasurementFeedback')}
+function renderMeasurementUiFeedback(source){
+  const el=measurementFeedbackElement(source),feedback=measurementUiFeedback[source];if(!el||!feedback)return;
+  el.className='measurement-tds-feedback'+(feedback.kind?` ${feedback.kind}`:'');el.textContent=feedback.text||'';el.title=feedback.text||'';
+}
+function setMeasurementUiFeedback(source,kind='',text=''){
+  const feedback=measurementUiFeedback[source];if(!feedback)return;feedback.kind=kind||'';feedback.text=String(text||'');renderMeasurementUiFeedback(source);
+}
+function clearMeasurementUiFeedback(source){setMeasurementUiFeedback(source,'','')}
+function measurementCompactResult(result){
+  if(!result)return {kind:'error',text:'응답 확인 필요'};
+  if(result.kind===MEASUREMENT_RESULT_KINDS.STATUS){
+    if(result.statusCode==='air')return {kind:'warn',text:'샘플 미감지'};
+    if(result.statusCode==='hi-range')return {kind:'warn',text:'측정 범위 초과'};
+    return {kind:'warn',text:'상태 확인 필요'};
+  }
+  if(result.kind===MEASUREMENT_RESULT_KINDS.ERROR){
+    if(result.errorCode==='unstable')return {kind:'warn',text:'측정값 불안정'};
+    return {kind:'error',text:'측정기 오류'};
+  }
+  return {kind:'error',text:'응답 확인 필요'};
+}
+function measurementCompactException(error){
+  if(error?.code==='measurement-timeout')return {kind:'warn',text:'응답 시간 초과'};
+  if(error?.code==='connection-lost'||error?.code==='not-connected')return {kind:'error',text:'연결 끊김'};
+  if(error?.code==='measurement-cancelled')return {kind:'warn',text:'측정 취소됨'};
+  if(error?.code==='measurement-busy')return {kind:'busy',text:'이미 측정 중'};
+  return {kind:'error',text:'측정 실패'};
+}
+function measurementTdsInputValue(result){
+  const rawTds=result?.raw?.payload?.TDS;if(typeof rawTds==='string'&&rawTds.trim()!==''&&Number.isFinite(Number(rawTds))&&Number(rawTds)===Number(result?.tds))return rawTds.trim();
+  return Number.isFinite(Number(result?.tds))?String(Number(result.tds)):'';
+}
+function measurementResultMessage(result){
+  if(!result)return '측정기 응답을 확인하지 못했습니다. 기존 TDS 값은 유지됩니다.';
+  if(result.kind===MEASUREMENT_RESULT_KINDS.STATUS){
+    if(result.statusCode==='air')return '샘플이 감지되지 않았습니다. 기존 TDS 값은 유지됩니다.';
+    if(result.statusCode==='hi-range')return '측정 범위를 초과했습니다. 기존 TDS 값은 유지됩니다.';
+    return result.status?`측정기 상태: ${result.status}. 기존 TDS 값은 유지됩니다.`:'측정기 상태를 확인해 주세요. 기존 TDS 값은 유지됩니다.';
+  }
+  if(result.kind===MEASUREMENT_RESULT_KINDS.ERROR){
+    if(result.errorCode==='unstable')return '측정값이 안정되지 않았습니다. 다시 측정해 주세요. 기존 TDS 값은 유지됩니다.';
+    return result.deviceError?`측정기 오류: ${result.deviceError}. 기존 TDS 값은 유지됩니다.`:'측정기 오류가 발생했습니다. 기존 TDS 값은 유지됩니다.';
+  }
+  return '측정기 응답을 확인하지 못했습니다. 기존 TDS 값은 유지됩니다.';
+}
+function measurementExceptionMessage(error){
+  if(error?.code==='measurement-timeout')return '측정 응답 시간이 초과되었습니다. 기존 TDS 값은 유지됩니다.';
+  if(error?.code==='connection-lost'||error?.code==='not-connected')return '측정기 연결이 끊어졌습니다. 기존 TDS 값은 유지됩니다.';
+  if(error?.code==='measurement-cancelled')return '측정이 취소되었습니다. 기존 TDS 값은 유지됩니다.';
+  if(error?.code==='measurement-busy')return '이미 측정 중입니다.';
+  return '측정에 실패했습니다. 기존 TDS 값은 유지됩니다.';
+}
+function renderQuickMeasurementControl(snapshot=measurementDeviceManager.getSnapshot()){
+  const wrap=$('qMeasurementAction'),button=$('qMeasureTds');if(!wrap||!button||!state)return;
+  const profile=measurementDeviceProfile(),visible=profile.id!=='none'&&state.measurementDevice?.controlsVisible===true;wrap.hidden=!visible;
+  if(!visible){button.disabled=true;button.textContent='Measure TDS';button.classList.remove('measuring');button.removeAttribute('aria-busy');button.title='';clearMeasurementUiFeedback('quick');return}
+  const measuring=snapshot.measurementState===DEVICE_MEASUREMENT_STATES.MEASURING,connected=snapshot.connectionState===DEVICE_CONNECTION_STATES.CONNECTED;
+  button.classList.toggle('measuring',measuring);button.textContent=measuring?'Measuring…':'Measure TDS';button.disabled=measuring||!connected;
+  if(measuring){button.setAttribute('aria-busy','true');button.title='측정값을 기다리는 중입니다. 응답까지 최대 약 60초 걸릴 수 있습니다.'}
+  else{button.removeAttribute('aria-busy');button.title=connected?'연결된 측정기에서 TDS를 측정합니다. 응답까지 최대 약 60초 걸릴 수 있습니다.':'측정기를 먼저 연결해 주세요.'}
+  renderMeasurementUiFeedback('quick');
+}
+function renderClassMeasurementControl(snapshot=measurementDeviceManager.getSnapshot()){
+  const wrap=$('cMeasurementAction'),button=$('cMeasureTds');if(!wrap||!button||!state)return;
+  const profile=measurementDeviceProfile(),visible=profile.id!=='none'&&state.measurementDevice?.controlsVisible===true;wrap.hidden=!visible;
+  if(!visible){button.disabled=true;button.textContent='Measure TDS';button.classList.remove('measuring');button.removeAttribute('aria-busy');button.title='';clearMeasurementUiFeedback('class');return}
+  const measuring=snapshot.measurementState===DEVICE_MEASUREMENT_STATES.MEASURING,connected=snapshot.connectionState===DEVICE_CONNECTION_STATES.CONNECTED;
+  button.classList.toggle('measuring',measuring);button.textContent=measuring?'Measuring…':'Measure TDS';button.disabled=measuring||!connected;
+  if(measuring){button.setAttribute('aria-busy','true');button.title='측정값을 기다리는 중입니다. 응답까지 최대 약 60초 걸릴 수 있습니다.'}
+  else{button.removeAttribute('aria-busy');button.title=connected?'연결된 측정기에서 TDS를 측정합니다. 응답까지 최대 약 60초 걸릴 수 있습니다.':'측정기를 먼저 연결해 주세요.'}
+  renderMeasurementUiFeedback('class');
+}
+async function measureQuickTds(){
+  const snapshot=measurementDeviceManager.getSnapshot();if(snapshot.connectionState!==DEVICE_CONNECTION_STATES.CONNECTED||snapshot.measurementState===DEVICE_MEASUREMENT_STATES.MEASURING){renderQuickMeasurementControl(snapshot);return false}
+  const input=$('qTds');setMeasurementUiFeedback('quick','busy','응답 대기 중 · 최대 60초');
+  try{
+    const result=await measurementDeviceManager.measure({source:'quick'});
+    if(result?.kind===MEASUREMENT_RESULT_KINDS.SUCCESS&&Number.isFinite(Number(result.tds))){
+      const value=measurementTdsInputValue(result);if(!value)throw new MeasurementDeviceError('invalid-tds','Measurement result did not contain a usable TDS value.');
+      input.value=value;input.dispatchEvent(new Event('input',{bubbles:true}));setMeasurementUiFeedback('quick','ok',`TDS ${value}% 입력됨`);toast(`TDS ${value}%를 측정값으로 입력했습니다`,2200);return true;
+    }
+    const compact=measurementCompactResult(result);setMeasurementUiFeedback('quick',compact.kind,compact.text);toast(measurementResultMessage(result),3400);return false;
+  }catch(error){const compact=measurementCompactException(error);setMeasurementUiFeedback('quick',compact.kind,compact.text);toast(measurementExceptionMessage(error),3400);return false}
+}
+async function measureClassTds(){
+  const snapshot=measurementDeviceManager.getSnapshot();if(snapshot.connectionState!==DEVICE_CONNECTION_STATES.CONNECTED||snapshot.measurementState===DEVICE_MEASUREMENT_STATES.MEASURING){renderClassMeasurementControl(snapshot);return false}
+  const input=$('cTds');setMeasurementUiFeedback('class','busy','응답 대기 중 · 최대 60초');
+  try{
+    const result=await measurementDeviceManager.measure({source:'class'});
+    if(result?.kind===MEASUREMENT_RESULT_KINDS.SUCCESS&&Number.isFinite(Number(result.tds))){
+      const value=measurementTdsInputValue(result);if(!value)throw new MeasurementDeviceError('invalid-tds','Measurement result did not contain a usable TDS value.');
+      input.value=value;input.dispatchEvent(new Event('input',{bubbles:true}));setMeasurementUiFeedback('class','ok',`TDS ${value}% 입력됨`);toast(`TDS ${value}%를 측정값으로 입력했습니다`,2200);return true;
+    }
+    const compact=measurementCompactResult(result);setMeasurementUiFeedback('class',compact.kind,compact.text);toast(measurementResultMessage(result),3400);return false;
+  }catch(error){const compact=measurementCompactException(error);setMeasurementUiFeedback('class',compact.kind,compact.text);toast(measurementExceptionMessage(error),3400);return false}
+}
 function renderQuick(){
   const q=liveQuickRecord();state.quick={dose:$('qDose').value,water:$('qWater').value,bev:$('qBev').value,tds:$('qTds').value};save();
+  renderQuickMeasurementControl();
   const d=calcRecord(q);$('qBevHint').innerHTML=Number.isFinite(d.autoBev)?`자동: [물량 − (${fmt(state.settings.absorption,1)} × 원두량)] ÷ (1 − TDS/100) = ${fmt(d.autoBev,1)} g <span class="auto">AUTO</span>`:(pos(d.dose)&&pos(d.water)&&!Number.isFinite(d.tds)?'TDS 입력 시 자동 계산':'자동 계산값 없음');
   $('qEyOut').textContent=Number.isFinite(d.ey)?fmt(d.ey,2)+'%':'—';$('qTdsOut').textContent=Number.isFinite(d.tds)?fmt(d.tds,2)+'%':'—';$('qRatioOut').textContent=Number.isFinite(d.ratio)?'1 : '+fmt(d.ratio,2):'—';$('qSolidsOut').textContent=Number.isFinite(d.solids)?fmt(d.solids,3)+' g':'—';$('qBevOut').textContent=Number.isFinite(d.bev)?`${fmt(d.bev,1)} g · ${d.manualBev?'직접':'자동'}`:'—';
   $('quickTargetLabel').textContent=`${state.settings.targetName} | EY ${fmt(state.settings.eyMin,1)}–${fmt(state.settings.eyMax,1)}% · TDS ${fmt(state.settings.tdsMin,2)}–${fmt(state.settings.tdsMax,2)}%`;
@@ -1130,6 +1254,8 @@ function renderQuickHistory(){
 }
 function saveQuickResult(){const rec=liveQuickRecord(),d=calcRecord(rec);if(!pos(d.dose)||!pos(d.water)||!pos(d.tds)||!pos(d.bev)||!Number.isFinite(d.ey)){toast('저장할 측정값을 확인해 주세요');return}state.quickHistory.push({id:id(),dose:rec.dose,water:rec.water,bev:rec.bev?rec.bev:'',tds:rec.tds});save();selectedPointKey=null;renderQuick();renderChart();toast(`${state.quickHistory.length}차 추출 결과를 저장했습니다`)}
 function deleteQuickRecord(rid){const i=state.quickHistory.findIndex(r=>r.id===rid);if(i<0)return;state.quickHistory.splice(i,1);selectedPointKey=null;save();renderQuick();renderChart();toast('Quick 기록을 삭제했습니다')}
+$('qMeasureTds').onclick=measureQuickTds;
+$('cMeasureTds').onclick=measureClassTds;
 $('qSaveResult').onclick=saveQuickResult;
 $('qClearHistory').onclick=()=>{if(!state.quickHistory.length)return;openDialog({title:'Quick 기록 전체 삭제',message:'저장된 Quick 추출 기록을 모두 삭제할까요?',confirmText:'전체 삭제',danger:true,onConfirm:()=>{state.quickHistory=[];selectedPointKey=null;save();renderQuick();renderChart();toast('Quick 기록을 모두 삭제했습니다')}})};
 ['qDose','qWater','qBev','qTds'].forEach(x=>$(x).addEventListener('input',()=>{renderQuick();if(chartMode==='quick')renderChart()}));
@@ -1168,7 +1294,7 @@ function renderTeacherFeedback(r){
   const text=(r.teacherFeedback||'').trim();return `<div class="teacher-feedback"><div class="teacher-feedback-head"><b>강사 피드백</b><span class="hint" style="margin:0">클릭하여 편집</span></div><button class="teacher-feedback-view ${text?'':'empty'}" data-teacher-edit="${r.id}">${text?esc(text):'피드백을 입력하려면 여기를 클릭하세요.'}</button></div>`;
 }
 function renderClass(){
-  ensureCurrentClass();ensureCurrentSession();ensureCurrentStudent();renderClassSession();renderStudentBar();syncFeedbackControls();const s=currentStudent();if(!s)return;
+  ensureCurrentClass();ensureCurrentSession();ensureCurrentStudent();renderClassSession();renderStudentBar();syncFeedbackControls();renderClassMeasurementControl();const s=currentStudent();if(!s)return;
   const records=sessionRecords(s.id,true),ss=currentSession();ss.studentNames=ss.studentNames||{};ss.studentNames[s.id]=s.name;$('recordListTitle').textContent=`${s.name} · ${ss.name} · 추출 기록`;$('nextAttemptBadge').textContent=editingRecordId?`${records.findIndex(r=>r.id===editingRecordId)+1}차 수정`:`${records.length+1}차`;
   $('classFormTitle').textContent=editingRecordId?'추출 기록 수정':'새 추출 기록';$('saveRecord').textContent=editingRecordId?'수정 저장':'추출 기록 추가';$('cancelEdit').style.display=editingRecordId?'inline-block':'none';
   const list=$('recordList');list.innerHTML='';if(!records.length){list.innerHTML='<div class="empty">현재 실습에는 아직 기록이 없습니다.<br>첫 측정값을 입력하면 1차 기록이 만들어집니다.</div>';return}
@@ -1193,6 +1319,7 @@ $('qFeedbackToggle').onchange=e=>setQuickFeedback(e.target.checked);$('classFeed
 $('sMeasurementDeviceProfile').onchange=async e=>{e.target.disabled=true;try{await setMeasurementDeviceProfile(e.target.value)}finally{e.target.disabled=false;renderMeasurementDeviceSettings()}};
 $('sMeasurementControlsVisible').onchange=e=>{const profileId=measurementDeviceProfile().id;state.measurementDevice.controlsVisible=profileId==='none'?e.target.checked:true;save();renderMeasurementDeviceSettings();renderSettingsSummaries();toast(`측정기 UI ${state.measurementDevice.controlsVisible?'ON':'OFF'}`)};
 $('sTestMeasurementConnection').onclick=()=>testMeasurementDeviceConnection();
+$('headerDeviceControl').onclick=()=>handleHeaderDeviceControlClick();
 
 function initChartSelectionForStudent(s,selectNew=false){if(!s)return;const records=sessionRecords(s.id);chartSelection[s.id]=chartSelection[s.id]||{};records.forEach(r=>{if(!(r.id in chartSelection[s.id]))chartSelection[s.id][r.id]=true});Object.keys(chartSelection[s.id]).forEach(rid=>{if(!records.some(r=>r.id===rid))delete chartSelection[s.id][rid]});if(selectNew&&records.length)chartSelection[s.id][records[records.length-1].id]=true}
 function initChartSelections(){sessionChartStudents().forEach(s=>initChartSelectionForStudent(s))}
@@ -1378,8 +1505,42 @@ function measurementConnectionErrorText(error){
   if(code==='web-serial-unsupported')return '이 브라우저에서는 Web Serial을 사용할 수 없습니다.';
   if(code==='port-open-failed'||code==='port-stale-or-busy'||code==='port-unavailable')return '측정기 포트를 열지 못했습니다.';
   if(code==='device-selection-failed')return '측정기를 선택하지 못했습니다.';
+  if(code==='connection-lost'||code==='connection-not-established'||code==='write-failed'||code==='write-timeout'||code==='write-unavailable')return '측정기 연결이 끊어졌습니다.';
   if(code==='adapter-unavailable')return '선택한 Device Profile의 연결 어댑터를 사용할 수 없습니다.';
   return '측정기 연결을 확인하지 못했습니다.';
+}
+function renderHeaderDeviceControl(snapshot=measurementDeviceManager.getSnapshot()){
+  const control=$('headerDeviceControl'),stateEl=$('headerDeviceState'),nameEl=$('headerDeviceName');if(!control||!stateEl||!nameEl||!state)return;
+  const md=state.measurementDevice||DEFAULT_MEASUREMENT_DEVICE,profile=measurementDeviceProfile(),visible=profile.id!=='none'||md.controlsVisible===true;
+  control.hidden=!visible;control.closest('.head-tools')?.classList.toggle('device-visible',visible);if(!visible)return;
+  control.classList.remove('setup','disconnected','connecting','connected');control.removeAttribute('aria-busy');
+  if(profile.id==='none'){
+    control.classList.add('setup');control.disabled=false;stateEl.textContent='Device setup';nameEl.textContent='Device Profile 선택';control.title='클릭하여 측정기 설정을 엽니다.';control.setAttribute('aria-label','측정기 설정 열기');return;
+  }
+  const displayName=snapshot.profileId===profile.id&&snapshot.displayName?snapshot.displayName:profile.displayName;
+  nameEl.textContent=displayName;
+  if(snapshot.connectionState===DEVICE_CONNECTION_STATES.CONNECTED){control.classList.add('connected');control.disabled=true;stateEl.textContent='Connected';control.title=`Connected · ${displayName}`;control.setAttribute('aria-label',`측정기 연결됨 · ${displayName}`);return}
+  if(snapshot.connectionState===DEVICE_CONNECTION_STATES.CONNECTING){control.classList.add('connecting');control.disabled=true;control.setAttribute('aria-busy','true');stateEl.textContent='Connecting…';control.title=`Connecting · ${displayName}`;control.setAttribute('aria-label',`측정기 연결 중 · ${displayName}`);return}
+  control.classList.add('disconnected');control.disabled=false;stateEl.textContent='Disconnected';control.title=snapshot.lastError?`${measurementConnectionErrorText(snapshot.lastError)} 클릭하여 다시 연결합니다.`:`클릭하여 ${displayName}에 연결합니다.`;control.setAttribute('aria-label',`측정기 연결 또는 재연결 · ${displayName}`);
+}
+function openMeasurementDeviceSettingsFromHeader(){
+  showPage('settings');const details=$('measurementDeviceSettings');if(details)details.open=true;requestAnimationFrame(()=>{details?.scrollIntoView?.({behavior:'smooth',block:'center'});$('sMeasurementDeviceProfile')?.focus?.()});
+}
+async function connectMeasurementDeviceFromHeader(){
+  const profile=measurementDeviceProfile();if(profile.id==='none'){openMeasurementDeviceSettingsFromHeader();return false}
+  let snapshot=measurementDeviceManager.getSnapshot();
+  if(snapshot.connectionState===DEVICE_CONNECTION_STATES.CONNECTED||snapshot.connectionState===DEVICE_CONNECTION_STATES.CONNECTING)return false;
+  try{
+    if(snapshot.profileId!==profile.id||!snapshot.adapterAvailable){const ok=await syncMeasurementDeviceRuntimeFromState();if(!ok)throw measurementDeviceManager.lastError||new MeasurementDeviceError('adapter-unavailable','Selected measurement-device adapter is not available.')}
+    snapshot=measurementDeviceManager.getSnapshot();if(snapshot.connectionState===DEVICE_CONNECTION_STATES.CONNECTED)return true;
+    const result=await measurementDeviceManager.reconnect({source:'header'}),finalSnapshot=measurementDeviceManager.getSnapshot();
+    if(result?.connectionState!==DEVICE_CONNECTION_STATES.CONNECTED||finalSnapshot.connectionState!==DEVICE_CONNECTION_STATES.CONNECTED)throw finalSnapshot.lastError||new MeasurementDeviceError('connection-not-established','Measurement-device connection did not remain active.');
+    toast('측정기를 연결했습니다');return true;
+  }catch(error){if(error?.code!=='device-selection-cancelled')toast(measurementConnectionErrorText(error));return false}
+}
+async function handleHeaderDeviceControlClick(){
+  if(measurementDeviceProfile().id==='none'){openMeasurementDeviceSettingsFromHeader();return}
+  await connectMeasurementDeviceFromHeader();
 }
 function renderMeasurementConnectionTest(snapshot=measurementDeviceManager.getSnapshot()){
   const profile=measurementDeviceProfile(),button=$('sTestMeasurementConnection'),status=$('measurementConnectionStatus');
@@ -1399,15 +1560,15 @@ function renderMeasurementDeviceSettings(){
   $('measurementControlsDesc').textContent=locked?'선택한 측정기를 사용할 수 있도록 컨트롤이 자동으로 표시됩니다.':'측정기 연결 상태와 측정 버튼을 표시할지 선택합니다.';
   $('measurementDeviceProfileNote').textContent=locked?'현재 프로필에 맞는 통신 어댑터를 사용합니다. 연결 테스트에서는 측정 명령을 보내지 않습니다.':'측정기를 사용하지 않으면 없음으로 두세요. UI만 미리 표시할 수도 있습니다.';
   $('measurementDeviceStatus').innerHTML=locked?`선택된 Device Profile: <b>${esc(profile.displayName)}</b>`:(md.controlsVisible?'Device Profile은 없지만 측정기 UI 표시는 <b>ON</b>입니다.':'현재 측정기 기능을 사용하지 않습니다.');
-  renderMeasurementConnectionTest();
+  renderMeasurementConnectionTest();renderHeaderDeviceControl();
 }
 async function testMeasurementDeviceConnection(){
   const snapshot=measurementDeviceManager.getSnapshot();
   if(measurementDeviceProfile().id==='none'||snapshot.connectionState===DEVICE_CONNECTION_STATES.CONNECTING||snapshot.connectionState===DEVICE_CONNECTION_STATES.CONNECTED){renderMeasurementConnectionTest(snapshot);return false}
-  try{await measurementDeviceManager.connect({source:'settings-test'});renderMeasurementConnectionTest();toast('측정기 연결을 확인했습니다');return true}
+  try{const result=await measurementDeviceManager.connect({source:'settings-test'}),finalSnapshot=measurementDeviceManager.getSnapshot();if(result?.connectionState!==DEVICE_CONNECTION_STATES.CONNECTED||finalSnapshot.connectionState!==DEVICE_CONNECTION_STATES.CONNECTED)throw finalSnapshot.lastError||new MeasurementDeviceError('connection-not-established','Measurement-device connection did not remain active.');renderMeasurementConnectionTest();toast('측정기 연결을 확인했습니다');return true}
   catch(error){renderMeasurementConnectionTest();if(error?.code!=='device-selection-cancelled')toast('측정기 연결을 확인하지 못했습니다');return false}
 }
-measurementDeviceManager.subscribe(snapshot=>{if(state)renderMeasurementConnectionTest(snapshot)});
+measurementDeviceManager.subscribe(snapshot=>{if(state){renderMeasurementConnectionTest(snapshot);renderHeaderDeviceControl(snapshot);renderQuickMeasurementControl(snapshot);renderClassMeasurementControl(snapshot)}});
 async function setMeasurementDeviceProfile(profileId){
   if(!MEASUREMENT_DEVICE_PROFILES[profileId])profileId='none';
   const previous={...state.measurementDevice},nextControls=profileId==='none'?previous.controlsVisible===true:true;
