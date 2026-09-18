@@ -4,6 +4,55 @@ All notable changes to Coffee Brewing Control are documented here.
 
 The project was developed iteratively before its first public GitHub release. Earlier entries are intentionally condensed to major user-facing and architectural milestones rather than every intermediate test or debugging change.
 
+## [4.4.0] - 2026-09-19
+
+### Added
+- Added a reusable **Measurement Device** framework with persistent Device Profile settings and runtime-only connection / measurement state.
+- Added direct HM Digital **BTR-1000 / RCM-1000BT** support through Web Serial and Bluetooth Classic SPP.
+- Added **Measure TDS** actions to Quick and Class. Successful measurements enter TDS through the existing input path; measurements never auto-save a Quick attempt or Class record.
+- Added a global header device control for connection state and reconnect, plus a Settings connection test that opens the device connection without sending a measurement command.
+- Added platform-specific troubleshooting for Windows Bluetooth pairing and Android Chrome **Nearby devices** permission.
+- Added normalized runtime measurement results for TDS, Brix, Celsius / Fahrenheit temperature, refractive index, and the original raw device response for future device-aware features.
+
+### Changed
+- Existing TDS remains visible while a measurement is pending and is replaced only after a successful new TDS result.
+- Air, Unstable, Hi Range, timeout, unknown-response, and connection-loss cases preserve the previous TDS value.
+- Measurement feedback now follows the current attempt and connection lifecycle: a new measurement replaces the previous result message, connection loss takes priority over an older measurement message, and a confirmed reconnect returns the measurement UI to standby.
+- Connection and measurement state are handled independently, with guarded cleanup, duplicate-event protection, stale-port recovery, delayed-result rejection, and reconnect support after device sleep or link loss.
+- Device Profile display names are used when a browser cannot expose the physical Bluetooth device name; the internal model can also accept a device-provided display name when available.
+
+### Compatibility
+- Advanced the saved-data schema to **v4**.
+- Existing schema-v3 browser data and backups remain importable. Measurement-device settings default to **no device + controls hidden** for migrated data.
+- The selected Device Profile and measurement-control visibility are included in normal app persistence and JSON backup; live serial-port objects and runtime measurement results are not persisted.
+- The legacy browser storage key `coffeeBrewControlClassroomV2` and backup format identifier `coffee-brew-control-backup` remain unchanged.
+- HM Digital device integration was validated with Chrome on Windows, a Windows PC using a Bluetooth dongle, and Android Chrome. Windows may require Bluetooth pairing before the device appears; Android Chrome may require **Nearby devices** permission.
+
+## [4.3.6] - 2026-09-18
+
+### Added
+- Added an independent **Calculation Settings** section for the global liquid-retention coefficient, including the automatic Beverage mass-balance formula and an explanation of where the coefficient is applied.
+- Split the former combined Brewing Profile into **Target Profiles** and **Chart View Presets**, each with built-in presets, load controls, and collapsible management for save / overwrite / delete.
+- Added per-student master toggles to the Class chart filter, with aligned student-name columns and attempt checkboxes, so all attempts for one student can be selected or hidden at once while preserving mixed-selection state.
+- Made the **Coffee Brewing Control** header title return to Quick as the app's home action.
+
+### Changed
+- Quick results now show the extraction target and Quick goal as separate reference lines; goal coordinates are no longer repeated inside the main feedback text.
+- Quick goal feedback separates remaining ΔEY / ΔTDS from the adjustment recommendation for easier reading.
+- Stabilized layout around Quick goal creation / removal and chart out-of-range warnings to reduce vertical shifts.
+- Improved chart-header handling for long experiment / class / session names and constrained the mobile navigation pill to its content width while keeping its existing position.
+- Renamed the UI setting from **absorption coefficient** to **Liquid retention** terminology while retaining the same calculation role.
+
+### Compatibility
+- Advanced the saved-data schema to **v3**.
+- Existing schema-v2 browser data and backups remain importable. Legacy custom Brewing Profiles are migrated into same-named Target Profiles and Chart View Presets.
+- During migration, the currently applied liquid-retention value is preserved as the global calculation setting; liquid retention is no longer stored per preset.
+- The legacy browser storage key `coffeeBrewControlClassroomV2` and backup format identifier `coffee-brew-control-backup` remain unchanged for compatibility.
+
+### Deferred / Future considerations — not implemented in v4.3.6
+- Add stored-data size and record-count summaries in Settings if long-term classroom datasets make this useful.
+- Move the `StorageAdapter` persistence backend from localStorage to IndexedDB if real-world data volume approaches localStorage limits; future native/app ports can use an appropriate backend such as SQLite.
+
 ## [4.3.5] - 2026-09-17
 
 ### Changed
