@@ -4,6 +4,33 @@ All notable changes to Coffee Brewing Control are documented here.
 
 The project was developed iteratively before its first public GitHub release. Earlier entries are intentionally condensed to major user-facing and architectural milestones rather than every intermediate test or debugging change.
 
+## [4.4.1] - 2026-09-20
+
+### Added
+- Added editing for saved **Quick** attempts through the existing input form. Saving an edit preserves the attempt ID, order, and liquid-retention value; saving or cancelling restores the previous LIVE input.
+- Added a per-record **liquid-retention snapshot** for Quick and Class so later Calculation Settings changes do not recalculate saved automatic Beverage values.
+
+### Fixed
+- Storage recovery now validates available candidates and falls back to a valid copy instead of silently replacing unreadable data with defaults. Recovery preserves the previous committed snapshot; unreadable or newer-schema data stops automatic writes.
+- Added stale-tab write detection and serialized same-origin writes through Web Locks when available. Conflicting tabs keep their in-memory data available for JSON export instead of overwriting another tab.
+- Class input ownership now follows student, class, practice-session, record-edit, and backup-restore transitions. Deleting the record being edited clears the obsolete form values.
+- Delayed measurement results no longer replace input after its owner changes, an input reset, or a subsequent manual TDS edit. Returning to the same student does not reactivate an earlier measurement.
+- Unsubmitted instructor feedback survives same-context Class re-rendering. Editing an existing Class record preserves chart-filter selections.
+- Backup import now checks known data structures, record IDs, chart settings, and preset settings while retaining supported legacy migrations and historical roster records. Imported IDs are assigned through DOM properties rather than inserted into HTML attributes.
+- File-save and JSON-copy actions now create a fresh export snapshot at the start of each operation. Backup restore also clears previous form, editing, and pending-measurement contexts.
+
+### Changed
+- Separated input updates and persistence from rendering, and extracted calculation functions with explicit settings. Quick input updates no longer rebuild the entire saved-attempt list.
+- Shared Quick / Class measurement controls and separated Settings and Chart rendering responsibilities within the existing single-file app. Unapplied calculation, target, and chart fields survive unrelated Settings refreshes.
+- Coalesced Quick input chart-render requests and flushes pending chart rendering before PNG generation. Added label associations for numeric fields and a chart description without changing the existing layout.
+- The automatic Beverage formula, default liquid retention of **2.1**, manual-input policy, chart out-of-range notice, measurement transport, and PNG layout remain unchanged.
+
+### Compatibility
+- Advanced the saved-data schema to **v5**. Supported schema-v4 and earlier browser data / backups remain importable. Existing records receive the dataset's liquid-retention value during migration to preserve the results shown immediately before migration; this does not reconstruct an unknown historical coefficient.
+- The legacy browser storage key **coffeeBrewControlClassroomV2** and backup format identifier **coffee-brew-control-backup** remain unchanged. Local / session storage and the memory fallback are retained.
+- Web Locks strengthen coordination between participating v4.4.1 tabs. Environments without Web Locks retain change detection but do not guarantee protection against simultaneous writes. Older app tabs do not participate in the new coordination.
+- Export a backup and close older app tabs before upgrading in the same browser storage context. Schema-v5 backups are not intended for older app versions; retain a pre-upgrade backup for rollback.
+
 ## [4.4.0] - 2026-09-19
 
 ### Added
