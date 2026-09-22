@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Coffee Brewing Control · Classroom v4.4.1</title>
+<title>Coffee Brewing Control · Classroom v4.4.2</title>
 <style>
 :root{
   --bg:#f3ede4; --card:#fffdf9; --ink:#2b2722; --muted:#766e66; --line:#ddd3c7;
@@ -88,10 +88,11 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
     </details>
     <div class="grid">
       <div><label for="qDose">원두량 · Dose</label><div class="field"><input id="qDose" type="number" inputmode="decimal" step="0.1" value="20"><span class="unit">g</span></div></div>
-      <div><label for="qWater">물량 · Brew water</label><div class="field"><input id="qWater" type="number" inputmode="decimal" step="0.1" value="300"><span class="unit">g</span></div></div>
-      <div><label for="qBev">추출된 액체량 · Beverage</label><div class="field"><input id="qBev" type="number" inputmode="decimal" step="0.1" placeholder="비우면 자동"><span class="unit">g</span></div><div class="hint" id="qBevHint"></div></div>
+      <div><label for="qWater">물양 · Brew water</label><div class="field"><input id="qWater" type="number" inputmode="decimal" step="0.1" value="300" placeholder="비우면 자동 추정" aria-describedby="qInputRule"><span class="unit">g</span></div><div class="hint" id="qWaterHint" style="display:none"></div></div>
+      <div><label for="qBev">추출된 액체량 · Beverage</label><div class="field"><input id="qBev" type="number" inputmode="decimal" step="0.1" placeholder="비우면 자동 추정" aria-describedby="qInputRule"><span class="unit">g</span></div><div class="hint" id="qBevHint"></div></div>
       <div><label for="qTds">측정 TDS · Strength</label><div class="field"><input id="qTds" type="number" inputmode="decimal" step="0.01" value="1.53"><span class="unit">%</span></div><div class="measurement-tds-action" id="qMeasurementAction" hidden><button class="btn" id="qMeasureTds" type="button" disabled>Measure TDS</button><span class="measurement-tds-feedback" id="qMeasurementFeedback" role="status" aria-live="polite"></span></div></div>
     </div>
+    <div class="hint" id="qInputRule">원두량과 TDS는 필수입니다. 물양과 추출액은 둘 중 하나 이상 입력하세요. 하나를 비우면 입력한 값을 기준으로 자동 추정합니다.</div>
   </div>
   <div class="panel">
     <div class="panel-head"><div><h2>결과</h2><div class="quick-reference"><div class="quick-reference-line" id="quickTargetLabel"></div><div class="quick-reference-line quick-reference-goal is-empty" id="quickGoalLabel">목표점 | EY — · TDS —</div></div></div><div class="mini-feedback"><b>피드백</b><label class="toggle" title="Quick 방향 가이드 ON/OFF"><input id="qFeedbackToggle" type="checkbox"><span class="slider"></span></label></div></div>
@@ -131,9 +132,10 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
     <div class="form-title"><b id="classFormTitle">새 추출 기록</b><span class="attempt-badge" id="nextAttemptBadge">1차</span></div>
     <div class="record-form">
       <div><label for="cDose">원두량</label><div class="field"><input id="cDose" type="number" step="0.1" value="20"><span class="unit">g</span></div></div>
-      <div><label for="cWater">물량</label><div class="field"><input id="cWater" type="number" step="0.1" value="300"><span class="unit">g</span></div></div>
-      <div><label for="cBev">추출된 액체량</label><div class="field"><input id="cBev" type="number" step="0.1" placeholder="비우면 자동"><span class="unit">g</span></div><div class="hint" id="cBevHint"></div></div>
+      <div><label for="cWater">물양</label><div class="field"><input id="cWater" type="number" step="0.1" value="300" placeholder="비우면 자동 추정" aria-describedby="cInputRule"><span class="unit">g</span></div><div class="hint" id="cWaterHint" style="display:none"></div></div>
+      <div><label for="cBev">추출된 액체량</label><div class="field"><input id="cBev" type="number" step="0.1" placeholder="비우면 자동 추정" aria-describedby="cInputRule"><span class="unit">g</span></div><div class="hint" id="cBevHint"></div></div>
       <div><label for="cTds">TDS</label><div class="field"><input id="cTds" type="number" step="0.01" placeholder="예: 1.35"><span class="unit">%</span></div><div class="measurement-tds-action" id="cMeasurementAction" hidden><button class="btn" id="cMeasureTds" type="button" disabled>Measure TDS</button><span class="measurement-tds-feedback" id="cMeasurementFeedback" role="status" aria-live="polite"></span></div></div>
+      <div class="wide hint" id="cInputRule">원두량과 TDS는 필수입니다. 물양과 추출액은 둘 중 하나 이상 입력하세요. 하나를 비우면 입력한 값을 기준으로 자동 추정합니다.</div>
       <div class="wide"><label>추출 노트</label><textarea id="cNote" rows="1" maxlength="160" placeholder="예: 분쇄 2클릭 가늘게 · 3푸어 · 물온도 92℃"></textarea></div>
     </div>
     <div class="actions"><button class="btn" id="saveRecord">추출 기록 추가</button><button class="btn secondary" id="cancelEdit" style="display:none">수정 취소</button></div>
@@ -183,9 +185,9 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
               <div class="actions"><button class="btn" id="applyCalculationSettings">계산 설정 적용</button><button class="btn secondary" id="resetCalculationFields">기본값 불러오기</button></div>
             </div>
             <div class="calculation-note">
-              Beverage를 비워두면 원두층에 남는 액체량을 이 계수로 가정해 자동 추정합니다.
-              <code>Beverage = [물량 − (계수 × 원두량)] ÷ (1 − TDS/100)</code>
-              현재 계수는 새 LIVE 계산과 신규 기록, 차트의 Brew Ratio 가이드에 적용됩니다. 저장된 기록은 보존된 계수를 사용하며, 구버전 기록은 이관 당시 계수로 표시값을 유지합니다. 실제 Beverage를 직접 입력한 기록의 EY 계산에는 이 계수가 사용되지 않습니다. 기본값은 2.1입니다.
+              물양 또는 Beverage 중 하나를 비워두면 원두층에 남는 액체량을 이 계수로 가정해 자동 추정합니다.
+              <code>Beverage = [물양 − (계수 × 원두량)] ÷ (1 − TDS/100)</code><br><code>물양 = Beverage × (1 − TDS/100) + 계수 × 원두량</code>
+              현재 계수는 새 LIVE 계산과 신규 기록, 차트의 Brew Ratio 가이드에 적용됩니다. 저장된 기록은 보존된 계수를 사용하며, 구버전 기록은 이관 당시 계수로 표시값을 유지합니다. 실제 Beverage를 직접 입력한 기록의 EY 계산에는 이 계수가 사용되지 않습니다. 물양이 비어 있으면 물양과 Ratio 추정에는 보존된 계수가 적용됩니다. 기본값은 2.1입니다.
             </div>
           </div>
         </div>
@@ -349,7 +351,7 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
       </details>
 
       <div class="public-info">
-        <div class="meta"><b>Coffee Brewing Control v4.4.1</b><br>Local-first · single-file web app</div>
+        <div class="meta"><b>Coffee Brewing Control v4.4.2</b><br>Local-first · single-file web app</div>
         <div class="actions"><button class="btn ghost small" id="openAbout">About &amp; References</button><button class="btn ghost small" id="openChangelog">Changelog</button></div>
       </div>
     </div>
@@ -380,16 +382,23 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
     <p>This tool is designed for coffee brewing education, repeated brew testing, and comparative analysis. It visualizes brew strength (TDS), extraction yield, and brew ratio relationships using the brewing control chart framework originating from E. E. Lockhart's work.</p>
     <p>The built-in <b>Classic Filter</b> target profile uses a default reference range of <b>18–22% extraction yield</b> and <b>1.15–1.35% TDS</b>, informed by published SCA brewing materials. This range is provided as a starting reference only.</p>
     <p>Target ranges, chart scales, brew ratios, and liquid-retention assumptions are configurable. User-defined targets and chart ranges should not be interpreted as established sensory-quality standards or physical limits.</p>
-    <p>When beverage mass is not entered, the tool estimates it from brew water, measured TDS, and the configured liquid-retention value using a mass-balance relationship. The default liquid-retention reference is 2.1 and remains independently configurable. Calculated extraction yield therefore depends on the measurements and assumptions provided by the user.</p>
-    <p>Saved Quick and Class records retain their liquid-retention value when edited. New LIVE calculations and Brew Ratio guides use the current global setting. Older records migrated to schema v5 receive the dataset's retention value at migration, preserving their preceding displayed results rather than reconstructing an unknown historical value. Manual Beverage calculations remain independent of this coefficient.</p>
+    <p>When either beverage mass or brew water is left blank, the tool estimates the missing mass from the other mass, dose, measured TDS, and the configured liquid-retention value using the same mass-balance relationship. Estimated brew water and its Brew Ratio are reference estimates; extra liquid left in the dripper when brewing is stopped is not reconstructed. The default liquid-retention reference is 2.1 and remains independently configurable. Calculated extraction yield therefore depends on the measurements and assumptions provided by the user.</p>
+    <p>Saved Quick and Class records retain their liquid-retention value when edited. New LIVE calculations and Brew Ratio guides use the current global setting. Older records migrated to schema v5 receive the dataset's retention value at migration, preserving their preceding displayed results rather than reconstructing an unknown historical value. EY calculated from directly entered Beverage remains independent of this coefficient; estimating Brew water and Ratio still uses it. Records migrated from schema v5 or earlier retain their previous water-input interpretation.</p>
     <div class="notice"><b>Independent project.</b> This project is independently developed and is not affiliated with or endorsed by the Specialty Coffee Association. No SCA logo or SCA chart artwork is included.</div>
     <h4>Data &amp; privacy</h4>
     <p>Brew records, class data, profiles, and settings are stored locally in the browser by this application. The application does not transmit entered brew or class data to an application backend. When a supported measurement device is used, device communication is handled directly through browser device APIs; live connection objects and normalized auxiliary readings are not persisted as application records. This does not cover ordinary hosting access logs or actions explicitly initiated by the user, such as export or sharing. JSON export is available for manual backup and transfer.</p>
-    <p>Version 4.4.1 uses schema v5 with the existing storage key and backup format. Export a backup and close older app tabs before upgrading in the same browser storage context. Keep a pre-upgrade backup for rollback; older versions do not participate in the new write protection. Unreadable or newer-schema stored data stops automatic writes, and raw recovery export remains available. Conflicting tabs preserve their in-memory content for export.</p>
+    <p>Version 4.4.2 uses schema v6 with the existing storage key and backup format. Export a backup and close older app tabs before upgrading in the same browser storage context. Keep a pre-upgrade backup for rollback; older versions do not participate in the new write protection. Unreadable or newer-schema stored data stops automatic writes, and raw recovery export remains available. Conflicting tabs preserve their in-memory content for export.</p>
     <h4>References</h4>
     <div class="reference">E. E. Lockhart. <i>The Soluble Solids in Beverage Coffee as an Index to Cup Quality.</i> Coffee Brewing Institute, 1957.</div>
     <div class="reference">Specialty Coffee Association. <i>Coffee Brewing Control Chart</i>, Version 3, revised March 2019.</div>
     <div class="reference">J.-X. Guinard et al. <i>A new Coffee Brewing Control Chart relating sensory properties and consumer liking to brew strength, extraction yield, and brew ratio.</i> Journal of Food Science 88(5), 2023. DOI 10.1111/1750-3841.16531.</div>
+    <h4>Copyright &amp; Usage</h4>
+    <p>© 2026 Taehee Yoon. All Rights Reserved.</p>
+    <p>The hosted Coffee Brewing Control application and unmodified copies distributed by the copyright holder may be used for personal, educational, research, and professional brewing purposes, including cafés and paid instruction.</p>
+    <p>Users may save, use, export, and share their own brewing records, backup JSON files, and chart images produced through the application's provided features.</p>
+    <p>App use does not grant permission to reuse or redistribute protected project materials, except as permitted by applicable law or platform terms. No exclusive rights are claimed over brewing principles or formulas.</p>
+    <p>Third-party software, libraries, and other components used by this project remain subject to their respective licenses and terms.</p>
+    <p><a href="COPYRIGHT.md" target="_blank" rel="noopener">Full Copyright &amp; Usage terms</a></p>
     <div class="actions"><button class="btn secondary" id="closeAbout">닫기</button></div>
   </div>
 </div>
@@ -398,6 +407,30 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
   <div class="app-dialog info-dialog" role="dialog" aria-modal="true" aria-labelledby="changelogModalTitle">
     <h3 id="changelogModalTitle">Changelog</h3>
     <p>All notable changes to Coffee Brewing Control are documented here. Earlier development history is intentionally condensed to major milestones.</p>
+    <div class="version-block"><h4>4.4.2 - 2026-09-22</h4>
+    <p><strong>Added</strong></p>
+    <ul>
+      <li>Added automatic Brew water estimation in Quick and Class when Brew water is blank and Dose, Beverage mass, and TDS are provided. Estimated Brew Ratio is identified as an estimate.</li>
+      <li>Added optional per-attempt Quick notes using the saved-card editor pattern from Class instructor feedback, with save / cancel and Ctrl/⌘+Enter / Esc shortcuts.</li>
+      <li>Added Copyright &amp; Usage terms clarifying free use of the hosted application and unmodified locally run copies distributed by the copyright holder, permitted use, export, and sharing of users’ own brewing records, backup JSON files, and chart images, restrictions on reuse of protected project materials, and the exclusion of brewing principles and third-party materials from ownership claims.</li>
+    </ul>
+    <p><strong>Fixed</strong></p>
+    <ul>
+      <li>Individual Quick attempt deletion now asks for confirmation before removing the record, matching Class record deletion.</li>
+    </ul>
+    <p><strong>Changed</strong></p>
+    <ul>
+      <li>Quick and Class records and chart details show whether Beverage or Brew water was estimated and the liquid-retention value used. Quick notes appear in chart tooltips and details.</li>
+      <li>Shared raw-input reading, bidirectional mass calculation, and calculation-source presentation within the existing single-file app. The Quick measurement form does not add a note field.</li>
+      <li>The forward automatic Beverage formula, default liquid retention of 2.1, existing manual-input policy, chart out-of-range notice, measurement transport, and PNG layout remain unchanged.</li>
+    </ul>
+    <p><strong>Compatibility</strong></p>
+    <ul>
+      <li>Advanced the saved-data schema to v6 to preserve each record’s Brew water input mode and Quick attempt note. Supported schema-v5 and earlier data remain importable; existing records retain their previous water-input interpretation and liquid-retention value.</li>
+      <li>Automatic estimates remain derived values: blank raw inputs and the saved liquid-retention value are retained during editing and JSON backup / restore.</li>
+      <li>The browser storage key and backup format identifier remain unchanged. Export a backup and close older app tabs before upgrading. Schema-v6 backups are not intended for older app versions.</li>
+    </ul>
+    </div>
     <div class="version-block"><h4>4.4.1 - 2026-09-20</h4>
       <p><strong>Added</strong></p><ul>
         <li>Added editing for saved <strong>Quick</strong> attempts through the existing input form. Saving an edit preserves the attempt ID, order, and liquid-retention value; saving or cancelling restores the previous LIVE input.</li>
@@ -609,8 +642,8 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
 'use strict';
 const $=id=>document.getElementById(id), $$=sel=>Array.from(document.querySelectorAll(sel));
 const STORAGE_KEY='coffeeBrewControlClassroomV2'; // legacy key retained so existing browser data continues to load
-const APP_SCHEMA_VERSION=5;
-const APP_VERSION='4.4.1';
+const APP_SCHEMA_VERSION=6;
+const APP_VERSION='4.4.2';
 const BACKUP_FORMAT='coffee-brew-control-backup'; // legacy identifier retained for backup compatibility
 const COLORS=['#3157d5','#c85245','#2f7a52','#8a55a8','#d28a22','#2c8a9b','#7d6b35','#b24d84'];
 const GOAL_COLOR='#8a55a8';
@@ -649,6 +682,8 @@ let editingRecordId=null;
 let editingTeacherFeedbackId=null;
 let editingTeacherFeedbackDraft='';
 let editingQuickRecordId=null;
+let editingQuickNoteId=null;
+let editingQuickNoteDraft='';
 let quickDraftBeforeEdit=null;
 const inputContext={quick:{generation:0,tdsRevision:0},class:{generation:0,tdsRevision:0}};
 let chartMode='quick';
@@ -995,7 +1030,21 @@ class MeasurementDeviceManager{
 }
 const measurementDeviceManager=new MeasurementDeviceManager();
 measurementDeviceManager.registerAdapter('hm-btr1000',profile=>new HMDigitalBTRAdapter(profile));
-function normalizeRecord(r={}){return {id:r.id||generateId(),dose:r.dose,water:r.water,bev:r.bev??'',tds:r.tds,note:String(r.note||''),teacherFeedback:String(r.teacherFeedback||''),...(r.retentionUsed!==undefined?{retentionUsed:r.retentionUsed}:{})}}
+function normalizeRecord(r = {}) {
+  return {
+    id: r.id || generateId(),
+    dose: r.dose,
+    water: r.water,
+    bev: r.bev ?? '',
+    tds: r.tds,
+    note: String(r.note || ''),
+    teacherFeedback: String(r.teacherFeedback || ''),
+    waterMode: r.waterMode,
+    ...(r.retentionUsed !== undefined ? {
+      retentionUsed: r.retentionUsed
+    } : {})
+  };
+}
 function normalizeStudents(students){return Array.isArray(students)?students.filter(st=>st&&typeof st==='object').map(st=>({id:st.id||generateId(),name:(st.name||'이름 없음').trim()||'이름 없음'})):[]}
 function normalizeSessionRecords(records){
   const out={};if(!records||typeof records!=='object'||Array.isArray(records))return out;
@@ -1406,15 +1455,21 @@ function validateRawState(value) {
   }
   for (const key of ['settings', 'quick', 'quickMeta', 'measurementDevice']) if (value[key] !== undefined && !isObject(value[key])) throw new Error(key);
 }
-function validateNormalizedState(value){
+function validateNormalizedState(value) {
   validateRawState(value);
-  if(!validateCalculation({absorption:value.settings.absorption})||!validateTarget(value.settings)||!validateChart(value.settings))throw new Error('settings');
-  for(const p of value.targetProfiles)if(!validateTarget(p.settings))throw new Error('target');
-  for(const p of value.chartPresets)if(!validateChart(p.settings))throw new Error('chart');
-  if(value.targetProfiles.some(p=>p.id===CLASSIC_TARGET_PROFILE.id)||value.chartPresets.some(p=>p.id===DEFAULT_CHART_PRESET.id))throw new Error('reserved preset id');
-  const records=[...value.quickHistory];
-  value.classes.forEach(c=>c.sessions.forEach(ss=>Object.values(ss.records).forEach(arr=>records.push(...arr))));
-  for(const r of records)if(!Number.isFinite(r.retentionUsed)||r.retentionUsed<0)throw new Error('retention');
+  if (!validateCalculation({
+    absorption: value.settings.absorption
+  }) || !validateTarget(value.settings) || !validateChart(value.settings)) throw new Error('settings');
+  for (const p of value.targetProfiles) if (!validateTarget(p.settings)) throw new Error('target');
+  for (const p of value.chartPresets) if (!validateChart(p.settings)) throw new Error('chart');
+  if (value.targetProfiles.some(p => p.id === CLASSIC_TARGET_PROFILE.id) || value.chartPresets.some(p => p.id === DEFAULT_CHART_PRESET.id)) throw new Error('reserved preset id');
+  const records = [...value.quickHistory];
+  value.classes.forEach(c => c.sessions.forEach(ss => Object.values(ss.records).forEach(arr => records.push(...arr))));
+  for (const r of records) {
+    if (!Number.isFinite(r.retentionUsed) || r.retentionUsed < 0) throw new Error('retention');
+    if (!['manual', 'auto'].includes(r.waterMode)) throw new Error('water mode');
+    if (r.waterMode === 'auto' && !isBlankInput(r.water)) throw new Error('auto water input');
+  }
 }
 function validateBackupEnvelope(parsed){
   if(!isObject(parsed))throw new Error('backup');
@@ -1454,7 +1509,7 @@ function normalizeState(s={}){
   }else classes=clone(DEFAULT.classes);
   let activeClassId=s.activeClassId;
   if(!classes.some(c=>c.id===activeClassId))activeClassId=classes[0].id;
-  const qh=Array.isArray(s.quickHistory)?s.quickHistory.map(r=>({id:r.id||generateId(),dose:r.dose,water:r.water,bev:r.bev??'',tds:r.tds,...(r.retentionUsed!==undefined?{retentionUsed:r.retentionUsed}:{})})):[];
+  const qh=Array.isArray(s.quickHistory)?s.quickHistory.map(r=>({id:r.id||generateId(),dose:r.dose,water:r.water,bev:r.bev??'',tds:r.tds,note:String(r.note||''),waterMode:r.waterMode,...(r.retentionUsed!==undefined?{retentionUsed:r.retentionUsed}:{})})):[];
   const qg=s.quickGoal&&Number.isFinite(parseNumber(s.quickGoal.ey))&&Number.isFinite(parseNumber(s.quickGoal.tds))?{ey:parseNumber(s.quickGoal.ey),tds:parseNumber(s.quickGoal.tds)}:null;
   const targetKeys=['targetName','eyMin','eyMax','tdsMin','tdsMax'],chartKeys=['chartEyMin','chartEyMax','chartEyStep','chartTdsMin','chartTdsMax','chartTdsStep','ratioMin','ratioMax','ratioStep'];
   const pick=(obj,keys,base)=>{const out={...base};keys.forEach(k=>{if(obj&&obj[k]!==undefined)out[k]=obj[k]});return out};
@@ -1468,6 +1523,7 @@ function normalizeState(s={}){
   if(activeChartPresetId!=='builtin-chart-default'&&!chartPresets.some(p=>p.id===activeChartPresetId))activeChartPresetId=null;
   const allRecords=[...qh];
   classes.forEach(c=>c.sessions.forEach(ss=>Object.values(ss.records).forEach(arr=>allRecords.push(...arr))));
+  if(sourceVersion<6)allRecords.forEach(r=>{r.waterMode='manual'});
   if(sourceVersion<5)allRecords.forEach(r=>{r.retentionUsed=settings.absorption});
   const normalized={schemaVersion:APP_SCHEMA_VERSION,settings,measurementDevice,targetProfiles,activeTargetProfileId,chartPresets,activeChartPresetId,classes,activeClassId,quick:{...DEFAULT.quick,...(s.quick||{})},quickMeta:{name:String(s.quickMeta?.name||''),note:String(s.quickMeta?.note||'')},quickHistory:qh,quickGoal:qg,storageUpdatedAt:Number.isFinite(Number(s.storageUpdatedAt))?Number(s.storageUpdatedAt):0,storageRevision:Number.isSafeInteger(s.storageRevision)&&s.storageRevision>=0?s.storageRevision:0,storageWriteId:typeof s.storageWriteId==='string'?s.storageWriteId:'',storageParentToken:typeof s.storageParentToken==='string'?s.storageParentToken:''};
   validateNormalizedState(normalized);
@@ -1578,12 +1634,63 @@ function autoBeverage(dose,water,tds,retention){
   const tf=tds/100,retained=retention*dose;
   return isPositiveNumber(dose)&&isPositiveNumber(water)&&Number.isFinite(tds)&&tds>=0&&tds<100&&water>retained?Math.max(0,(water-retained)/(1-tf)):NaN;
 }
-function calculateBrew(rec,retention){
-  const dose=parseNumber(rec.dose),water=parseNumber(rec.water),tds=parseNumber(rec.tds),manual=parseNumber(rec.bev),auto=autoBeverage(dose,water,tds,retention),bev=isPositiveNumber(manual)?manual:auto;
-  const solids=isPositiveNumber(bev)&&Number.isFinite(tds)?bev*tds/100:NaN;
-  const ey=isPositiveNumber(dose)&&Number.isFinite(solids)?solids/dose*100:NaN;
-  const ratio=isPositiveNumber(dose)&&isPositiveNumber(water)?water/dose:NaN;
-  return {...rec,dose,water,tds,bev,manualBev:isPositiveNumber(manual),autoBev:auto,solids,ey,ratio};
+function isBlankInput(value) {
+  return value === undefined || value === null || typeof value === 'string' && value.trim() === '';
+}
+function autoBrewWater(dose, beverage, tds, retention) {
+  if (!isPositiveNumber(dose) || !isPositiveNumber(beverage) || !Number.isFinite(tds) || tds < 0 || tds >= 100 || !Number.isFinite(retention) || retention < 0) return NaN;
+  return beverage * (1 - tds / 100) + retention * dose;
+}
+function calculateBrew(rec, retention) {
+  const dose = parseNumber(rec.dose),
+    tds = parseNumber(rec.tds);
+  const enteredWater = parseNumber(rec.water),
+    enteredBeverage = parseNumber(rec.bev);
+  const manualBev = isPositiveNumber(enteredBeverage);
+  // Historical records explicitly retain manual mode, even if their water was absent.
+  const waterMode = rec.waterMode ?? (isPositiveNumber(enteredWater) ? 'manual' : 'auto');
+  const autoWater = waterMode === 'auto' && isBlankInput(rec.water) ? autoBrewWater(dose, enteredBeverage, tds, retention) : NaN;
+  const water = waterMode === 'auto' ? autoWater : enteredWater;
+  const autoBev = autoBeverage(dose, enteredWater, tds, retention);
+  const bev = manualBev ? enteredBeverage : autoBev;
+  const solids = isPositiveNumber(bev) && Number.isFinite(tds) ? bev * tds / 100 : NaN;
+  const ey = isPositiveNumber(dose) && Number.isFinite(solids) ? solids / dose * 100 : NaN;
+  const ratio = isPositiveNumber(dose) && isPositiveNumber(water) ? water / dose : NaN;
+  return {
+    ...rec,
+    dose,
+    water,
+    tds,
+    bev,
+    manualBev,
+    waterMode,
+    autoWater,
+    autoBev,
+    retentionUsed: retention,
+    solids,
+    ey,
+    ratio
+  };
+}
+function validBrewResult(result) {
+  return !!result && isPositiveNumber(result.dose) && isPositiveNumber(result.water) && isPositiveNumber(result.bev) && isPositiveNumber(result.tds) && Number.isFinite(result.ey) && Number.isFinite(result.ratio);
+}
+function normalizePositiveMassInput(value) {
+  return isPositiveNumber(parseNumber(value)) ? value : '';
+}
+function readBrewInputs(prefix, retention) {
+  const rawWater = $(prefix + 'Water').value,
+    rawBeverage = $(prefix + 'Bev').value;
+  const water = normalizePositiveMassInput(rawWater);
+  const bev = normalizePositiveMassInput(rawBeverage);
+  return {
+    dose: parseNumber($(prefix + 'Dose').value),
+    water,
+    bev,
+    tds: parseNumber($(prefix + 'Tds').value),
+    retentionUsed: retention,
+    waterMode: water === '' ? 'auto' : 'manual'
+  };
 }
 function calcRecord(rec){return calculateBrew(rec,rec.retentionUsed??state.settings.absorption)}
 function classRetention() {
@@ -1608,49 +1715,80 @@ $('qNoteSave').onclick = () => {
 };
 $('qNoteCancel').onclick=()=>{closeQuickNoteEditor();updateQuickMetaUI()};
 $('qNoteInput').addEventListener('keydown',e=>{if(e.key==='Escape'){$('qNoteCancel').click()}});
-function liveQuickRecord(){return {dose:parseNumber($('qDose').value),water:parseNumber($('qWater').value),bev:$('qBev').value,tds:parseNumber($('qTds').value),retentionUsed:quickRetention()}}
+function liveQuickRecord(){return readBrewInputs('q',quickRetention())}
 function quickLivePoint(){return {...calcRecord(liveQuickRecord()),studentName:'Quick',attempt:null,key:'quick_live',note:'',teacherFeedback:'',isLive:true}}
-function quickHistoryPoints(){return state.quickHistory.map((r,i)=>({...calcRecord(r),studentName:'Quick',attempt:i+1,key:'qh_'+r.id,note:'',teacherFeedback:'',isLive:false}))}
-function validQuickPoint(p){return !!p&&Number.isFinite(p.ey)&&Number.isFinite(p.tds)}
+function quickHistoryPoints(){return state.quickHistory.map((r,i)=>({...calcRecord(r),studentName:'Quick',attempt:i+1,key:'qh_'+r.id,note:r.note||'',teacherFeedback:'',isLive:false}))}
+function validQuickPoint(p) {
+  return validBrewResult(p);
+}
 function quickValidHistoryPoints(){return quickHistoryPoints().filter(validQuickPoint)}
 function quickChartPoints(){const hist=quickValidHistoryPoints(),live=quickLivePoint();return validQuickPoint(live)?[...hist,live]:hist}
 function quickGoalGuideSource(){const live=quickLivePoint();if(validQuickPoint(live))return live;const hist=quickValidHistoryPoints();return hist.length?hist[hist.length-1]:null}
 function axisState(v,min,max){return v<min?'low':v>max?'high':'in'}
-function classifyBrew(d,s){
-  if(!Number.isFinite(d.ey)||!Number.isFinite(d.tds))return {label:'측정값 필요',cls:'combo'};
-  const x=axisState(d.ey,s.eyMin,s.eyMax),y=axisState(d.tds,s.tdsMin,s.tdsMax);
-  if(x==='in'&&y==='in')return {label:'TARGET',cls:'target'};
-  const parts=[];if(y==='high')parts.push('STRONG');if(y==='low')parts.push('WEAK');if(x==='low')parts.push('UNDER');if(x==='high')parts.push('OVER');
-  let cls='combo';if(parts.length===1)cls=parts[0].toLowerCase();return {label:parts.join(' · '),cls};
+function classifyBrew(d, s) {
+  if (!validBrewResult(d)) return {
+    label: '입력값 필요',
+    cls: 'combo'
+  };
+  const x = axisState(d.ey, s.eyMin, s.eyMax),
+    y = axisState(d.tds, s.tdsMin, s.tdsMax);
+  if (x === 'in' && y === 'in') return {
+    label: 'TARGET',
+    cls: 'target'
+  };
+  const parts = [];
+  if (y === 'high') parts.push('STRONG');
+  if (y === 'low') parts.push('WEAK');
+  if (x === 'low') parts.push('UNDER');
+  if (x === 'high') parts.push('OVER');
+  let cls = 'combo';
+  if (parts.length === 1) cls = parts[0].toLowerCase();
+  return {
+    label: parts.join(' · '),
+    cls
+  };
 }
 function directionFeedback(xs,ys,insideTitle='타겟 안'){
   if(xs==='in'&&ys==='in')return {arrow:'✓',title:insideTitle,text:'현재 목표 조건에 도달했습니다.',rec:'맛과 재현성을 확인해 다음 조정을 결정하세요.'};
   const map={
-    'low_high':{arrow:'↘',title:'수율 ↑ · 농도 ↓',text:'오른쪽 아래 방향으로 이동해야 합니다.',rec:'우선 물량 ↑. 또는 추출을 조금 더 진행하면서 최종 농도를 낮추는 방향.'},
-    'high_low':{arrow:'↖',title:'수율 ↓ · 농도 ↑',text:'왼쪽 위 방향으로 이동해야 합니다.',rec:'우선 물량 ↓ 또는 원두량 ↑. 필요하면 분쇄를 조금 굵게.'},
+    'low_high':{arrow:'↘',title:'수율 ↑ · 농도 ↓',text:'오른쪽 아래 방향으로 이동해야 합니다.',rec:'우선 물양 ↑. 또는 추출을 조금 더 진행하면서 최종 농도를 낮추는 방향.'},
+    'high_low':{arrow:'↖',title:'수율 ↓ · 농도 ↑',text:'왼쪽 위 방향으로 이동해야 합니다.',rec:'우선 물양 ↓ 또는 원두량 ↑. 필요하면 분쇄를 조금 굵게.'},
     'low_low':{arrow:'↗',title:'수율 ↑ · 농도 ↑',text:'오른쪽 위 방향으로 이동해야 합니다.',rec:'분쇄를 가늘게 / 물온도 ↑ / 푸어링으로 접촉·교반 ↑.'},
     'high_high':{arrow:'↙',title:'수율 ↓ · 농도 ↓',text:'왼쪽 아래 방향으로 이동해야 합니다.',rec:'분쇄를 굵게 / 물온도 ↓ / 푸어링의 접촉·교반 ↓.'},
     'low_in':{arrow:'→',title:'수율 ↑',text:'농도는 목표 범위에 있고 수율만 올리면 됩니다.',rec:'분쇄를 가늘게 / 물온도 ↑ / 푸어링으로 추출시간·교반 ↑.'},
     'high_in':{arrow:'←',title:'수율 ↓',text:'농도는 목표 범위에 있고 수율만 낮추면 됩니다.',rec:'분쇄를 굵게 / 물온도 ↓ / 푸어링으로 추출시간·교반 ↓.'},
-    'in_low':{arrow:'↑',title:'농도 ↑',text:'수율은 목표 범위에 있고 농도만 올리면 됩니다.',rec:'원두량 ↑ 또는 물량 ↓. 수율도 함께 움직일 수 있으니 재측정.'},
-    'in_high':{arrow:'↓',title:'농도 ↓',text:'수율은 목표 범위에 있고 농도만 낮추면 됩니다.',rec:'물량 ↑ 또는 원두량 ↓. 수율도 함께 움직일 수 있으니 재측정.'}
+    'in_low':{arrow:'↑',title:'농도 ↑',text:'수율은 목표 범위에 있고 농도만 올리면 됩니다.',rec:'원두량 ↑ 또는 물양 ↓. 수율도 함께 움직일 수 있으니 재측정.'},
+    'in_high':{arrow:'↓',title:'농도 ↓',text:'수율은 목표 범위에 있고 농도만 낮추면 됩니다.',rec:'물양 ↑ 또는 원두량 ↓. 수율도 함께 움직일 수 있으니 재측정.'}
   };
   return map[xs+'_'+ys]||{arrow:'·',title:'조정 확인',text:'현재 값과 목표를 비교하세요.',rec:''};
 }
-function getTargetFeedback(d,s){
-  if(!Number.isFinite(d.ey)||!Number.isFinite(d.tds))return {arrow:'·',title:'측정값 필요',text:'원두량, 물량, TDS를 확인해 주세요.',rec:''};
-  const xs=axisState(d.ey,s.eyMin,s.eyMax),ys=axisState(d.tds,s.tdsMin,s.tdsMax);
-  const f=directionFeedback(xs,ys,`${s.targetName} 안`);if(xs==='in'&&ys==='in')f.text='현재 설정한 타겟 범위 안입니다.';return f;
+function getTargetFeedback(d, s) {
+  if (!validBrewResult(d)) return {
+    arrow: '·',
+    title: '입력값 필요',
+    text: BREW_INPUT_GUIDANCE,
+    rec: ''
+  };
+  const xs = axisState(d.ey, s.eyMin, s.eyMax),
+    ys = axisState(d.tds, s.tdsMin, s.tdsMax);
+  const f = directionFeedback(xs, ys, `${s.targetName} 안`);
+  if (xs === 'in' && ys === 'in') f.text = '현재 설정한 타겟 범위 안입니다.';
+  return f;
 }
-function getGoalFeedback(d,goal,target){
-  if(!goal)return getTargetFeedback(d,target);
-  if(!Number.isFinite(d.ey)||!Number.isFinite(d.tds))return {arrow:'·',title:'측정값 필요',text:'원두량, 물량, TDS를 확인해 주세요.',rec:''};
-  const ex=.03,ty=.006;
-  const xs=d.ey<goal.ey-ex?'low':d.ey>goal.ey+ex?'high':'in';
-  const ys=d.tds<goal.tds-ty?'low':d.tds>goal.tds+ty?'high':'in';
-  const f=directionFeedback(xs,ys,'목표점 도달');
-  if(xs==='in'&&ys==='in')f.text='목표점에 거의 도달했습니다.';
-  else f.text=`목표점까지 ΔEY ${(goal.ey-d.ey)>=0?'+':''}${fmt(goal.ey-d.ey,2)}%p · ΔTDS ${(goal.tds-d.tds)>=0?'+':''}${fmt(goal.tds-d.tds,2)}%p`;
+function getGoalFeedback(d, goal, target) {
+  if (!goal) return getTargetFeedback(d, target);
+  if (!validBrewResult(d)) return {
+    arrow: '·',
+    title: '입력값 필요',
+    text: BREW_INPUT_GUIDANCE,
+    rec: ''
+  };
+  const ex = .03,
+    ty = .006;
+  const xs = d.ey < goal.ey - ex ? 'low' : d.ey > goal.ey + ex ? 'high' : 'in';
+  const ys = d.tds < goal.tds - ty ? 'low' : d.tds > goal.tds + ty ? 'high' : 'in';
+  const f = directionFeedback(xs, ys, '목표점 도달');
+  if (xs === 'in' && ys === 'in') f.text = '목표점에 거의 도달했습니다.';else f.text = `목표점까지 ΔEY ${goal.ey - d.ey >= 0 ? '+' : ''}${fmt(goal.ey - d.ey, 2)}%p · ΔTDS ${goal.tds - d.tds >= 0 ? '+' : ''}${fmt(goal.tds - d.tds, 2)}%p`;
   return f;
 }
 function classificationFor(d){return classifyBrew(d,state.settings)}
@@ -1776,7 +1914,7 @@ async function measureTds(source){
 }
 function measureQuickTds(){return measureTds('quick')}
 function measureClassTds(){return measureTds('class')}
-function readQuickDraftFromForm(){return {dose:$('qDose').value,water:$('qWater').value,bev:$('qBev').value,tds:$('qTds').value}}
+function readQuickDraftFromForm(){return {dose:$('qDose').value,water:normalizePositiveMassInput($('qWater').value),bev:normalizePositiveMassInput($('qBev').value),tds:$('qTds').value}}
 function fillQuickForm(draft){for(const [key,node] of Object.entries({dose:'qDose',water:'qWater',bev:'qBev',tds:'qTds'}))$(node).value=draft[key]??''}
 function updateQuickDraft(){if(!editingQuickRecordId){state.quick=readQuickDraftFromForm();save()}}
 function editQuickRecord(rid){
@@ -1792,35 +1930,132 @@ function cancelQuickEdit(){
 function renderQuick(){
   renderQuickResult();renderQuickHistory();
 }
-function renderQuickResult(){
-  const q=liveQuickRecord();
-  $('qSaveResult').textContent=editingQuickRecordId?`${state.quickHistory.findIndex(r=>r.id===editingQuickRecordId)+1}차 수정 저장`:'추출 결과 저장';
-  $('qCancelEdit').style.display=editingQuickRecordId?'inline-block':'none';
-  renderQuickMeasurementControl();
-  const d=calcRecord(q);$('qBevHint').innerHTML=Number.isFinite(d.autoBev)?`자동: [물량 − (${fmt(quickRetention(),1)} × 원두량)] ÷ (1 − TDS/100) = ${fmt(d.autoBev,1)} g <span class="auto">AUTO</span>`:(isPositiveNumber(d.dose)&&isPositiveNumber(d.water)&&!Number.isFinite(d.tds)?'TDS 입력 시 자동 계산':'자동 계산값 없음');
-  $('qEyOut').textContent=Number.isFinite(d.ey)?fmt(d.ey,2)+'%':'—';$('qTdsOut').textContent=Number.isFinite(d.tds)?fmt(d.tds,2)+'%':'—';$('qRatioOut').textContent=Number.isFinite(d.ratio)?'1 : '+fmt(d.ratio,2):'—';$('qSolidsOut').textContent=Number.isFinite(d.solids)?fmt(d.solids,3)+' g':'—';$('qBevOut').textContent=Number.isFinite(d.bev)?`${fmt(d.bev,1)} g · ${d.manualBev?'직접':'자동'}`:'—';
-  $('quickTargetLabel').textContent=`${state.settings.targetName} | EY ${fmt(state.settings.eyMin,1)}–${fmt(state.settings.eyMax,1)}% · TDS ${fmt(state.settings.tdsMin,2)}–${fmt(state.settings.tdsMax,2)}%`;
-  const goalLabel=$('quickGoalLabel');if(state.quickGoal){goalLabel.textContent=`목표점 | EY ${fmt(state.quickGoal.ey,2)}% · TDS ${fmt(state.quickGoal.tds,2)}%`;goalLabel.classList.remove('is-empty')}else{goalLabel.textContent='목표점 | EY — · TDS —';goalLabel.classList.add('is-empty')}
-  const st=statusForQuick(d),box=$('qStatus');box.style.display=quickFeedbackVisible()?'flex':'none';box.className='status '+st.cls;$('qStatusTitle').textContent=st.title;
-  $('qStatusDesc').textContent='현재 측정값 기준 · '+st.desc;$('qStatusRec').textContent=st.rec||'';
+const BREW_INPUT_GUIDANCE = '원두량과 TDS를 입력하고, 물양 또는 추출액 중 하나 이상을 입력해 주세요.';
+function calculationBasis(result) {
+  if (result.waterMode === 'auto' && Number.isFinite(result.autoWater)) return '물양·Ratio 자동 추정 · 계수 ' + trimNum(result.retentionUsed, 3);
+  if (!result.manualBev && Number.isFinite(result.autoBev)) return '추출액 자동 추정 · 계수 ' + trimNum(result.retentionUsed, 3);
+  return '직접 입력';
 }
-function renderQuickHistory(){
-  const wrap=$('qHistoryWrap'),list=$('qHistoryList');wrap.style.display=state.quickHistory.length?'block':'none';list.innerHTML='';
-  state.quickHistory.forEach((r,i)=>{const d=calcRecord(r),cl=classificationFor(d),f=quickFeedbackFor(d),row=document.createElement('div');row.className='quick-history-row';row.innerHTML=`<div class="quick-history-no">${i+1}차</div><div class="quick-history-body"><div class="record-metrics"><span class="pill">EY ${fmt(d.ey,2)}%</span><span class="pill">TDS ${fmt(d.tds,2)}%</span><span class="pill">1:${fmt(d.ratio,2)}</span><span class="pill ${cl.cls}">${esc(cl.label)}</span></div><div class="quick-history-sub">${fmt(d.dose,1)}g / ${fmt(d.water,1)}g · Beverage ${fmt(d.bev,1)}g${d.manualBev?'':' (auto)'}</div>${quickFeedbackVisible()?`<div class="feedback"><div><span class="arrow">${f.arrow}</span> <b>${esc(f.title)}</b></div><p>${esc(f.text)}</p><p class="rec">${esc(f.rec)}</p></div>`:''}</div><div class="actions" style="margin:0"><button class="btn ghost small" data-qedit>수정</button><button class="btn danger small" data-qdel>삭제</button></div>`;row.querySelector('[data-qedit]').dataset.qedit=r.id;row.querySelector('[data-qdel]').dataset.qdel=r.id;list.appendChild(row)});
-  list.querySelectorAll('[data-qedit]').forEach(b=>b.onclick=()=>editQuickRecord(b.dataset.qedit));
-  list.querySelectorAll('[data-qdel]').forEach(b=>b.onclick=()=>deleteQuickRecord(b.dataset.qdel));
+function brewRatioText(result) {
+  return Number.isFinite(result.ratio) ? '1:' + fmt(result.ratio, 2) + (result.waterMode === 'auto' ? ' (추정)' : '') : '—';
+}
+function renderMassHints(prefix, result) {
+  const waterHint = $(prefix + 'WaterHint');
+  waterHint.textContent = result.waterMode === 'manual' && Number.isFinite(result.water) ? '물양 직접 입력' : Number.isFinite(result.autoWater) ? '자동 추정 ' + fmt(result.autoWater, 1) + ' g · 계수 ' + trimNum(result.retentionUsed, 3) : result.manualBev ? '원두량과 TDS를 입력하면 자동 추정됩니다' : '';
+  waterHint.style.display = waterHint.textContent ? 'block' : 'none';
+  $(prefix + 'BevHint').textContent = result.manualBev ? '추출액 직접 입력' : Number.isFinite(result.autoBev) ? '자동 추정 ' + fmt(result.autoBev, 1) + ' g · 계수 ' + trimNum(result.retentionUsed, 3) : result.waterMode === 'manual' && Number.isFinite(result.water) ? '원두량과 TDS를 입력하면 자동 추정됩니다' : '물양 또는 추출액 중 하나를 입력하세요';
+}
+function renderQuickResult() {
+  const q = liveQuickRecord();
+  $('qSaveResult').textContent = editingQuickRecordId ? `${state.quickHistory.findIndex(r => r.id === editingQuickRecordId) + 1}차 수정 저장` : '추출 결과 저장';
+  $('qCancelEdit').style.display = editingQuickRecordId ? 'inline-block' : 'none';
+  renderQuickMeasurementControl();
+  const d = calcRecord(q);
+  renderMassHints('q', d);
+  $('qEyOut').textContent = Number.isFinite(d.ey) ? fmt(d.ey, 2) + '%' : '—';
+  $('qTdsOut').textContent = Number.isFinite(d.tds) ? fmt(d.tds, 2) + '%' : '—';
+  $('qRatioOut').textContent = brewRatioText(d);
+  $('qSolidsOut').textContent = Number.isFinite(d.solids) ? fmt(d.solids, 3) + ' g' : '—';
+  $('qBevOut').textContent = Number.isFinite(d.bev) ? `${fmt(d.bev, 1)} g · ${d.manualBev ? '직접' : '자동'}` : '—';
+  $('quickTargetLabel').textContent = `${state.settings.targetName} | EY ${fmt(state.settings.eyMin, 1)}–${fmt(state.settings.eyMax, 1)}% · TDS ${fmt(state.settings.tdsMin, 2)}–${fmt(state.settings.tdsMax, 2)}%`;
+  const goalLabel = $('quickGoalLabel');
+  if (state.quickGoal) {
+    goalLabel.textContent = `목표점 | EY ${fmt(state.quickGoal.ey, 2)}% · TDS ${fmt(state.quickGoal.tds, 2)}%`;
+    goalLabel.classList.remove('is-empty');
+  } else {
+    goalLabel.textContent = '목표점 | EY — · TDS —';
+    goalLabel.classList.add('is-empty');
+  }
+  const st = statusForQuick(d),
+    box = $('qStatus');
+  box.style.display = quickFeedbackVisible() ? 'flex' : 'none';
+  box.className = 'status ' + st.cls;
+  $('qStatusTitle').textContent = st.title;
+  $('qStatusDesc').textContent = st.title === '입력값 필요' ? st.desc : '현재 측정값 기준 · ' + st.desc;
+  $('qStatusRec').textContent = st.rec || '';
+}
+function renderQuickAttemptNote(record) {
+  if (editingQuickNoteId === record.id) return `<div class="teacher-feedback teacher-feedback-edit"><div class="teacher-feedback-head"><b>회차 노트</b><span class="hint" style="margin:0">Ctrl/⌘+Enter 저장 · Esc 취소</span></div><textarea id="quickAttemptNoteEditor" aria-label="회차 노트" maxlength="400" placeholder="이 회차에서 변경한 조건이나 관찰 내용">${esc(editingQuickNoteDraft)}</textarea><div class="actions"><button class="btn small" data-qnote-save>저장</button><button class="btn secondary small" data-qnote-cancel>취소</button></div></div>`;
+  const note = record.note || '';
+  return `<div class="teacher-feedback"><div class="teacher-feedback-head"><b>회차 노트</b><span class="hint" style="margin:0">클릭하여 편집</span></div><button class="teacher-feedback-view ${note ? '' : 'empty'}" data-qnote-edit>${note ? esc(note) : '노트를 입력하려면 여기를 클릭하세요.'}</button></div>`;
+}
+function editQuickAttemptNote(id) {
+  const record = state.quickHistory.find(item => item.id === id);
+  if (!record) return;
+  editingQuickNoteId = id;
+  editingQuickNoteDraft = record.note || '';
+  renderQuickHistory();
+  requestAnimationFrame(() => $('quickAttemptNoteEditor')?.focus());
+}
+function cancelQuickAttemptNote() {
+  editingQuickNoteId = null;
+  editingQuickNoteDraft = '';
+  renderQuickHistory();
+}
+function saveQuickAttemptNote() {
+  const record = state.quickHistory.find(item => item.id === editingQuickNoteId);
+  if (!record) return;
+  record.note = editingQuickNoteDraft.trim();
+  editingQuickNoteId = null;
+  editingQuickNoteDraft = '';
+  save();
+  renderQuickHistory();
+  requestChartRender();
+  notifyAfterSave('회차 노트를 저장했습니다');
+}
+function renderQuickHistory() {
+  const wrap = $('qHistoryWrap'),
+    list = $('qHistoryList');
+  wrap.style.display = state.quickHistory.length ? 'block' : 'none';
+  list.innerHTML = '';
+  state.quickHistory.forEach((r, i) => {
+    const d = calcRecord(r),
+      cl = classificationFor(d),
+      f = quickFeedbackFor(d),
+      row = document.createElement('div');
+    row.className = 'quick-history-row';
+    row.innerHTML = `<div class="quick-history-no">${i + 1}차</div><div class="quick-history-body"><div class="record-metrics"><span class="pill">EY ${fmt(d.ey, 2)}%</span><span class="pill">TDS ${fmt(d.tds, 2)}%</span><span class="pill">${brewRatioText(d)}</span><span class="pill ${cl.cls}">${esc(cl.label)}</span></div><div class="quick-history-sub">${fmt(d.dose, 1)}g / ${fmt(d.water, 1)}g · Beverage ${fmt(d.bev, 1)}g · ${esc(calculationBasis(d))}</div>${renderQuickAttemptNote(r)}${quickFeedbackVisible() ? `<div class="feedback"><div><span class="arrow">${f.arrow}</span> <b>${esc(f.title)}</b></div><p>${esc(f.text)}</p><p class="rec">${esc(f.rec)}</p></div>` : ''}</div><div class="actions" style="margin:0"><button class="btn ghost small" data-qedit>수정</button><button class="btn danger small" data-qdel>삭제</button></div>`;
+    row.querySelector('[data-qedit]').dataset.qedit = r.id;
+    row.querySelector('[data-qdel]').dataset.qdel = r.id;
+    for (const name of ['edit', 'save', 'cancel']) {
+      const button = row.querySelector('[data-qnote-' + name + ']');
+      if (button) button.dataset['qnote' + name[0].toUpperCase() + name.slice(1)] = r.id;
+    }
+    list.appendChild(row);
+  });
+  list.querySelectorAll('[data-qedit]').forEach(b => b.onclick = () => editQuickRecord(b.dataset.qedit));
+  list.querySelectorAll('[data-qdel]').forEach(b => b.onclick = () => deleteQuickRecord(b.dataset.qdel));
+  list.querySelectorAll('[data-qnote-edit]').forEach(button => button.onclick = () => editQuickAttemptNote(button.dataset.qnoteEdit));
+  list.querySelectorAll('[data-qnote-save]').forEach(button => button.onclick = saveQuickAttemptNote);
+  list.querySelectorAll('[data-qnote-cancel]').forEach(button => button.onclick = cancelQuickAttemptNote);
+  const editor = $('quickAttemptNoteEditor');
+  if (editor) {
+    editor.addEventListener('input', () => {
+      editingQuickNoteDraft = editor.value;
+    });
+    editor.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        cancelQuickAttemptNote();
+      } else if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        saveQuickAttemptNote();
+      }
+    });
+  }
 }
 function saveQuickResult() {
   const rec = liveQuickRecord(),
     d = calcRecord(rec);
   const wasEditing = !!editingQuickRecordId;
-  if (!isPositiveNumber(d.dose) || !isPositiveNumber(d.water) || !isPositiveNumber(d.tds) || !isPositiveNumber(d.bev) || !Number.isFinite(d.ey)) {
-    toast('저장할 측정값을 확인해 주세요');
+  if (!validBrewResult(d)) {
+    toast(BREW_INPUT_GUIDANCE);
     return;
   }
   const data = {
     dose: rec.dose,
     water: rec.water,
+    waterMode: rec.waterMode,
     bev: rec.bev || '',
     tds: rec.tds,
     retentionUsed: rec.retentionUsed
@@ -1846,15 +2081,29 @@ function saveQuickResult() {
   renderChart();
 }
 function deleteQuickRecord(rid) {
-  const index = state.quickHistory.findIndex(r => r.id === rid);
+  const index = state.quickHistory.findIndex(record => record.id === rid);
   if (index < 0) return;
-  state.quickHistory.splice(index, 1);
-  if (editingQuickRecordId === rid) cancelQuickEdit();
-  selectedPointKey = null;
-  save();
-  renderQuick();
-  renderChart();
-  notifyAfterSave('Quick 기록을 삭제했습니다');
+  openDialog({
+    title: 'Quick 추출 기록 삭제',
+    message: index + 1 + '차 기록을 삭제할까요? 삭제 후 회차 번호는 자동으로 다시 매겨집니다.',
+    confirmText: '삭제',
+    danger: true,
+    onConfirm: () => {
+      const currentIndex = state.quickHistory.findIndex(record => record.id === rid);
+      if (currentIndex < 0) return;
+      state.quickHistory.splice(currentIndex, 1);
+      if (editingQuickNoteId === rid) {
+        editingQuickNoteId = null;
+        editingQuickNoteDraft = '';
+      }
+      if (editingQuickRecordId === rid) cancelQuickEdit();
+      selectedPointKey = null;
+      save();
+      renderQuick();
+      renderChart();
+      notifyAfterSave('Quick 기록을 삭제했습니다');
+    }
+  });
 }
 $('qCancelEdit').onclick=cancelQuickEdit;
 
@@ -1870,6 +2119,8 @@ $('qClearHistory').onclick = () => {
     danger: true,
     onConfirm: () => {
       state.quickHistory = [];
+      editingQuickNoteId = null;
+      editingQuickNoteDraft = '';
       if (editingQuickRecordId) cancelQuickEdit();
       selectedPointKey = null;
       save();
@@ -2066,14 +2317,16 @@ function fillClassFormFromLast() {
   const arr = getSessionRecords(s.id),
     last = arr[arr.length - 1];
   $('cDose').value = last?.dose || 20;
-  $('cWater').value = last?.water || 300;
+  $('cWater').value = last?.water ?? 300;
   $('cBev').value = '';
   $('cTds').value = '';
   $('cNote').value = '';
   updateClassBevHint();
 }
-function updateClassBevHint(){const dose=parseNumber($('cDose').value),water=parseNumber($('cWater').value),tds=parseNumber($('cTds').value),a=autoBeverage(dose,water,tds,classRetention());$('cBevHint').innerHTML=Number.isFinite(a)?`자동 ${fmt(a,1)} g · 질량수지 <span class="auto">AUTO</span>`:(isPositiveNumber(dose)&&isPositiveNumber(water)&&!Number.isFinite(tds)?'TDS 입력 시 자동 계산':'자동 계산값 없음')}
-['cDose','cWater','cTds'].forEach(x=>$(x).addEventListener('input',()=>{if(x==='cTds')inputContext.class.tdsRevision++;updateClassBevHint()}));
+function updateClassBevHint() {
+  renderMassHints('c', calcRecord(readBrewInputs('c', classRetention())));
+}
+['cDose','cWater','cBev','cTds'].forEach(x=>$(x).addEventListener('input',()=>{if(x==='cTds')inputContext.class.tdsRevision++;updateClassBevHint()}));
 function renderTeacherFeedback(r){
   if(editingTeacherFeedbackId===r.id)return `<div class="teacher-feedback teacher-feedback-edit"><div class="teacher-feedback-head"><b>강사 피드백</b><span class="hint" style="margin:0">Ctrl/⌘+Enter 저장 · Esc 취소</span></div><textarea id="teacherFeedbackEditor" maxlength="400" placeholder="이 추출에 대해 강사가 남길 피드백">${esc(editingTeacherFeedbackDraft)}</textarea><div class="actions"><button class="btn small" data-teacher-save>저장</button><button class="btn secondary small" data-teacher-cancel>취소</button></div></div>`;
   const text=(r.teacherFeedback||'').trim();return `<div class="teacher-feedback"><div class="teacher-feedback-head"><b>강사 피드백</b><span class="hint" style="margin:0">클릭하여 편집</span></div><button class="teacher-feedback-view ${text?'':'empty'}" data-teacher-edit>${text?esc(text):'피드백을 입력하려면 여기를 클릭하세요.'}</button></div>`;
@@ -2104,7 +2357,7 @@ function renderClass() {
       cl = classificationFor(d),
       card = document.createElement('div');
     card.className = 'record-card';
-    card.innerHTML = `<div class="record-top"><div class="record-title"><div class="attempt-no">${i + 1}</div><div class="record-main"><b>${esc(s.name)} · ${i + 1}차</b><span>${fmt(d.dose, 1)}g / ${fmt(d.water, 1)}g · Beverage ${fmt(d.bev, 1)}g${d.manualBev ? '' : ' (auto)'}</span></div></div><div class="actions" style="margin:0"><button class="btn ghost small" data-edit>수정</button><button class="btn danger small" data-del>삭제</button></div></div><div class="record-metrics"><span class="pill">EY ${fmt(d.ey, 2)}%</span><span class="pill">TDS ${fmt(d.tds, 2)}%</span><span class="pill">1:${fmt(d.ratio, 2)}</span><span class="pill ${cl.cls}">${esc(cl.label)}</span></div>${r.note ? `<div class="note"><b>추출 노트</b>${esc(r.note)}</div>` : ''}${renderTeacherFeedback(r)}${classFeedbackVisible() ? `<div class="feedback"><div><span class="arrow">${f.arrow}</span> <b>${esc(f.title)}</b></div><p>${esc(f.text)}</p><p class="rec">${esc(f.rec)}</p></div>` : ''}`;
+    card.innerHTML = `<div class="record-top"><div class="record-title"><div class="attempt-no">${i + 1}</div><div class="record-main"><b>${esc(s.name)} · ${i + 1}차</b><span>${fmt(d.dose, 1)}g / ${fmt(d.water, 1)}g · Beverage ${fmt(d.bev, 1)}g · ${esc(calculationBasis(d))}</span></div></div><div class="actions" style="margin:0"><button class="btn ghost small" data-edit>수정</button><button class="btn danger small" data-del>삭제</button></div></div><div class="record-metrics"><span class="pill">EY ${fmt(d.ey, 2)}%</span><span class="pill">TDS ${fmt(d.tds, 2)}%</span><span class="pill">${brewRatioText(d)}</span><span class="pill ${cl.cls}">${esc(cl.label)}</span></div>${r.note ? `<div class="note"><b>추출 노트</b>${esc(r.note)}</div>` : ''}${renderTeacherFeedback(r)}${classFeedbackVisible() ? `<div class="feedback"><div><span class="arrow">${f.arrow}</span> <b>${esc(f.title)}</b></div><p>${esc(f.text)}</p><p class="rec">${esc(f.rec)}</p></div>` : ''}`;
     for (const name of ['edit', 'del', 'teacher-edit', 'teacher-save', 'teacher-cancel']) card.querySelectorAll('[data-' + name + ']').forEach(button => button.setAttribute('data-' + name, r.id));
     list.appendChild(card);
   });
@@ -2205,16 +2458,12 @@ $('saveRecord').onclick = () => {
   const wasEditing = !!editingRecordId,
     records = ensureSessionRecords(s.id),
     rec = {
-      retentionUsed: classRetention(),
-      dose: parseNumber($('cDose').value),
-      water: parseNumber($('cWater').value),
-      bev: $('cBev').value ? parseNumber($('cBev').value) : '',
-      tds: parseNumber($('cTds').value),
+      ...readBrewInputs('c', classRetention()),
       note: $('cNote').value.trim()
     };
   const d = calcRecord(rec);
-  if (!isPositiveNumber(rec.dose) || !isPositiveNumber(rec.water) || !isPositiveNumber(rec.tds) || !isPositiveNumber(d.bev)) {
-    toast('원두량, 물량, TDS를 확인해 주세요');
+  if (!validBrewResult(d)) {
+    toast(BREW_INPUT_GUIDANCE);
     return;
   }
   currentSession().studentNames = currentSession().studentNames || {};
@@ -2286,7 +2535,7 @@ function selectedClassPoints() {
     getSessionRecords(s.id).forEach((r, ri) => {
       if (chartSelection[s.id]?.[r.id]) {
         const d = calcRecord(r);
-        if (Number.isFinite(d.ey) && Number.isFinite(d.tds)) out.push({
+        if (validBrewResult(d)) out.push({
           ...d,
           studentId: s.id,
           studentName: s.name,
@@ -2403,7 +2652,13 @@ function deltaForPoint(p) {
   };
 }
 function deltaHtml(p){const d=deltaForPoint(p);return d?`<div class="tip-delta">${esc(d.label)} · ΔEY ${signed(d.dey,2)}%p · ΔTDS ${signed(d.dtds,2)}%p</div>`:''}
-function tooltipHtml(p){const f=chartFeedbackForPoint(p),cl=classificationFor(p),title=chartMode==='class'?`${esc(p.studentName)} · ${p.attempt}차`:(p.attempt?`Quick · ${p.attempt}차`:'Quick · 현재값'),showF=chartMode==='quick'?quickFeedbackVisible():classFeedbackVisible();return `<b>${title}</b><div>EY ${fmt(p.ey,2)}% · TDS ${fmt(p.tds,2)}% · 1:${fmt(p.ratio,2)}</div><div class="muted">${esc(cl.label)} · ${fmt(p.dose,1)}g / ${fmt(p.water,1)}g · Beverage ${fmt(p.bev,1)}g</div>${deltaHtml(p)}${p.note?`<div class="muted">노트 · ${esc(p.note)}</div>`:''}${p.teacherFeedback?`<div class="tip-teacher"><b>강사 피드백</b><br>${esc(p.teacherFeedback)}</div>`:''}${showF?`<div class="tip-feedback">${f.arrow} ${esc(f.title)} · ${esc(f.rec)}</div>`:''}`}
+function tooltipHtml(p) {
+  const f = chartFeedbackForPoint(p),
+    cl = classificationFor(p),
+    title = chartMode === 'class' ? `${esc(p.studentName)} · ${p.attempt}차` : p.attempt ? `Quick · ${p.attempt}차` : 'Quick · 현재값',
+    showF = chartMode === 'quick' ? quickFeedbackVisible() : classFeedbackVisible();
+  return `<b>${title}</b><div>EY ${fmt(p.ey, 2)}% · TDS ${fmt(p.tds, 2)}% · ${brewRatioText(p)}</div><div class="muted">${esc(cl.label)} · ${fmt(p.dose, 1)}g / ${fmt(p.water, 1)}g · Beverage ${fmt(p.bev, 1)}g · ${esc(calculationBasis(p))}</div>${deltaHtml(p)}${p.note ? `<div class="muted">노트 · ${esc(p.note)}</div>` : ''}${p.teacherFeedback ? `<div class="tip-teacher"><b>강사 피드백</b><br>${esc(p.teacherFeedback)}</div>` : ''}${showF ? `<div class="tip-feedback">${f.arrow} ${esc(f.title)} · ${esc(f.rec)}</div>` : ''}`;
+}
 function goalTooltipHtml(touch=false){if(!state.quickGoal)return '';return `<b>TARGET POINT</b><div>EY ${fmt(state.quickGoal.ey,2)}% · TDS ${fmt(state.quickGoal.tds,3)}%</div><div class="tip-action">${touch?'다시 탭하면 목표점 삭제':'클릭하면 목표점 삭제'}</div>`}
 function coordTooltipHtml(c){return `<b>좌표 미리보기</b><div>EY ${fmt(c.ey,2)}% · TDS ${fmt(c.tds,3)}%</div><div class="muted">클릭하면 목표점 지정</div>`}
 function showTooltipHtml(html, e, {
@@ -2998,7 +3253,21 @@ $('chartSvg').addEventListener('click', e => {
   if (!touchLike()) notifyAfterSave(`목표점 EY ${fmt(state.quickGoal.ey, 2)}% · TDS ${fmt(state.quickGoal.tds, 2)}%`);
 });
 function renderChartLegend(pts){const l=$('chartLegend');let html=`<span><i style="background:${CHART_TARGET_COLOR}"></i>${esc(state.settings.targetName)}</span>`;if(chartMode==='quick'){if(pts.some(p=>!p.isLive))html+='<span><i style="background:#3157d5;border-radius:50%"></i>저장 기록</span>';if(pts.some(p=>p.isLive))html+=`<span><i style="background:${LIVE_COLOR};border-radius:50%"></i>현재값</span>`;if(state.quickGoal)html+=`<span><i style="background:#fff;border:2px solid ${GOAL_COLOR};border-radius:50%"></i>목표점</span>`}else sessionChartStudents().forEach((s,i)=>{if(pts.some(p=>p.studentId===s.id))html+=`<span><i style="background:${COLORS[i%COLORS.length]};border-radius:50%"></i>${esc(s.name)}</span>`});l.innerHTML=html}
-function renderChartDetail(p){const box=$('chartDetail');if(!p){box.classList.remove('show');box.innerHTML='';return}const f=chartFeedbackForPoint(p),cl=classificationFor(p),showF=chartMode==='quick'?quickFeedbackVisible():classFeedbackVisible(),title=chartMode==='class'?`${esc(p.studentName)} · ${p.attempt}차`:(p.attempt?`Quick · ${p.attempt}차`:'Quick · 현재값'),d=deltaForPoint(p);box.classList.add('show');box.innerHTML=`<h3>${title} — EY ${fmt(p.ey,2)}% / TDS ${fmt(p.tds,2)}% / 1:${fmt(p.ratio,2)} · ${esc(cl.label)}</h3><p>${fmt(p.dose,1)}g / ${fmt(p.water,1)}g · Beverage ${fmt(p.bev,1)}g${p.note?` · 노트: ${esc(p.note)}`:''}</p>${d?`<p><b>${esc(d.label)}</b> · ΔEY ${signed(d.dey,2)}%p · ΔTDS ${signed(d.dtds,2)}%p</p>`:''}${p.teacherFeedback?`<p class="teacher-line"><b>강사 피드백</b> · ${esc(p.teacherFeedback)}</p>`:''}${showF?`<p><b>${f.arrow} ${esc(f.title)}</b> · ${esc(f.text)} ${esc(f.rec)}</p>`:''}`}
+function renderChartDetail(p) {
+  const box = $('chartDetail');
+  if (!p) {
+    box.classList.remove('show');
+    box.innerHTML = '';
+    return;
+  }
+  const f = chartFeedbackForPoint(p),
+    cl = classificationFor(p),
+    showF = chartMode === 'quick' ? quickFeedbackVisible() : classFeedbackVisible(),
+    title = chartMode === 'class' ? `${esc(p.studentName)} · ${p.attempt}차` : p.attempt ? `Quick · ${p.attempt}차` : 'Quick · 현재값',
+    d = deltaForPoint(p);
+  box.classList.add('show');
+  box.innerHTML = `<h3>${title} — EY ${fmt(p.ey, 2)}% / TDS ${fmt(p.tds, 2)}% / ${brewRatioText(p)} · ${esc(cl.label)}</h3><p>${fmt(p.dose, 1)}g / ${fmt(p.water, 1)}g · Beverage ${fmt(p.bev, 1)}g · ${esc(calculationBasis(p))}${p.note ? ` · 노트: ${esc(p.note)}` : ''}</p>${d ? `<p><b>${esc(d.label)}</b> · ΔEY ${signed(d.dey, 2)}%p · ΔTDS ${signed(d.dtds, 2)}%p</p>` : ''}${p.teacherFeedback ? `<p class="teacher-line"><b>강사 피드백</b> · ${esc(p.teacherFeedback)}</p>` : ''}${showF ? `<p><b>${f.arrow} ${esc(f.title)}</b> · ${esc(f.text)} ${esc(f.rec)}</p>` : ''}`;
+}
 
 
 function chartExportTitle(){const name=(state.quickMeta?.name||'').trim();if(chartMode==='quick')return name||'Quick Brewing Control Chart';return `${currentClass()?.name||'Class'} · ${currentSession()?.name||'실습'}`}
@@ -3669,6 +3938,8 @@ function applyImportedState(imported) {
   importReadGeneration++;
   settingsDraftFields.clear();
   editingQuickRecordId = null;
+  editingQuickNoteId = null;
+  editingQuickNoteDraft = '';
   quickDraftBeforeEdit = null;
   invalidateInputContext('quick');
   repairActiveClassState();

@@ -4,6 +4,26 @@ All notable changes to Coffee Brewing Control are documented here.
 
 The project was developed iteratively before its first public GitHub release. Earlier entries are intentionally condensed to major user-facing and architectural milestones rather than every intermediate test or debugging change.
 
+## [4.4.2] - 2026-09-22
+
+### Added
+- Added automatic Brew water estimation in Quick and Class when Brew water is blank and Dose, Beverage mass, and TDS are provided. Estimated Brew Ratio is identified as an estimate.
+- Added optional per-attempt Quick notes using the saved-card editor pattern from Class instructor feedback, with save / cancel and Ctrl/⌘+Enter / Esc shortcuts.
+- Added Copyright & Usage terms clarifying free use of the hosted application and unmodified locally run copies distributed by the copyright holder, permitted use, export, and sharing of users’ own brewing records, backup JSON files, and chart images, restrictions on reuse of protected project materials, and the exclusion of brewing principles and third-party materials from ownership claims.
+
+### Fixed
+- Individual Quick attempt deletion now asks for confirmation before removing the record, matching Class record deletion.
+
+### Changed
+- Quick and Class records and chart details show whether Beverage or Brew water was estimated and the liquid-retention value used. Quick notes appear in chart tooltips and details.
+- Shared raw-input reading, bidirectional mass calculation, and calculation-source presentation within the existing single-file app. The Quick measurement form does not add a note field.
+- The forward automatic Beverage formula, default liquid retention of 2.1, existing manual-input policy, chart out-of-range notice, measurement transport, and PNG layout remain unchanged.
+
+### Compatibility
+- Advanced the saved-data schema to v6 to preserve each record’s Brew water input mode and Quick attempt note. Supported schema-v5 and earlier data remain importable; existing records retain their previous water-input interpretation and liquid-retention value.
+- Automatic estimates remain derived values: blank raw inputs and the saved liquid-retention value are retained during editing and JSON backup / restore.
+- The browser storage key and backup format identifier remain unchanged. Export a backup and close older app tabs before upgrading. Schema-v6 backups are not intended for older app versions.
+
 ## [4.4.1] - 2026-09-20
 
 ### Added

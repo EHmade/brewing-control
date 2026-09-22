@@ -6,7 +6,7 @@ The application visualizes brew strength (TDS), extraction yield, and brew ratio
 
 ## Features
 
-- **Quick** — enter brew measurements, save and edit repeated attempts, compare changes, set a target point, and export the current chart as PNG.
+- **Quick** — enter brew measurements, save and edit repeated attempts and per-attempt notes, estimate either missing brew mass, compare changes, set a target point, and export the current chart as PNG.
 - **Class** — manage classes, students, and reusable practice sessions; keep per-student attempts and instructor feedback.
 - **Chart** — interactive TDS / extraction-yield chart with configurable target range, chart scale, brew-ratio lines, filters, and comparison paths.
 - **Measurement Device** — optionally connect a supported refractometer and insert measured TDS directly into Quick or Class without changing the existing save / record workflow.
@@ -16,7 +16,9 @@ The application visualizes brew strength (TDS), extraction yield, and brew ratio
 
 ## Editing saved attempts
 
-Quick history supports editing through the existing measurement form. An edit keeps the original attempt ID, position, and liquid-retention value. Saving or cancelling returns to the LIVE input that was present before editing. Unsaved edits are not committed records; reloading the page returns to the preserved LIVE input.
+Quick history supports editing through the existing measurement form. An edit keeps the original attempt ID, position, and liquid-retention value. Saving or cancelling returns to the LIVE input that was present before editing. Brew water may remain blank for inverse estimation; editing keeps the saved liquid-retention value and preserves directly entered values. Unsaved edits are not committed records; reloading the page returns to the preserved LIVE input.
+
+Each saved Quick attempt has an optional note edited directly on its card, independently of the measurement form. Click the note to edit it; save with the button or Ctrl/⌘+Enter, and cancel with the button or Esc. Unsaved notes survive same-context refreshes but are not committed by reloading the page. Saved notes appear in chart tooltips and details and are included in JSON backups. The experiment name and common Quick note remain separate. Individual Quick record deletion asks for confirmation.
 
 Class record edits preserve chart-filter selections. Instructor-feedback drafts remain in place during same-context screen refreshes; saving, cancelling, or changing the editing context ends the draft.
 
@@ -61,11 +63,18 @@ The built-in **Classic Filter** Target Profile starts with:
 
 These values are informed by published Specialty Coffee Association brewing materials and are provided as a starting reference only. Target ranges, chart scales, brew ratios, and liquid-retention assumptions are configurable and should not be interpreted as universal sensory-quality standards or physical limits.
 
-When beverage mass is left blank, the application estimates beverage mass from brew water, measured TDS, and the configured liquid-retention value. The default liquid-retention coefficient is **2.1**, and it can be changed independently in Calculation Settings. Extraction-yield results therefore depend on the measurements and assumptions supplied by the user.
+When beverage mass is left blank, the application estimates beverage mass from brew water, dose, measured TDS, and the configured liquid-retention value. When brew water is left blank instead, it estimates brew water and Brew Ratio from directly entered beverage mass, dose, and TDS. If both masses are entered, both are used directly; if neither is entered, neither is estimated. The default liquid-retention coefficient is **2.1**, and it can be changed independently in Calculation Settings. Extraction-yield results therefore depend on the measurements and assumptions supplied by the user.
 
-New Quick and Class records store the liquid-retention value used when they are saved. Editing a saved record continues to use that value, including a switch from manual to automatic Beverage. The global setting applies to new LIVE calculations, new records, and chart Brew Ratio guides; it does not change saved automatic-Beverage results. Target classification and feedback still follow the current target settings. Manual Beverage calculations do not use the retention coefficient.
+The two directions use the same mass-balance relationship, with masses in grams and TDS entered as a percentage:
 
-Older records receive the dataset's configured retention value when migrated to schema v5, preserving their immediately preceding displayed results. This is a migration assumption, not a reconstruction of the coefficient originally used for each historical brew.
+    Beverage = (Brew water − Liquid retention × Dose) / (1 − TDS/100)
+    Brew water = Beverage × (1 − TDS/100) + Liquid retention × Dose
+
+Estimated brew water and its Ratio are marked as estimates. They provide a reference under the configured retention assumption rather than reconstructing extra liquid left in the dripper when brewing is stopped. Record cards and chart details identify the calculation source and the retention value used.
+
+New Quick and Class records store the liquid-retention value used when they are saved. Editing a saved record continues to use that value, including a switch from manual to automatic Beverage. The global setting applies to new LIVE calculations, new records, and chart Brew Ratio guides; it does not change saved automatic-Beverage or automatic-Brew-water results. Target classification and feedback still follow the current target settings. EY calculated from directly entered Beverage does not use the retention coefficient; automatic Brew water and Ratio estimation still use it. Blank raw mass inputs remain blank in saved records and backups so an estimate is not mistaken for a direct input.
+
+Records from before schema v5 receive the dataset's configured retention value during migration, preserving their immediately preceding displayed results. This is a migration assumption, not a reconstruction of the coefficient originally used for each historical brew.
 
 ## Data and privacy
 
@@ -77,13 +86,13 @@ Hosting providers may still receive ordinary web-request metadata when the page 
 
 ## Backup and version compatibility
 
-Version 4.4.1 uses **schema v5** with the existing browser storage key and JSON backup format identifier. Supported older data structures remain importable. JSON import validates the backup structure and settings before applying it; it does not add new TDS / extraction-yield range restrictions.
+Version 4.4.2 uses **schema v6** with the existing browser storage key and JSON backup format identifier. Supported older data structures remain importable. Schema v6 preserves each record’s Brew water input mode and Quick attempt note. Existing schema-v5 retention values are retained; older records keep their prior water-input interpretation rather than acquiring inverse estimation automatically. JSON import validates the backup structure and settings before applying it; it does not add new TDS / extraction-yield range restrictions.
 
 The app checks stored candidates before loading and preserves the previous committed snapshot as a recovery copy. If no valid copy can be read, or a newer schema is found, automatic writes stop to protect the stored data. In that condition, JSON export can preserve the raw candidates as a recovery-only bundle; this bundle is for inspection and is not a normal importable app backup.
 
 Conflicting tabs stop automatic writes and retain their current in-memory content for export. Web Locks serialize participating tabs' writes where supported. Without that API, change detection remains available, but simultaneous writes cannot be fully coordinated. Session-only storage is temporary and should be backed up before closing the tab.
 
-Before upgrading, export a JSON backup and close older app tabs that use the same browser storage. Older versions do not participate in the new write protection and should not be opened against migrated data. Keep the old application and its pre-upgrade backup if rollback is needed; schema-v5 backups are not intended for older versions.
+Before upgrading, export a JSON backup and close older app tabs that use the same browser storage. Older versions do not participate in the new write protection and should not be opened against migrated data. Keep the old application and its pre-upgrade backup if rollback is needed; schema-v6 backups are not intended for older versions.
 
 ## References
 
@@ -108,14 +117,25 @@ Minimal repository structure:
 index.html
 README.md
 CHANGELOG.md
+COPYRIGHT.md
 ```
 
 ## Version
 
-Current version: **v4.4.1**
+Current version: **v4.4.2**
 
 See [CHANGELOG.md](CHANGELOG.md).
 
-## License
+## Copyright & Usage
 
-No open-source license is selected in this repository template. Public source availability does not by itself grant reuse rights. If you want others to freely reuse and modify the code, add an explicit license such as MIT after deciding the terms you want.
+© 2026 Taehee Yoon. All Rights Reserved.
+
+The hosted Coffee Brewing Control application may be used free of charge for personal, educational, research, and professional purposes, including use in cafés and paid instruction. An unmodified copy distributed by the copyright holder may also be run locally for the same permitted purposes.
+
+Users may save, use, export, and share their own brewing records, backup JSON files, and chart images produced through the application's provided features.
+
+Permission to use the application does not grant permission to reuse, modify, or redistribute its protected source code, interface implementation, documentation, or other protected project materials, except as permitted by applicable law or platform terms.
+
+No exclusive rights are claimed over brewing principles, formulas, scientific concepts, or functional ideas. Referenced third-party materials remain subject to their respective rights. Third-party software, libraries, and other components used by this project remain subject to their respective licenses and terms.
+
+See [COPYRIGHT.md](COPYRIGHT.md) for the full terms.
