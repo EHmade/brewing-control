@@ -4,6 +4,36 @@ All notable changes to Coffee Brewing Control are documented here.
 
 The project was developed iteratively before its first public GitHub release. Earlier entries are intentionally condensed to major user-facing and architectural milestones rather than every intermediate test or debugging change.
 
+## [4.4.3] - 2026-09-25
+
+### Added
+- Added a shared brew-data sanity review for Quick and Class. Calculable but unusual records retain their existing values, target classification, and direction feedback while showing an input-review warning.
+- Added record-level acknowledgment for intentionally entered outliers. Saved Quick and Class records can show `확인됨`; changes to brew data clear the acknowledgment, while note and instructor-feedback edits preserve it.
+- Added permanent deletion for excluded students. The action removes the student from the excluded roster together with all session records, saved names, instructor feedback, and related chart / editing references after confirmation.
+- Added a two-stage full app-data reset in Settings. It returns persistent user state and Measurement Device selection / UI visibility to defaults and disconnects the runtime device while retaining the app's built-in device profiles and measurement functions.
+- Added inline TDS range guidance and accessible invalid-state reporting to Quick and Class.
+
+### Fixed
+- Added reset-generation coordination so stale tabs, queued writes, pending recovery data, primary / recovery snapshots, and lifecycle saves cannot restore data from before a full reset. Already-stale tabs cannot start a new reset or mutate persistent state.
+- Early schema-v2 backups without `excludedStudents` now migrate correctly. Malformed v2 values remain rejected, and schema-v3-or-newer data retain strict `excludedStudents` validation.
+- Backup Restore now closes an open Quick common-note editor before restored state is rendered, preventing a stale draft from overwriting restored content.
+- Class automatic-estimate hints now refresh immediately after the liquid-retention setting changes, while edits of saved records continue to use the record's retained coefficient.
+- Chart minor grid lines now render completely at the validator's maximum density.
+- Backup filenames now use the Asia/Seoul calendar date while the JSON `exportedAt` timestamp remains UTC ISO.
+- Stabilized Quick and narrow two-column Class layouts when calculation, sanity, TDS-range, and automatic-estimate messages change.
+
+### Changed
+- Valid TDS for a calculated brew result is now strictly **0 < TDS < 100%**. New or edited records outside that interval cannot be saved. Existing imported records retain their raw TDS but do not produce EY, dissolved solids, classification, feedback, or chart points; independently calculable Brew Ratio may still be shown.
+- Sanity review remains separate from calculation validity. Calculable outliers can still be saved and charted, and acknowledgment records the user's confirmation without storing derived review reasons.
+- Ordinary protected pending writes complete without a storage warning. Actionable failures, conflicts, stale-tab states, and damaged or newer data remain visible.
+- Settings sections start collapsed, Class form actions appear before the sanity message, and custom Target Profile / Chart View Preset names no longer receive an extra user suffix.
+
+### Compatibility
+- Advanced the saved-data schema to **v7**. Every saved Quick and Class record carries a strict boolean `sanityAcknowledged` field; `needsReview` and reason codes remain derived and are not stored.
+- Supported schema-v1 through schema-v6 data remain importable and receive `sanityAcknowledged: false` without changing their historical measurements, record provenance, notes, feedback, retention value, or measurement-device state.
+- Current schema-v7 representation is validated strictly. Missing or non-boolean acknowledgment fields are rejected rather than silently repaired.
+- The legacy browser storage key `coffeeBrewControlClassroomV2` and backup format identifier `coffee-brew-control-backup` remain unchanged. Export a backup and close older app tabs before upgrading. Schema-v7 backups are not intended for older app versions.
+
 ## [4.4.2] - 2026-09-22
 
 ### Added

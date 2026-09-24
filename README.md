@@ -10,6 +10,7 @@ The application visualizes brew strength (TDS), extraction yield, and brew ratio
 - **Class** — manage classes, students, and reusable practice sessions; keep per-student attempts and instructor feedback.
 - **Chart** — interactive TDS / extraction-yield chart with configurable target range, chart scale, brew-ratio lines, filters, and comparison paths.
 - **Measurement Device** — optionally connect a supported refractometer and insert measured TDS directly into Quick or Class without changing the existing save / record workflow.
+- **Input review** — distinguish calculation validity from unusual but calculable brew data, retain the original result and classification, and acknowledge intentional outlier records.
 - **Profiles & presets** — save extraction targets as Target Profiles and chart scales / brew-ratio guides as Chart View Presets; the liquid-retention coefficient is managed independently in Calculation Settings.
 - **Local-first storage** — records are stored in the browser; full JSON backup and restore are available.
 - **Single-file app** — no build step, framework, external JavaScript library, webfont, image pack, or API key is required.
@@ -21,6 +22,14 @@ Quick history supports editing through the existing measurement form. An edit ke
 Each saved Quick attempt has an optional note edited directly on its card, independently of the measurement form. Click the note to edit it; save with the button or Ctrl/⌘+Enter, and cancel with the button or Esc. Unsaved notes survive same-context refreshes but are not committed by reloading the page. Saved notes appear in chart tooltips and details and are included in JSON backups. The experiment name and common Quick note remain separate. Individual Quick record deletion asks for confirmation.
 
 Class record edits preserve chart-filter selections. Instructor-feedback drafts remain in place during same-context screen refreshes; saving, cancelling, or changing the editing context ends the draft.
+
+## Input validity and review
+
+A calculated brew result requires positive dose, brew-water and beverage values, finite derived values, and TDS strictly inside **0 < TDS < 100%**. Quick and Class show the accepted TDS interval beside the input. Values outside that interval can remain visible in the input field, but new records cannot be saved from them and they do not produce extraction yield, dissolved solids, classification, direction feedback, or chart points. Brew Ratio may still be shown when it can be calculated independently from dose and brew water.
+
+Separately, the app evaluates calculable records for unusual mass relationships and extreme derived results. These records keep their existing values, target classification, and direction feedback while showing **입력값 확인**. After saving, the user can acknowledge that the record was entered intentionally; the record then shows **확인됨**. Changing dose, brew water, beverage, TDS, the input mode, or the retained coefficient clears that acknowledgment, while changing a Quick note or instructor feedback does not.
+
+The acknowledgment is stored with the record. The review result and its internal reason codes are recalculated from the current evaluator rather than stored in the backup.
 
 ## Measurement device support
 
@@ -86,13 +95,15 @@ Hosting providers may still receive ordinary web-request metadata when the page 
 
 ## Backup and version compatibility
 
-Version 4.4.2 uses **schema v6** with the existing browser storage key and JSON backup format identifier. Supported older data structures remain importable. Schema v6 preserves each record’s Brew water input mode and Quick attempt note. Existing schema-v5 retention values are retained; older records keep their prior water-input interpretation rather than acquiring inverse estimation automatically. JSON import validates the backup structure and settings before applying it; it does not add new TDS / extraction-yield range restrictions.
+Version 4.4.3 uses **schema v7** with the existing browser storage key and JSON backup format identifier. Supported schema-v1 through schema-v6 data remain importable. Schema v7 adds a strict boolean review-acknowledgment field to every saved Quick and Class record. Earlier records receive an unacknowledged state during migration without changing their stored brew measurements, water-input interpretation, notes, feedback, measurement-device settings, or retained liquid-retention value.
+
+Current-schema representation is validated strictly, while supported historical shapes are handled by their migration contracts. In particular, early schema-v2 data may omit `excludedStudents`; malformed values remain rejected, and schema-v3-or-newer data retain their stricter requirement. Existing imported records with TDS outside the current calculated-result interval retain the original raw value but do not generate calculated brew results or chart points until edited to a valid TDS.
 
 The app checks stored candidates before loading and preserves the previous committed snapshot as a recovery copy. If no valid copy can be read, or a newer schema is found, automatic writes stop to protect the stored data. In that condition, JSON export can preserve the raw candidates as a recovery-only bundle; this bundle is for inspection and is not a normal importable app backup.
 
-Conflicting tabs stop automatic writes and retain their current in-memory content for export. Web Locks serialize participating tabs' writes where supported. Without that API, change detection remains available, but simultaneous writes cannot be fully coordinated. Session-only storage is temporary and should be backed up before closing the tab.
+Conflicting or stale tabs stop persistent mutations and retain their current in-memory content for read-only export. Full app-data reset uses a shared reset generation so participating tabs cannot restore queued, pending, primary, or recovery data from before the reset. Web Locks serialize participating tabs' writes and reset-generation changes where supported. Without that API, change detection remains available, but simultaneous operations cannot be fully coordinated. Session-only storage is temporary and should be backed up before closing the tab.
 
-Before upgrading, export a JSON backup and close older app tabs that use the same browser storage. Older versions do not participate in the new write protection and should not be opened against migrated data. Keep the old application and its pre-upgrade backup if rollback is needed; schema-v6 backups are not intended for older versions.
+Before upgrading, export a JSON backup and close older app tabs that use the same browser storage. Older versions do not participate in the reset-generation protection and should not be opened against migrated data. Keep the old application and its pre-upgrade backup if rollback is needed; schema-v7 backups are not intended for older versions.
 
 ## References
 
@@ -122,7 +133,7 @@ COPYRIGHT.md
 
 ## Version
 
-Current version: **v4.4.2**
+Current version: **v4.4.3**
 
 See [CHANGELOG.md](CHANGELOG.md).
 

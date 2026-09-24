@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Coffee Brewing Control · Classroom v4.4.2</title>
+<title>Coffee Brewing Control · Classroom v4.4.3</title>
 <style>
 :root{
   --bg:#f3ede4; --card:#fffdf9; --ink:#2b2722; --muted:#766e66; --line:#ddd3c7;
@@ -49,6 +49,16 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
 @media(max-width:399px){.status{height:111px}}
 @media(max-width:360px){.head-tools.device-visible{grid-template-columns:minmax(0,1fr) 92px;gap:6px}.head-tools.device-visible .tab{padding-left:6px;padding-right:6px;font-size:10.5px}.device-connection-control{width:92px;flex-basis:92px;padding-left:7px;padding-right:7px}.device-connection-dot{width:8px;height:8px}.device-connection-state{font-size:8.5px}.device-connection-name{font-size:7.5px}}
 @media(max-width:340px){.quick-reference{font-size:10.5px}}
+/* Stable LIVE guidance slots; saved record cards keep their natural height. */
+#qWaterHint,#qBevHint{min-height:1.5em;line-height:1.5}
+#qSanity{min-height:28px;display:flex;align-items:center}
+#cSanity{align-self:center;min-width:0}
+@media(max-width:680px){#qWaterHint,#qBevHint{min-height:3em}}
+.tds-label-row{display:flex;justify-content:space-between;align-items:baseline;gap:0 8px;flex-wrap:wrap;margin-bottom:5px}
+.tds-label-row label{margin-bottom:0}
+.tds-range-hint{display:block;min-width:16em;font-size:10.5px;line-height:1.5;text-align:right;color:var(--muted);margin-left:auto}
+.tds-range-hint.invalid{color:var(--danger)}
+@media(min-width:441px) and (max-width:500px){#cWaterHint,#cBevHint{min-height:2.9em}}
 </style>
 </head>
 <body>
@@ -88,9 +98,9 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
     </details>
     <div class="grid">
       <div><label for="qDose">원두량 · Dose</label><div class="field"><input id="qDose" type="number" inputmode="decimal" step="0.1" value="20"><span class="unit">g</span></div></div>
-      <div><label for="qWater">물양 · Brew water</label><div class="field"><input id="qWater" type="number" inputmode="decimal" step="0.1" value="300" placeholder="비우면 자동 추정" aria-describedby="qInputRule"><span class="unit">g</span></div><div class="hint" id="qWaterHint" style="display:none"></div></div>
+      <div><label for="qWater">물양 · Brew water</label><div class="field"><input id="qWater" type="number" inputmode="decimal" step="0.1" value="300" placeholder="비우면 자동 추정" aria-describedby="qInputRule"><span class="unit">g</span></div><div class="hint" id="qWaterHint"></div></div>
       <div><label for="qBev">추출된 액체량 · Beverage</label><div class="field"><input id="qBev" type="number" inputmode="decimal" step="0.1" placeholder="비우면 자동 추정" aria-describedby="qInputRule"><span class="unit">g</span></div><div class="hint" id="qBevHint"></div></div>
-      <div><label for="qTds">측정 TDS · Strength</label><div class="field"><input id="qTds" type="number" inputmode="decimal" step="0.01" value="1.53"><span class="unit">%</span></div><div class="measurement-tds-action" id="qMeasurementAction" hidden><button class="btn" id="qMeasureTds" type="button" disabled>Measure TDS</button><span class="measurement-tds-feedback" id="qMeasurementFeedback" role="status" aria-live="polite"></span></div></div>
+      <div><div class="tds-label-row"><label for="qTds">측정 TDS · Strength</label><span class="tds-range-hint" id="qTdsHint">유효 범위 · 0 &lt; TDS &lt; 100%</span></div><div class="field"><input id="qTds" aria-describedby="qTdsHint" type="number" inputmode="decimal" step="0.01" value="1.53"><span class="unit">%</span></div><div class="measurement-tds-action" id="qMeasurementAction" hidden><button class="btn" id="qMeasureTds" type="button" disabled>Measure TDS</button><span class="measurement-tds-feedback" id="qMeasurementFeedback" role="status" aria-live="polite"></span></div></div>
     </div>
     <div class="hint" id="qInputRule">원두량과 TDS는 필수입니다. 물양과 추출액은 둘 중 하나 이상 입력하세요. 하나를 비우면 입력한 값을 기준으로 자동 추정합니다.</div>
   </div>
@@ -102,7 +112,7 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
       <div class="metric"><div class="k">Brew Ratio</div><div class="v" id="qRatioOut">—</div><div class="s">원두 : 투입수</div></div>
       <div class="metric"><div class="k">Dissolved Solids</div><div class="v" id="qSolidsOut">—</div><div class="s" id="qBevOut">—</div></div>
     </div>
-    <div class="status" id="qStatus"><div class="status-dot"></div><div class="status-copy"><b id="qStatusTitle">—</b><span id="qStatusDesc">—</span><span class="status-rec" id="qStatusRec"></span></div></div>
+    <div id="qSanity" aria-live="polite"></div><div class="status" id="qStatus"><div class="status-dot"></div><div class="status-copy"><b id="qStatusTitle">—</b><span id="qStatusDesc">—</span><span class="status-rec" id="qStatusRec"></span></div></div>
     <div class="actions"><button class="btn" id="qSaveResult">추출 결과 저장</button><button class="btn secondary" id="qCancelEdit" style="display:none">취소</button><button class="btn" id="qGoChart">차트에서 보기</button><button class="btn secondary" id="qReset">기본값</button></div>
     <div class="quick-history-wrap" id="qHistoryWrap" style="display:none">
       <div class="quick-history-head"><b>Quick 추출 기록</b><button class="btn danger small" id="qClearHistory">기록 전체 삭제</button></div>
@@ -134,11 +144,11 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
       <div><label for="cDose">원두량</label><div class="field"><input id="cDose" type="number" step="0.1" value="20"><span class="unit">g</span></div></div>
       <div><label for="cWater">물양</label><div class="field"><input id="cWater" type="number" step="0.1" value="300" placeholder="비우면 자동 추정" aria-describedby="cInputRule"><span class="unit">g</span></div><div class="hint" id="cWaterHint" style="display:none"></div></div>
       <div><label for="cBev">추출된 액체량</label><div class="field"><input id="cBev" type="number" step="0.1" placeholder="비우면 자동 추정" aria-describedby="cInputRule"><span class="unit">g</span></div><div class="hint" id="cBevHint"></div></div>
-      <div><label for="cTds">TDS</label><div class="field"><input id="cTds" type="number" step="0.01" placeholder="예: 1.35"><span class="unit">%</span></div><div class="measurement-tds-action" id="cMeasurementAction" hidden><button class="btn" id="cMeasureTds" type="button" disabled>Measure TDS</button><span class="measurement-tds-feedback" id="cMeasurementFeedback" role="status" aria-live="polite"></span></div></div>
+      <div><div class="tds-label-row"><label for="cTds">TDS</label><span class="tds-range-hint" id="cTdsHint">유효 범위 · 0 &lt; TDS &lt; 100%</span></div><div class="field"><input id="cTds" aria-describedby="cTdsHint" type="number" step="0.01" placeholder="예: 1.35"><span class="unit">%</span></div><div class="measurement-tds-action" id="cMeasurementAction" hidden><button class="btn" id="cMeasureTds" type="button" disabled>Measure TDS</button><span class="measurement-tds-feedback" id="cMeasurementFeedback" role="status" aria-live="polite"></span></div></div>
       <div class="wide hint" id="cInputRule">원두량과 TDS는 필수입니다. 물양과 추출액은 둘 중 하나 이상 입력하세요. 하나를 비우면 입력한 값을 기준으로 자동 추정합니다.</div>
       <div class="wide"><label>추출 노트</label><textarea id="cNote" rows="1" maxlength="160" placeholder="예: 분쇄 2클릭 가늘게 · 3푸어 · 물온도 92℃"></textarea></div>
     </div>
-    <div class="actions"><button class="btn" id="saveRecord">추출 기록 추가</button><button class="btn secondary" id="cancelEdit" style="display:none">수정 취소</button></div>
+    <div class="actions"><button class="btn" id="saveRecord">추출 기록 추가</button><button class="btn secondary" id="cancelEdit" style="display:none">수정 취소</button><div id="cSanity" aria-live="polite"></div></div>
   </div>
 
   <div class="panel" id="classRecordsPanel">
@@ -175,7 +185,7 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
   <div class="panel">
     <div class="panel-head"><div><h2>설정</h2><p>계산 가정, 추출 타겟, 차트 표시 범위를 각각 독립적으로 설정하고 필요한 항목만 펼쳐서 수정합니다.</p></div></div>
     <div class="settings-accordion">
-      <details class="settings-box" id="calculationSettings" open>
+      <details class="settings-box" id="calculationSettings">
         <summary><div><div class="settings-summary-title">계산 설정</div><div class="settings-summary-sub" id="calculationSummary">Liquid retention · 2.1×</div></div></summary>
         <div class="settings-body">
           <div class="calculation-grid">
@@ -193,7 +203,7 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
         </div>
       </details>
 
-      <details class="settings-box" id="targetSettings" open>
+      <details class="settings-box" id="targetSettings">
         <summary><div><div class="settings-summary-title">추출 타겟 설정</div><div class="settings-summary-sub" id="targetSummary">—</div></div></summary>
         <div class="settings-body">
           <div class="grid-3">
@@ -339,6 +349,7 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
         </div>
       </details>
 
+      <details class="settings-box" id="resetSettings"><summary><div class="settings-summary-title">전체 앱 데이터 초기화</div></summary><div class="settings-body"><div class="hint">이 브라우저에 저장된 기록과 모든 설정을 초기화합니다. 필요한 데이터는 먼저 백업해 주세요.</div><button class="btn danger" id="resetAppData">전체 앱 데이터 초기화</button></div></details>
       <details class="settings-box" id="backupSettings">
         <summary><div><div class="settings-summary-title">데이터 백업 및 복원</div><div class="settings-summary-sub" id="backupSummary">전체 앱 데이터 · JSON</div></div></summary>
         <div class="settings-body">
@@ -351,7 +362,7 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
       </details>
 
       <div class="public-info">
-        <div class="meta"><b>Coffee Brewing Control v4.4.2</b><br>Local-first · single-file web app</div>
+        <div class="meta"><b>Coffee Brewing Control v4.4.3</b><br>Local-first · single-file web app</div>
         <div class="actions"><button class="btn ghost small" id="openAbout">About &amp; References</button><button class="btn ghost small" id="openChangelog">Changelog</button></div>
       </div>
     </div>
@@ -387,7 +398,7 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
     <div class="notice"><b>Independent project.</b> This project is independently developed and is not affiliated with or endorsed by the Specialty Coffee Association. No SCA logo or SCA chart artwork is included.</div>
     <h4>Data &amp; privacy</h4>
     <p>Brew records, class data, profiles, and settings are stored locally in the browser by this application. The application does not transmit entered brew or class data to an application backend. When a supported measurement device is used, device communication is handled directly through browser device APIs; live connection objects and normalized auxiliary readings are not persisted as application records. This does not cover ordinary hosting access logs or actions explicitly initiated by the user, such as export or sharing. JSON export is available for manual backup and transfer.</p>
-    <p>Version 4.4.2 uses schema v6 with the existing storage key and backup format. Export a backup and close older app tabs before upgrading in the same browser storage context. Keep a pre-upgrade backup for rollback; older versions do not participate in the new write protection. Unreadable or newer-schema stored data stops automatic writes, and raw recovery export remains available. Conflicting tabs preserve their in-memory content for export.</p>
+    <p>Version 4.4.3 uses schema v7 with the existing storage key and backup format. Export a backup and close older app tabs before upgrading in the same browser storage context. Keep a pre-upgrade backup for rollback; older versions do not participate in the new write protection. Unreadable or newer-schema stored data stops automatic writes, and raw recovery export remains available. Conflicting tabs preserve their in-memory content for export.</p>
     <h4>References</h4>
     <div class="reference">E. E. Lockhart. <i>The Soluble Solids in Beverage Coffee as an Index to Cup Quality.</i> Coffee Brewing Institute, 1957.</div>
     <div class="reference">Specialty Coffee Association. <i>Coffee Brewing Control Chart</i>, Version 3, revised March 2019.</div>
@@ -407,6 +418,34 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
   <div class="app-dialog info-dialog" role="dialog" aria-modal="true" aria-labelledby="changelogModalTitle">
     <h3 id="changelogModalTitle">Changelog</h3>
     <p>All notable changes to Coffee Brewing Control are documented here. Earlier development history is intentionally condensed to major milestones.</p>
+    <div class="version-block"><h4>4.4.3 - 2026-09-25</h4>
+    <p><strong>Added</strong></p>
+    <ul>
+      <li>Added a shared brew-data sanity review for Quick and Class. Calculable but unusual records retain their existing results and classification while showing an input-review warning; saved records can be acknowledged as intentionally entered.</li>
+      <li>Added permanent deletion for excluded students and a two-stage full app-data reset in Settings. Both destructive actions state that they cannot be undone.</li>
+      <li>Added inline TDS range guidance and accessible invalid-state reporting to the Quick and Class input forms.</li>
+    </ul>
+    <p><strong>Fixed</strong></p>
+    <ul>
+      <li>Added reset-generation coordination so stale tabs, queued writes, pending recovery data, and lifecycle saves cannot restore data from before a full reset. Already-stale tabs cannot start a new reset.</li>
+      <li>Early schema-v2 backups without <code>excludedStudents</code> now migrate correctly while malformed v2 data and schema-v3-or-newer omissions remain rejected.</li>
+      <li>Backup Restore closes a stale Quick common-note editor before applying restored data. Class automatic-estimate hints refresh immediately after Calculation Settings changes.</li>
+      <li>Chart minor grid lines now render at the validator's maximum density, and backup filenames use the Asia/Seoul calendar date while <code>exportedAt</code> remains UTC.</li>
+      <li>Stabilized Quick and narrow two-column Class form layouts when calculation, sanity, and automatic-estimate messages change.</li>
+    </ul>
+    <p><strong>Changed</strong></p>
+    <ul>
+      <li>Valid TDS for a calculated brew result is now strictly <strong>0 &lt; TDS &lt; 100%</strong>. Existing imported records outside that interval retain their raw input but do not produce EY, dissolved solids, classification, feedback, or chart points; independently calculable Brew Ratio may still be shown.</li>
+      <li>Ordinary protected pending writes complete without a storage warning. Actionable failures, conflicts, stale-tab states, and damaged or newer data remain visible.</li>
+      <li>Settings sections start collapsed, Class form actions appear before the sanity message, and custom Target Profile / Chart View Preset names no longer receive an extra user suffix.</li>
+    </ul>
+    <p><strong>Compatibility</strong></p>
+    <ul>
+      <li>Advanced the saved-data schema to <strong>v7</strong>. Every saved Quick and Class record carries a strict boolean <code>sanityAcknowledged</code> field; review reasons remain derived and are not stored.</li>
+      <li>Supported schema-v1 through schema-v6 data remain importable and receive an unacknowledged review state without changing their historical measurements. Current schema-v7 representation is validated strictly.</li>
+      <li>The browser storage key and backup format identifier remain unchanged. Export a backup and close older app tabs before upgrading. Schema-v7 backups are not intended for older app versions.</li>
+    </ul>
+    </div>
     <div class="version-block"><h4>4.4.2 - 2026-09-22</h4>
     <p><strong>Added</strong></p>
     <ul>
@@ -642,8 +681,10 @@ label{display:block;font-size:11.5px;font-weight:850;color:#675d54;margin-bottom
 'use strict';
 const $=id=>document.getElementById(id), $$=sel=>Array.from(document.querySelectorAll(sel));
 const STORAGE_KEY='coffeeBrewControlClassroomV2'; // legacy key retained so existing browser data continues to load
-const APP_SCHEMA_VERSION=6;
-const APP_VERSION='4.4.2';
+const APP_SCHEMA_VERSION=7;
+const MAX_MAJOR_INTERVALS=40, MINOR_SUBDIVISIONS=2;
+const MAX_REQUIRED_TICKS=MAX_MAJOR_INTERVALS*MINOR_SUBDIVISIONS+1;
+const APP_VERSION='4.4.3';
 const BACKUP_FORMAT='coffee-brew-control-backup'; // legacy identifier retained for backup compatibility
 const COLORS=['#3157d5','#c85245','#2f7a52','#8a55a8','#d28a22','#2c8a9b','#7d6b35','#b24d84'];
 const GOAL_COLOR='#8a55a8';
@@ -1040,6 +1081,7 @@ function normalizeRecord(r = {}) {
     note: String(r.note || ''),
     teacherFeedback: String(r.teacherFeedback || ''),
     waterMode: r.waterMode,
+    sanityAcknowledged: r.sanityAcknowledged,
     ...(r.retentionUsed !== undefined ? {
       retentionUsed: r.retentionUsed
     } : {})
@@ -1077,6 +1119,98 @@ let lastSaveOperation = Promise.resolve(true);
 let recoveredPendingEntries = [];
 let pendingRecoveryConflict = false;
 
+// Reset generation is browser-local coordination metadata, never logical backup data.
+const RESET_EPOCH_KEY=STORAGE_KEY+'__reset_epoch';
+let loadedResetEpoch=0, resetInProgress=false, resetCoordination=null;
+function readSharedResetEpoch(){
+  let raw;
+  try{raw=localStorage.getItem(RESET_EPOCH_KEY)}catch{return {available:false,valid:true,epoch:0,raw:null}}
+  const valid=raw===null||(/^(0|[1-9]\d*)$/.test(raw)&&Number.isSafeInteger(Number(raw)));
+  return {available:true,valid,epoch:valid?(raw===null?0:Number(raw)):null,raw};
+}
+function jsonResetEpoch(object,key){
+  if(!object||!Object.prototype.hasOwnProperty.call(object,key))return 0;
+  const value=object[key];
+  return typeof value==='number'&&Number.isSafeInteger(value)&&value>=0?value:null;
+}
+function blockResetCoordination(status){
+  resetCoordination={rawResetEpoch:readSharedResetEpoch().raw,status};
+  storageBlocked='reset-anomaly';currentPending=null;
+}
+function candidateResetGeneration(object,key){
+  const epoch=jsonResetEpoch(object,key);
+  if(epoch===null){blockResetCoordination('invalid');return 'anomaly'}
+  if(epoch<loadedResetEpoch)return 'stale';
+  if(epoch>loadedResetEpoch){blockResetCoordination('future-generation');return 'anomaly'}
+  return 'current';
+}
+function checkResetGeneration(){
+  if(resetCoordination){storageBlocked='reset-anomaly';return false}
+  if(resetInProgress||storageBlocked==='reset-anomaly'||storageBlocked==='reset-stale')return false;
+  const shared=readSharedResetEpoch();
+  if(!shared.valid){blockResetCoordination('invalid');return false}
+  if(shared.available&&shared.epoch!==loadedResetEpoch){storageBlocked='reset-stale';currentPending=null;return false}
+  return true;
+}
+function canMutatePersistentState(){
+  if(checkResetGeneration())return true;
+  updateStorageWarning();
+  toast('전체 초기화 이후의 상태를 불러오려면 새로고침해 주세요. 현재 내용은 백업할 수 있습니다.',4000);
+  return false;
+}
+function removeAppUserState(storage){
+  const keys=[STORAGE_KEY,STORAGE_RECOVERY_KEY];
+  try{for(let i=0;i<storage.length;i++){const key=storage.key(i);if(key?.startsWith(PENDING_PREFIX))keys.push(key)}
+    for(const key of keys)storage.removeItem(key);
+  }catch{return false}
+  return true;
+}
+async function resetAppData(){
+  if(resetInProgress)return false;
+  // Admit only a current tab before changing local state or disconnecting its device.
+  // Once admitted, concurrent resets still read/increment the latest epoch inside the lock.
+  if(!canMutatePersistentState())return false;
+  resetInProgress=true;storageGeneration++;currentPending=null;
+  invalidateInputContext('quick');invalidateInputContext('class');
+  const failReset=status=>{
+    resetInProgress=false;
+    blockResetCoordination(status);
+    updateStorageWarning();
+    return false;
+  };
+  // Disconnect runtime only. Built-in profiles, factories and adapters remain installed.
+  try{await measurementDeviceManager.setProfile('none')}catch{}
+  const commitReset=()=>{
+    const shared=readSharedResetEpoch();
+    if(!shared.valid||!Number.isSafeInteger(shared.epoch+1)){
+      return failReset('invalid');
+    }
+    if(shared.available){
+      const next=shared.epoch+1;
+      if(!StorageAdapter.setVerified(localStorage,RESET_EPOCH_KEY,String(next))){
+        return failReset('write-failed');
+      }
+      loadedResetEpoch=next;
+      if(!removeAppUserState(localStorage))return failReset('cleanup-failed');
+    }
+    try{removeAppUserState(sessionStorage)}catch{}
+    StorageAdapter.memoryRaw=null;StorageAdapter.committedRaw=null;StorageAdapter.baseLocalRaw=null;
+    recoveredPendingEntries=[];pendingRecoveryConflict=false;
+    state=clone(DEFAULT);storageBlocked='';resetCoordination=null;
+    location.reload();return true;
+  };
+  try{return typeof navigator.locks?.request==='function'?await navigator.locks.request(STORAGE_KEY+'__write',commitReset):commitReset()}
+  catch{return failReset('write-failed')}
+}
+function requestFullReset(){
+  if(!canMutatePersistentState())return false;
+  openDialog({title:'전체 앱 데이터 초기화',message:'브라우저에 저장된 앱 데이터를 모두 초기화할까요? Quick/Class 기록, 반·실습·수강생, 프로필·프리셋과 모든 설정이 삭제됩니다.',confirmText:'계속',danger:true,onConfirm:()=>{
+    // Returning false keeps the newly opened second confirmation in place.
+    openDialog({title:'전체 앱 데이터 초기화',message:'정말 전체 초기화할까요? 이 작업은 되돌릴 수 없습니다. 필요한 데이터가 있다면 먼저 백업해 주세요.',confirmText:'전체 초기화',danger:true,onConfirm:()=>{void resetAppData()}});
+    return false;
+  }});
+}
+
 function pendingStores() {
   const stores = [];
   try { stores.push(['local', localStorage]); } catch {}
@@ -1105,6 +1239,7 @@ function removePendingEntry(entry) {
 }
 
 function writePendingEntry(entry) {
+  if(!checkResetGeneration())return false;
   const raw = JSON.stringify(entry);
   const key = PENDING_PREFIX + pendingWriterId;
   const written = Object.fromEntries(pendingStores().map(([source, storage]) => [source, StorageAdapter.setVerified(storage, key, raw)]));
@@ -1121,8 +1256,11 @@ function recoverPendingState(baseRaw) {
   for (const item of entries) {
     try {
       const pending = JSON.parse(item.raw);
+      const generation=candidateResetGeneration(pending,'resetEpoch');
+      if(generation!=='current')continue;
+      if(candidateResetGeneration(pending?.snapshot,'storageResetEpoch')!=='current')continue;
       if (Number(pending?.snapshot?.schemaVersion) > APP_SCHEMA_VERSION) {
-        storageBlocked = 'future';
+        if(storageBlocked!=='reset-anomaly')storageBlocked = 'future';
         continue;
       }
       if (pending.format !== 'coffee-brew-control-pending' || pending.version !== 1 ||
@@ -1137,6 +1275,7 @@ function recoverPendingState(baseRaw) {
       candidates.push({ ...item, pending, value });
     } catch { storageBlocked ||= 'corrupt'; }
   }
+  if (storageBlocked === 'reset-anomaly') return null;
   if (storageBlocked === 'future' || storageBlocked === 'corrupt') return baseRaw;
   completed.forEach(removePendingEntry);
   if (!candidates.length) return baseRaw;
@@ -1158,8 +1297,10 @@ function recoverPendingState(baseRaw) {
 }
 
 function stagePendingSnapshot(snapshot, sequence) {
+  if(!checkResetGeneration())return false;
+  snapshot={...snapshot,storageResetEpoch:loadedResetEpoch};
   const entry = {
-    format: 'coffee-brew-control-pending', version: 1,
+    format: 'coffee-brew-control-pending', version: 1, resetEpoch:loadedResetEpoch,
     sequence, createdAt: Date.now(), parents: [StorageAdapter.baseLocalRaw], snapshot
   };
   writePendingEntry(entry);
@@ -1180,7 +1321,7 @@ function finishPendingCommit(sequence, committedRaw, persistent) {
 }
 
 function save() {
-  if (storageBlocked) {
+  if (!checkResetGeneration() || storageBlocked) {
     updateStorageWarning();
     lastSaveOperation = Promise.resolve(false);
     return lastSaveOperation;
@@ -1192,7 +1333,7 @@ function save() {
   if (useLocks) stagePendingSnapshot(snapshot, sequence);
 
   const commit = () => {
-    if (generation !== storageGeneration || storageBlocked) return false;
+    if (generation !== storageGeneration || !checkResetGeneration() || storageBlocked) return false;
     if (StorageAdapter.localRaw() !== StorageAdapter.baseLocalRaw) {
       storageBlocked = 'conflict';
       updateStorageWarning();
@@ -1208,6 +1349,7 @@ function save() {
     }
     let previousRevision = 0;
     try { previousRevision = JSON.parse(StorageAdapter.committedRaw || '{}').storageRevision || 0; } catch {}
+    snapshot.storageResetEpoch=loadedResetEpoch;
     snapshot.schemaVersion = APP_SCHEMA_VERSION;
     snapshot.storageRevision = previousRevision + 1;
     snapshot.storageParentToken = storageToken(StorageAdapter.baseLocalRaw);
@@ -1217,7 +1359,7 @@ function save() {
     // If interrupted between journal and primary writes, either parent can recover the latest draft.
     if (currentPending) writePendingEntry({ ...currentPending.entry, parents: [StorageAdapter.baseLocalRaw, nextRaw] });
     let result;
-    try { result = StorageAdapter.write(snapshot); } catch { result = { persistent: false, session: false }; }
+    try { result = StorageAdapter.write(snapshot); } catch { result = StorageAdapter.lastWrite = { persistent: false, session: false }; }
     if (result.persistent || result.session) {
       state.storageRevision = snapshot.storageRevision;
       state.storageWriteId = snapshot.storageWriteId;
@@ -1263,14 +1405,14 @@ function notifyAfterSave(message) {
 
 // Lifecycle events retry an unprotected pending snapshot, not the shared primary write.
 function preservePendingSnapshot() {
-  if (currentPending && !storageBlocked) writePendingEntry(currentPending.entry);
+  if (checkResetGeneration() && currentPending && !storageBlocked) writePendingEntry(currentPending.entry);
 }
 window.addEventListener('pagehide', preservePendingSnapshot);
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') preservePendingSnapshot();
 });
 window.addEventListener('beforeunload', event => {
-  if (currentPending && !currentPending.persistent) {
+  if (!resetInProgress && checkResetGeneration() && currentPending && !currentPending.persistent) {
     event.preventDefault();
     event.returnValue = '';
   }
@@ -1295,21 +1437,24 @@ const StorageAdapter={
     this.baseLocalRaw=this.localRaw();
     const candidates=this.candidates();
     if(!candidates.length)return null;
-    const valid=[];
+    const valid=[];let staleCount=0;
     for(const candidate of candidates){
       try{
         const parsed=JSON.parse(candidate.raw);
-        if(Number(parsed?.schemaVersion)>APP_SCHEMA_VERSION){storageBlocked='future';continue}
+        const generation=candidateResetGeneration(parsed,'storageResetEpoch');
+        if(generation==='stale'){staleCount++;continue}
+        if(generation==='anomaly')continue;
+        if(Number(parsed?.schemaVersion)>APP_SCHEMA_VERSION){if(storageBlocked!=='reset-anomaly')storageBlocked='future';continue}
         candidate.value=normalizeState(parsed);
         valid.push(candidate);
       }catch{}
     }
-    if(storageBlocked==='future')return null;
+    if(storageBlocked==='future'||storageBlocked==='reset-anomaly')return null;
     // A session-only commit is recoverable while its shared-storage parent is unchanged.
     const local=valid.find(x=>x.source==='local'&&Number(JSON.parse(x.raw).schemaVersion)>=5);
     const pendingSession=valid.filter(x=>x.source==='session'&&x.value.storageParentToken===storageToken(this.baseLocalRaw)&&x.raw!==this.baseLocalRaw).sort((a,b)=>b.value.storageRevision-a.value.storageRevision||b.stamp-a.stamp)[0];
     const best=pendingSession||local||valid[0];
-    if(!best){storageBlocked='corrupt';return null}
+    if(!best){if(staleCount!==candidates.length)storageBlocked='corrupt';return null}
     this.lastReadSource=best.source;
     this.committedRaw=best.raw;
     this.memoryRaw=best.raw;
@@ -1318,7 +1463,9 @@ const StorageAdapter={
   },
   write(data){
     validateNormalizedState(data);
-    const raw=JSON.stringify(data), previous=this.committedRaw;
+    if(!checkResetGeneration())return {persistent:false,session:false};
+    const raw=JSON.stringify({...data,storageResetEpoch:loadedResetEpoch});
+    const previous=this.committedRaw?JSON.stringify({...JSON.parse(this.committedRaw),storageResetEpoch:loadedResetEpoch}):null;
     let localPrimary=false,localRecovery=false,sessionPrimary=false,sessionRecovery=false;
     try{
       localRecovery=!previous||this.setVerified(localStorage,STORAGE_RECOVERY_KEY,previous);
@@ -1402,7 +1549,7 @@ function hasKnownStateSignature(value) {
   if (version === 1) {
     if (!value.classes.every(item => !owns(item, 'sessions'))) return false;
   } else {
-    if (!value.classes.every(item => Array.isArray(item.excludedStudents) && validId(item.activeSessionId) &&
+    if (!value.classes.every(item => (Array.isArray(item.excludedStudents) || (version === 2 && !owns(item, 'excludedStudents'))) && validId(item.activeSessionId) &&
       Array.isArray(item.sessions) && item.sessions.length > 0 && item.sessions.every(session =>
         isObject(session) && validId(session.id) && typeof session.name === 'string' &&
         isObject(session.records) && isObject(session.studentNames)))) return false;
@@ -1411,6 +1558,34 @@ function hasKnownStateSignature(value) {
     typeof value.measurementDevice.profileId !== 'string' || typeof value.measurementDevice.controlsVisible !== 'boolean')) return false;
   return true;
 }
+// Representation validation is not brew validity or sanity evaluation.
+function isStoredNumeric(value, allowBlank=false){
+  if(allowBlank&&value==='')return true;
+  if(typeof value==='number')return Number.isFinite(value);
+  return typeof value==='string'&&/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(value.trim())&&Number.isFinite(Number(value));
+}
+function validateRecordRepresentation(record,version){
+  for(const key of ['dose','tds'])if(!isStoredNumeric(record[key]))throw new Error('record '+key);
+  const legacyMissingWater=(version<6||version===6&&record.waterMode==='manual')&&(record.water===undefined||record.water===null);
+  if(!legacyMissingWater&&!isStoredNumeric(record.water,true))throw new Error('record water');
+  const legacyBeverage=version<7&&(record.bev===undefined||record.bev===null);
+  if(!legacyBeverage&&!isStoredNumeric(record.bev,true))throw new Error('record beverage');
+  for(const key of ['note','teacherFeedback'])if(record[key]!==undefined&&typeof record[key]!=='string')throw new Error('record text');
+  if(version>=5||record.retentionUsed!==undefined){
+    if(typeof record.retentionUsed!=='number'||!Number.isFinite(record.retentionUsed)||record.retentionUsed<0)throw new Error('record retention');
+  }
+  if(version>=6){
+    if(!['manual','auto'].includes(record.waterMode))throw new Error('record water mode');
+    if(record.waterMode==='auto'&&record.water!=='')throw new Error('auto water input');
+    // manual + blank preserves pre-v6 incomplete records without silently inferring Water.
+    // Such records remain unplottable/unclassifiable until the user edits their inputs.
+  }
+  if(version>=7){
+    if(!validId(record.id))throw new Error('record id');
+    if(!Object.prototype.hasOwnProperty.call(record,'sanityAcknowledged')||typeof record.sanityAcknowledged!=='boolean')throw new Error('record sanityAcknowledged');
+  }
+}
+
 function validateRawState(value) {
   if (!hasKnownStateSignature(value)) throw new Error('unknown state');
   if (value.schemaVersion !== undefined && (!Number.isInteger(Number(value.schemaVersion)) || Number(value.schemaVersion) < 0)) throw new Error('schema');
@@ -1421,8 +1596,7 @@ function validateRawState(value) {
   const records = items => {
     checkIds(items);
     for (const r of items) {
-      if (!('dose' in r) || !('tds' in r)) throw new Error('record');
-      for (const k of ['dose', 'water', 'bev', 'tds']) if (r[k] != null && !['string', 'number'].includes(typeof r[k])) throw new Error('record field');
+      validateRecordRepresentation(r, Number(value.schemaVersion)||0);
     }
   };
   records(list(value, 'quickHistory'));
@@ -1509,7 +1683,7 @@ function normalizeState(s={}){
   }else classes=clone(DEFAULT.classes);
   let activeClassId=s.activeClassId;
   if(!classes.some(c=>c.id===activeClassId))activeClassId=classes[0].id;
-  const qh=Array.isArray(s.quickHistory)?s.quickHistory.map(r=>({id:r.id||generateId(),dose:r.dose,water:r.water,bev:r.bev??'',tds:r.tds,note:String(r.note||''),waterMode:r.waterMode,...(r.retentionUsed!==undefined?{retentionUsed:r.retentionUsed}:{})})):[];
+  const qh=Array.isArray(s.quickHistory)?s.quickHistory.map(r=>({id:r.id||generateId(),dose:r.dose,water:r.water,bev:r.bev??'',tds:r.tds,note:String(r.note||''),waterMode:r.waterMode,sanityAcknowledged:r.sanityAcknowledged,...(r.retentionUsed!==undefined?{retentionUsed:r.retentionUsed}:{})})):[];
   const qg=s.quickGoal&&Number.isFinite(parseNumber(s.quickGoal.ey))&&Number.isFinite(parseNumber(s.quickGoal.tds))?{ey:parseNumber(s.quickGoal.ey),tds:parseNumber(s.quickGoal.tds)}:null;
   const targetKeys=['targetName','eyMin','eyMax','tdsMin','tdsMax'],chartKeys=['chartEyMin','chartEyMax','chartEyStep','chartTdsMin','chartTdsMax','chartTdsStep','ratioMin','ratioMax','ratioStep'];
   const pick=(obj,keys,base)=>{const out={...base};keys.forEach(k=>{if(obj&&obj[k]!==undefined)out[k]=obj[k]});return out};
@@ -1523,29 +1697,38 @@ function normalizeState(s={}){
   if(activeChartPresetId!=='builtin-chart-default'&&!chartPresets.some(p=>p.id===activeChartPresetId))activeChartPresetId=null;
   const allRecords=[...qh];
   classes.forEach(c=>c.sessions.forEach(ss=>Object.values(ss.records).forEach(arr=>allRecords.push(...arr))));
-  if(sourceVersion<6)allRecords.forEach(r=>{r.waterMode='manual'});
+  if(sourceVersion<7)allRecords.forEach(r=>{r.sanityAcknowledged=false});
+  if(sourceVersion<6)allRecords.forEach(r=>{r.waterMode='manual';if(r.water==null)r.water=''});
+  if(sourceVersion===6)allRecords.forEach(r=>{if(r.waterMode==='manual'&&r.water==null)r.water=''});
   if(sourceVersion<5)allRecords.forEach(r=>{r.retentionUsed=settings.absorption});
   const normalized={schemaVersion:APP_SCHEMA_VERSION,settings,measurementDevice,targetProfiles,activeTargetProfileId,chartPresets,activeChartPresetId,classes,activeClassId,quick:{...DEFAULT.quick,...(s.quick||{})},quickMeta:{name:String(s.quickMeta?.name||''),note:String(s.quickMeta?.note||'')},quickHistory:qh,quickGoal:qg,storageUpdatedAt:Number.isFinite(Number(s.storageUpdatedAt))?Number(s.storageUpdatedAt):0,storageRevision:Number.isSafeInteger(s.storageRevision)&&s.storageRevision>=0?s.storageRevision:0,storageWriteId:typeof s.storageWriteId==='string'?s.storageWriteId:'',storageParentToken:typeof s.storageParentToken==='string'?s.storageParentToken:''};
   validateNormalizedState(normalized);
   return normalized;
 }
 function load(){
+  const shared=readSharedResetEpoch();
+  if(!shared.valid){blockResetCoordination('invalid');return clone(DEFAULT)}
+  loadedResetEpoch=shared.epoch;
   const raw=recoverPendingState(StorageAdapter.read());
   return raw?normalizeState(JSON.parse(raw)):clone(DEFAULT);
 }
 let storageWarningShown=false;
 function updateStorageWarning(result=StorageAdapter.lastWrite){
   const box=$('storageWarning');if(!box)return;
-  const messages={future:'이 앱보다 새로운 버전의 데이터가 있습니다. 기존 데이터를 보호하기 위해 자동 저장을 중단했습니다.',corrupt:'저장 데이터를 읽지 못했습니다. 원본을 보존하고 자동 저장을 중단했습니다. 설정 → 백업에서 원본을 보관하거나 정상 백업을 복원하세요.',conflict:'다른 탭에서 데이터가 변경되었습니다. 이 탭의 자동 저장을 중단했습니다. 현재 내용은 JSON으로 백업한 뒤 새로고침하세요.'};
-  const warning=storageBlocked||result?.persistent===false||pendingWriteCount>0;
+  const messages={'reset-stale':'다른 탭에서 전체 초기화되었습니다. 저장을 중단했습니다. 현재 내용을 백업하거나 새로고침하세요.','reset-anomaly':'초기화 세대 정보를 확인할 수 없어 자동 불러오기와 저장을 중단했습니다. 설정 → 백업에서 복구 원본을 보관하세요.',future:'이 앱보다 새로운 버전의 데이터가 있습니다. 기존 데이터를 보호하기 위해 자동 저장을 중단했습니다.',corrupt:'저장 데이터를 읽지 못했습니다. 원본을 보존하고 자동 저장을 중단했습니다. 설정 → 백업에서 원본을 보관하거나 정상 백업을 복원하세요.',conflict:'다른 탭에서 데이터가 변경되었습니다. 이 탭의 자동 저장을 중단했습니다. 현재 내용은 JSON으로 백업한 뒤 새로고침하세요.'};
+  // Ordinary journaled writes are silent. Keep actionable failures visible until recovery.
+  const unprotectedPending = pendingWriteCount > 0 && currentPending && !currentPending.persistent;
+  const warning = storageBlocked || result?.persistent === false || unprotectedPending;
   if(pendingRecoveryConflict)messages.conflict='미완료 저장본이 다른 저장 내용과 충돌합니다. 자동 저장을 중단했습니다. JSON 백업에는 복구 후보도 함께 보존됩니다. 복원할 백업을 확인해 가져오세요.';
   box.classList.toggle('show',!!warning);
-  box.textContent=messages[storageBlocked]||(pendingWriteCount>0?(currentPending?.persistent?'변경 내용을 보관했습니다. 저장을 마무리하는 중입니다…':'저장 대기 중 · 영구 보관을 확인하지 못했습니다. 이 탭을 유지하고 JSON을 백업해 주세요.'):null)||(result?.session?'영구 저장소 확인 실패 · 현재 탭에는 임시 저장 중입니다. 설정 → 백업에서 JSON을 보관해 주세요.':'저장소 쓰기 확인 전 또는 실패 · 현재 내용은 설정 → 백업에서 JSON으로 보관할 수 있습니다.');
+  box.textContent=messages[storageBlocked]||(unprotectedPending?'저장 대기 중 · 영구 보관을 확인하지 못했습니다. 이 탭을 유지하고 JSON을 백업해 주세요.':null)||(result?.session?'영구 저장소 확인 실패 · 현재 탭에는 임시 저장 중입니다. 설정 → 백업에서 JSON을 보관해 주세요.':'저장소 쓰기 확인 전 또는 실패 · 현재 내용은 설정 → 백업에서 JSON으로 보관할 수 있습니다.');
   if(storageBlocked&&!storageWarningShown){storageWarningShown=true;toast(messages[storageBlocked],4500)}
 }
-function stateContent(value){const copy={...value};delete copy.storageUpdatedAt;delete copy.storageRevision;delete copy.storageWriteId;delete copy.storageParentToken;return JSON.stringify(copy)}
+function stateContent(value){const copy={...value};delete copy.storageResetEpoch;delete copy.storageUpdatedAt;delete copy.storageRevision;delete copy.storageWriteId;delete copy.storageParentToken;return JSON.stringify(copy)}
 
 window.addEventListener?.('storage',event=>{
+  if(event.key===RESET_EPOCH_KEY){checkResetGeneration();updateStorageWarning();return}
+  if(!checkResetGeneration()){updateStorageWarning();return}
   if(event.key===STORAGE_KEY&&StorageAdapter.localRaw()!==StorageAdapter.baseLocalRaw){storageBlocked='conflict';updateStorageWarning()}
 });
 
@@ -1630,15 +1813,18 @@ function repairActiveStudentSelection() {
   const arr = students();
   if (!arr.some(s => s.id === currentStudentId)) currentStudentId = arr[0]?.id || null;
 }
+function isValidTds(tds) {
+  return isPositiveNumber(tds) && tds < 100;
+}
 function autoBeverage(dose,water,tds,retention){
   const tf=tds/100,retained=retention*dose;
-  return isPositiveNumber(dose)&&isPositiveNumber(water)&&Number.isFinite(tds)&&tds>=0&&tds<100&&water>retained?Math.max(0,(water-retained)/(1-tf)):NaN;
+  return isPositiveNumber(dose)&&isPositiveNumber(water)&&isValidTds(tds)&&water>retained?Math.max(0,(water-retained)/(1-tf)):NaN;
 }
 function isBlankInput(value) {
   return value === undefined || value === null || typeof value === 'string' && value.trim() === '';
 }
 function autoBrewWater(dose, beverage, tds, retention) {
-  if (!isPositiveNumber(dose) || !isPositiveNumber(beverage) || !Number.isFinite(tds) || tds < 0 || tds >= 100 || !Number.isFinite(retention) || retention < 0) return NaN;
+  if (!isPositiveNumber(dose) || !isPositiveNumber(beverage) || !isValidTds(tds) || !Number.isFinite(retention) || retention < 0) return NaN;
   return beverage * (1 - tds / 100) + retention * dose;
 }
 function calculateBrew(rec, retention) {
@@ -1653,7 +1839,7 @@ function calculateBrew(rec, retention) {
   const water = waterMode === 'auto' ? autoWater : enteredWater;
   const autoBev = autoBeverage(dose, enteredWater, tds, retention);
   const bev = manualBev ? enteredBeverage : autoBev;
-  const solids = isPositiveNumber(bev) && Number.isFinite(tds) ? bev * tds / 100 : NaN;
+  const solids = isPositiveNumber(bev) && isValidTds(tds) ? bev * tds / 100 : NaN;
   const ey = isPositiveNumber(dose) && Number.isFinite(solids) ? solids / dose * 100 : NaN;
   const ratio = isPositiveNumber(dose) && isPositiveNumber(water) ? water / dose : NaN;
   return {
@@ -1673,7 +1859,7 @@ function calculateBrew(rec, retention) {
   };
 }
 function validBrewResult(result) {
-  return !!result && isPositiveNumber(result.dose) && isPositiveNumber(result.water) && isPositiveNumber(result.bev) && isPositiveNumber(result.tds) && Number.isFinite(result.ey) && Number.isFinite(result.ratio);
+  return !!result && isPositiveNumber(result.dose) && isPositiveNumber(result.water) && isPositiveNumber(result.bev) && isValidTds(result.tds) && Number.isFinite(result.ey) && Number.isFinite(result.ratio);
 }
 function normalizePositiveMassInput(value) {
   return isPositiveNumber(parseNumber(value)) ? value : '';
@@ -1704,9 +1890,10 @@ function updateQuickMetaUI(){
 }
 function openQuickNoteEditor(){$('qNoteInput').value=state.quickMeta?.note||'';$('qNoteView').style.display='none';$('qNoteEdit').classList.add('open');requestAnimationFrame(()=>$('qNoteInput').focus())}
 function closeQuickNoteEditor(){$('qNoteEdit').classList.remove('open');$('qNoteView').style.display='block'}
-$('qExperimentName').addEventListener('input',()=>{state.quickMeta.name=$('qExperimentName').value;save();const summary=$('qMetaSummary'),note=state.quickMeta?.note||'';if(summary)summary.textContent=state.quickMeta.name.trim()?(note?`${state.quickMeta.name.trim()} · 노트 있음`:state.quickMeta.name.trim()):(note?'이름 없음 · 노트 있음':'선택 · 이름과 노트');if(chartMode==='quick')updateChartContext()});
+$('qExperimentName').addEventListener('input',()=>{if(!canMutatePersistentState())return;state.quickMeta.name=$('qExperimentName').value;save();const summary=$('qMetaSummary'),note=state.quickMeta?.note||'';if(summary)summary.textContent=state.quickMeta.name.trim()?(note?`${state.quickMeta.name.trim()} · 노트 있음`:state.quickMeta.name.trim()):(note?'이름 없음 · 노트 있음':'선택 · 이름과 노트');if(chartMode==='quick')updateChartContext()});
 $('qNoteView').onclick=openQuickNoteEditor;
 $('qNoteSave').onclick = () => {
+  if(!canMutatePersistentState())return false;
   state.quickMeta.note = $('qNoteInput').value.trim();
   save();
   closeQuickNoteEditor();
@@ -1716,8 +1903,8 @@ $('qNoteSave').onclick = () => {
 $('qNoteCancel').onclick=()=>{closeQuickNoteEditor();updateQuickMetaUI()};
 $('qNoteInput').addEventListener('keydown',e=>{if(e.key==='Escape'){$('qNoteCancel').click()}});
 function liveQuickRecord(){return readBrewInputs('q',quickRetention())}
-function quickLivePoint(){return {...calcRecord(liveQuickRecord()),studentName:'Quick',attempt:null,key:'quick_live',note:'',teacherFeedback:'',isLive:true}}
-function quickHistoryPoints(){return state.quickHistory.map((r,i)=>({...calcRecord(r),studentName:'Quick',attempt:i+1,key:'qh_'+r.id,note:r.note||'',teacherFeedback:'',isLive:false}))}
+function quickLivePoint(){const sanityRecord=liveQuickRecord();return {...calcRecord(sanityRecord),sanityRecord,studentName:'Quick',attempt:null,key:'quick_live',note:'',teacherFeedback:'',isLive:true}}
+function quickHistoryPoints(){return state.quickHistory.map((r,i)=>({...calcRecord(r),sanityRecord:r,studentName:'Quick',attempt:i+1,key:'qh_'+r.id,note:r.note||'',teacherFeedback:'',isLive:false}))}
 function validQuickPoint(p) {
   return validBrewResult(p);
 }
@@ -1727,7 +1914,7 @@ function quickGoalGuideSource(){const live=quickLivePoint();if(validQuickPoint(l
 function axisState(v,min,max){return v<min?'low':v>max?'high':'in'}
 function classifyBrew(d, s) {
   if (!validBrewResult(d)) return {
-    label: '입력값 필요',
+    label: '계산 불가',
     cls: 'combo'
   };
   const x = axisState(d.ey, s.eyMin, s.eyMax),
@@ -1765,7 +1952,7 @@ function directionFeedback(xs,ys,insideTitle='타겟 안'){
 function getTargetFeedback(d, s) {
   if (!validBrewResult(d)) return {
     arrow: '·',
-    title: '입력값 필요',
+    title: '계산 불가',
     text: BREW_INPUT_GUIDANCE,
     rec: ''
   };
@@ -1779,7 +1966,7 @@ function getGoalFeedback(d, goal, target) {
   if (!goal) return getTargetFeedback(d, target);
   if (!validBrewResult(d)) return {
     arrow: '·',
-    title: '입력값 필요',
+    title: '계산 불가',
     text: BREW_INPUT_GUIDANCE,
     rec: ''
   };
@@ -1916,7 +2103,8 @@ function measureQuickTds(){return measureTds('quick')}
 function measureClassTds(){return measureTds('class')}
 function readQuickDraftFromForm(){return {dose:$('qDose').value,water:normalizePositiveMassInput($('qWater').value),bev:normalizePositiveMassInput($('qBev').value),tds:$('qTds').value}}
 function fillQuickForm(draft){for(const [key,node] of Object.entries({dose:'qDose',water:'qWater',bev:'qBev',tds:'qTds'}))$(node).value=draft[key]??''}
-function updateQuickDraft(){if(!editingQuickRecordId){state.quick=readQuickDraftFromForm();save()}}
+function updateQuickDraft(){
+  if(!canMutatePersistentState())return false;if(!editingQuickRecordId){state.quick=readQuickDraftFromForm();save()}}
 function editQuickRecord(rid){
   const record=state.quickHistory.find(r=>r.id===rid);if(!record)return;
   if(!editingQuickRecordId)quickDraftBeforeEdit=clone(state.quick);
@@ -1930,7 +2118,7 @@ function cancelQuickEdit(){
 function renderQuick(){
   renderQuickResult();renderQuickHistory();
 }
-const BREW_INPUT_GUIDANCE = '원두량과 TDS를 입력하고, 물양 또는 추출액 중 하나 이상을 입력해 주세요.';
+const BREW_INPUT_GUIDANCE = '현재 입력값으로는 계산할 수 없습니다.';
 function calculationBasis(result) {
   if (result.waterMode === 'auto' && Number.isFinite(result.autoWater)) return '물양·Ratio 자동 추정 · 계수 ' + trimNum(result.retentionUsed, 3);
   if (!result.manualBev && Number.isFinite(result.autoBev)) return '추출액 자동 추정 · 계수 ' + trimNum(result.retentionUsed, 3);
@@ -1939,12 +2127,81 @@ function calculationBasis(result) {
 function brewRatioText(result) {
   return Number.isFinite(result.ratio) ? '1:' + fmt(result.ratio, 2) + (result.waterMode === 'auto' ? ' (추정)' : '') : '—';
 }
+function renderTdsHint(prefix) {
+  const raw = String($(prefix + 'Tds').value).trim();
+  const value = Number(raw);
+  const outOfRange = raw !== '' && !Number.isNaN(value) && (value <= 0 || value >= 100);
+  const hint = $(prefix + 'TdsHint');
+  hint.textContent = outOfRange ? 'TDS 입력 범위를 확인해 주세요.' : '유효 범위 · 0 < TDS < 100%';
+  hint.classList.toggle('invalid', outOfRange);
+  if (outOfRange) $(prefix + 'Tds').setAttribute('aria-invalid', 'true');
+  else $(prefix + 'Tds').removeAttribute('aria-invalid');
+}
 function renderMassHints(prefix, result) {
+  renderTdsHint(prefix);
   const waterHint = $(prefix + 'WaterHint');
   waterHint.textContent = result.waterMode === 'manual' && Number.isFinite(result.water) ? '물양 직접 입력' : Number.isFinite(result.autoWater) ? '자동 추정 ' + fmt(result.autoWater, 1) + ' g · 계수 ' + trimNum(result.retentionUsed, 3) : result.manualBev ? '원두량과 TDS를 입력하면 자동 추정됩니다' : '';
-  waterHint.style.display = waterHint.textContent ? 'block' : 'none';
+  waterHint.style.display = prefix === 'q' || waterHint.textContent ? 'block' : 'none';
   $(prefix + 'BevHint').textContent = result.manualBev ? '추출액 직접 입력' : Number.isFinite(result.autoBev) ? '자동 추정 ' + fmt(result.autoBev, 1) + ' g · 계수 ' + trimNum(result.retentionUsed, 3) : result.waterMode === 'manual' && Number.isFinite(result.water) ? '원두량과 TDS를 입력하면 자동 추정됩니다' : '물양 또는 추출액 중 하나를 입력하세요';
 }
+// Sanity is advisory and separate from calculability, chart inclusion and classification.
+// Thresholds were checked against the B05 matrix; they deliberately allow short/high-strength brews.
+const BREW_SANITY_LIMITS = Object.freeze({minMass:1, minTds:0.01, maxTds:20, minRecovery:0.05, maxEy:40});
+function assessBrewSanity(rawRecord, calculatedResult, retention) {
+  const d=calculatedResult, reasons=[];
+  if(!validBrewResult(d))return {needsReview:false,reasons};
+  const add=code=>{if(!reasons.includes(code))reasons.push(code)};
+  const lim=BREW_SANITY_LIMITS, t=d.tds/100;
+  const directWater=d.waterMode==='manual' && isPositiveNumber(parseNumber(rawRecord.water));
+  const directBev=d.manualBev && isPositiveNumber(parseNumber(rawRecord.bev));
+  const automatic=!directWater||!directBev;
+  const tolerance=1e-9*Math.max(1,d.water,d.bev,d.dose);
+  // Reuse the same predicates for individual reasons and the automatic-estimate summary.
+  const waterTooLow=d.water<=d.dose;
+  const recoveryTooLow=d.bev/d.water<lim.minRecovery;
+  const beverageExceedsWater=d.bev>d.water+tolerance;
+  const eyTooHigh=d.ey>lim.maxEy;
+  const tdsTooHigh=d.tds>lim.maxTds;
+  if(d.dose<lim.minMass||d.water<lim.minMass||d.bev<lim.minMass)add('MASS_TOO_SMALL');
+  if(t>=1)add('TDS_DEFINITION_INVALID');
+  else if(d.tds<lim.minTds||tdsTooHigh)add('TDS_EXTREME');
+  if(waterTooLow)add('WATER_TOO_LOW_FOR_DOSE');
+  if(recoveryTooLow)add('BEVERAGE_RECOVERY_EXTREME_LOW');
+  if(directWater&&directBev){
+    if(beverageExceedsWater)add('BEVERAGE_EXCEEDS_BREW_WATER');
+    if(d.bev*(1-t)>d.water+tolerance)add('BEVERAGE_WATER_EXCEEDS_BREW_WATER');
+  }
+  if(d.solids>d.dose+tolerance)add('SOLIDS_EXCEED_DOSE');
+  if(eyTooHigh)add('EY_EXTREME');
+  if(automatic&&(beverageExceedsWater||waterTooLow||recoveryTooLow||eyTooHigh||tdsTooHigh))add('AUTO_ESTIMATE_EXTREME');
+  return {needsReview:reasons.length>0,reasons};
+}
+function sanityAcknowledgementForEdit(previous,next){
+  if(!previous?.sanityAcknowledged)return false;
+  const value=(record,key)=>isBlankInput(record[key])?'':Number(record[key]);
+  return ['dose','water','bev','tds','retentionUsed'].every(key=>value(previous,key)===value(next,key))&&previous.waterMode===next.waterMode;
+}
+function renderSanityStatus(record,result,{live=false,feedback=false,interactive=true}={}){
+  if(!record)return '';
+  const sanity=assessBrewSanity(record,result,result.retentionUsed);
+  if(!sanity.needsReview)return '';
+  if(live)return '<span class="pill sanity-warning">⚠ 입력값을 확인해 주세요</span>';
+  if(record.sanityAcknowledged)return '<span class="pill sanity-confirmed">✓ 확인됨</span>';
+  if(!interactive)return '<span class="pill sanity-warning">⚠ 입력값 확인</span>';
+  return '<button class="btn ghost small sanity-warning" data-sanity-ack="'+esc(record.id)+'">⚠ 입력값 확인</button>'+(feedback?'<p class="hint sanity-warning">⚠ 입력값을 확인해 주세요</p>':'');
+}
+function acknowledgeBrewSanity(record){
+  if(!canMutatePersistentState()||!record||!assessBrewSanity(record,calcRecord(record),record.retentionUsed).needsReview)return;
+  openDialog({title:'입력값 확인',message:'입력값 확인 표시를 해제할까요?',confirmText:'해제',onConfirm:()=>{
+    if(!canMutatePersistentState())return false;
+    record.sanityAcknowledged=true;save();renderQuick();renderClass();renderChart();
+    notifyAfterSave('입력값 확인 표시를 해제했습니다');
+  }});
+}
+function bindSanityActions(container,records){
+  container.querySelectorAll('[data-sanity-ack]').forEach(button=>button.onclick=()=>acknowledgeBrewSanity(records.find(r=>r.id===button.dataset.sanityAck)));
+}
+
 function renderQuickResult() {
   const q = liveQuickRecord();
   $('qSaveResult').textContent = editingQuickRecordId ? `${state.quickHistory.findIndex(r => r.id === editingQuickRecordId) + 1}차 수정 저장` : '추출 결과 저장';
@@ -1952,6 +2209,7 @@ function renderQuickResult() {
   renderQuickMeasurementControl();
   const d = calcRecord(q);
   renderMassHints('q', d);
+  $('qSanity').innerHTML=renderSanityStatus(q,d,{live:true});
   $('qEyOut').textContent = Number.isFinite(d.ey) ? fmt(d.ey, 2) + '%' : '—';
   $('qTdsOut').textContent = Number.isFinite(d.tds) ? fmt(d.tds, 2) + '%' : '—';
   $('qRatioOut').textContent = brewRatioText(d);
@@ -1971,7 +2229,7 @@ function renderQuickResult() {
   box.style.display = quickFeedbackVisible() ? 'flex' : 'none';
   box.className = 'status ' + st.cls;
   $('qStatusTitle').textContent = st.title;
-  $('qStatusDesc').textContent = st.title === '입력값 필요' ? st.desc : '현재 측정값 기준 · ' + st.desc;
+  $('qStatusDesc').textContent = st.title === '계산 불가' ? st.desc : '현재 측정값 기준 · ' + st.desc;
   $('qStatusRec').textContent = st.rec || '';
 }
 function renderQuickAttemptNote(record) {
@@ -1993,6 +2251,7 @@ function cancelQuickAttemptNote() {
   renderQuickHistory();
 }
 function saveQuickAttemptNote() {
+  if(!canMutatePersistentState())return false;
   const record = state.quickHistory.find(item => item.id === editingQuickNoteId);
   if (!record) return;
   record.note = editingQuickNoteDraft.trim();
@@ -2014,7 +2273,7 @@ function renderQuickHistory() {
       f = quickFeedbackFor(d),
       row = document.createElement('div');
     row.className = 'quick-history-row';
-    row.innerHTML = `<div class="quick-history-no">${i + 1}차</div><div class="quick-history-body"><div class="record-metrics"><span class="pill">EY ${fmt(d.ey, 2)}%</span><span class="pill">TDS ${fmt(d.tds, 2)}%</span><span class="pill">${brewRatioText(d)}</span><span class="pill ${cl.cls}">${esc(cl.label)}</span></div><div class="quick-history-sub">${fmt(d.dose, 1)}g / ${fmt(d.water, 1)}g · Beverage ${fmt(d.bev, 1)}g · ${esc(calculationBasis(d))}</div>${renderQuickAttemptNote(r)}${quickFeedbackVisible() ? `<div class="feedback"><div><span class="arrow">${f.arrow}</span> <b>${esc(f.title)}</b></div><p>${esc(f.text)}</p><p class="rec">${esc(f.rec)}</p></div>` : ''}</div><div class="actions" style="margin:0"><button class="btn ghost small" data-qedit>수정</button><button class="btn danger small" data-qdel>삭제</button></div>`;
+    row.innerHTML = `<div class="quick-history-no">${i + 1}차</div><div class="quick-history-body"><div class="record-metrics"><span class="pill">EY ${fmt(d.ey, 2)}%</span><span class="pill">TDS ${fmt(d.tds, 2)}%</span><span class="pill">${brewRatioText(d)}</span><span class="pill ${cl.cls}">${esc(cl.label)}</span></div><div class="quick-history-sub">${fmt(d.dose, 1)}g / ${fmt(d.water, 1)}g · Beverage ${fmt(d.bev, 1)}g · ${esc(calculationBasis(d))}</div>${renderSanityStatus(r,d,{feedback:quickFeedbackVisible()})}${renderQuickAttemptNote(r)}${quickFeedbackVisible() ? `<div class="feedback"><div><span class="arrow">${f.arrow}</span> <b>${esc(f.title)}</b></div><p>${esc(f.text)}</p><p class="rec">${esc(f.rec)}</p></div>` : ''}</div><div class="actions" style="margin:0"><button class="btn ghost small" data-qedit>수정</button><button class="btn danger small" data-qdel>삭제</button></div>`;
     row.querySelector('[data-qedit]').dataset.qedit = r.id;
     row.querySelector('[data-qdel]').dataset.qdel = r.id;
     for (const name of ['edit', 'save', 'cancel']) {
@@ -2023,6 +2282,7 @@ function renderQuickHistory() {
     }
     list.appendChild(row);
   });
+  bindSanityActions(list,state.quickHistory);
   list.querySelectorAll('[data-qedit]').forEach(b => b.onclick = () => editQuickRecord(b.dataset.qedit));
   list.querySelectorAll('[data-qdel]').forEach(b => b.onclick = () => deleteQuickRecord(b.dataset.qdel));
   list.querySelectorAll('[data-qnote-edit]').forEach(button => button.onclick = () => editQuickAttemptNote(button.dataset.qnoteEdit));
@@ -2045,6 +2305,7 @@ function renderQuickHistory() {
   }
 }
 function saveQuickResult() {
+  if(!canMutatePersistentState())return false;
   const rec = liveQuickRecord(),
     d = calcRecord(rec);
   const wasEditing = !!editingQuickRecordId;
@@ -2058,11 +2319,13 @@ function saveQuickResult() {
     waterMode: rec.waterMode,
     bev: rec.bev || '',
     tds: rec.tds,
-    retentionUsed: rec.retentionUsed
+    retentionUsed: rec.retentionUsed,
+    sanityAcknowledged:false
   };
   if (editingQuickRecordId) {
     const index = state.quickHistory.findIndex(r => r.id === editingQuickRecordId);
     if (index < 0) return;
+    data.sanityAcknowledged=sanityAcknowledgementForEdit(state.quickHistory[index],data);
     state.quickHistory[index] = {
       ...state.quickHistory[index],
       ...data
@@ -2085,10 +2348,11 @@ function deleteQuickRecord(rid) {
   if (index < 0) return;
   openDialog({
     title: 'Quick 추출 기록 삭제',
-    message: index + 1 + '차 기록을 삭제할까요? 삭제 후 회차 번호는 자동으로 다시 매겨집니다.',
+    message: (index + 1 + '차 기록을 삭제할까요? 삭제 후 회차 번호는 자동으로 다시 매겨집니다.') + '\n이 작업은 되돌릴 수 없습니다.',
     confirmText: '삭제',
     danger: true,
     onConfirm: () => {
+      if(!canMutatePersistentState())return false;
       const currentIndex = state.quickHistory.findIndex(record => record.id === rid);
       if (currentIndex < 0) return;
       state.quickHistory.splice(currentIndex, 1);
@@ -2114,10 +2378,11 @@ $('qClearHistory').onclick = () => {
   if (!state.quickHistory.length) return;
   openDialog({
     title: 'Quick 기록 전체 삭제',
-    message: '저장된 Quick 추출 기록을 모두 삭제할까요?',
+    message: ('저장된 Quick 추출 기록을 모두 삭제할까요?') + '\n이 작업은 되돌릴 수 없습니다.',
     confirmText: '전체 삭제',
     danger: true,
     onConfirm: () => {
+      if(!canMutatePersistentState())return false;
       state.quickHistory = [];
       editingQuickNoteId = null;
       editingQuickNoteDraft = '';
@@ -2145,6 +2410,7 @@ function renderClassSession(){
 }
 function resetClassUiAfterSwitch(){currentStudentId=currentClass()?.students?.[0]?.id||null;editingRecordId=null;editingTeacherFeedbackId=null;chartSelection=Object.create(null);selectedPointKey=null;initChartSelections();fillClassFormFromLast();$('sessionActions').classList.remove('show')}
 function switchClass(cid) {
+  if(!canMutatePersistentState())return false;
   if (!state.classes.some(c => c.id === cid)) return;
   state.activeClassId = cid;
   repairActiveSessionState();
@@ -2156,6 +2422,7 @@ function switchClass(cid) {
   notifyAfterSave(`${currentClass().name}을 불러왔습니다`);
 }
 function createClass(name) {
+  if(!canMutatePersistentState())return false;
   const v = String(name || '').trim();
   if (!v) {
     toast('새 반 이름을 입력해 주세요');
@@ -2181,6 +2448,7 @@ function createClass(name) {
   return true;
 }
 function renameCurrentClass(name) {
+  if(!canMutatePersistentState())return false;
   const c = currentClass(),
     v = String(name || '').trim();
   if (!c) return false;
@@ -2205,10 +2473,11 @@ function deleteCurrentClass() {
   }
   openDialog({
     title: '반 삭제',
-    message: `${c.name} 반과 모든 실습·수강생·추출 기록·강사 피드백을 삭제할까요?`,
+    message: (`${c.name} 반과 모든 실습·수강생·추출 기록·강사 피드백을 삭제할까요?`) + '\n이 작업은 되돌릴 수 없습니다.',
     confirmText: '반 삭제',
     danger: true,
     onConfirm: () => {
+      if(!canMutatePersistentState())return false;
       state.classes = state.classes.filter(x => x.id !== c.id);
       state.activeClassId = state.classes[0].id;
       repairActiveSessionState();
@@ -2222,6 +2491,7 @@ function deleteCurrentClass() {
   });
 }
 function switchSession(sid) {
+  if(!canMutatePersistentState())return false;
   const c = currentClass();
   if (!c?.sessions?.some(s => s.id === sid)) return;
   c.activeSessionId = sid;
@@ -2233,6 +2503,7 @@ function switchSession(sid) {
   notifyAfterSave(`${currentSession().name} 실습을 불러왔습니다`);
 }
 function createSession(name) {
+  if(!canMutatePersistentState())return false;
   const c = currentClass(),
     v = String(name || '').trim();
   if (!c || !v) {
@@ -2251,6 +2522,7 @@ function createSession(name) {
   return true;
 }
 function renameCurrentSession(name) {
+  if(!canMutatePersistentState())return false;
   const ss = currentSession(),
     v = String(name || '').trim();
   if (!ss) return false;
@@ -2277,10 +2549,11 @@ function deleteCurrentSession() {
   const count = Object.values(ss.records || {}).reduce((a, x) => a + (Array.isArray(x) ? x.length : 0), 0);
   openDialog({
     title: '실습 삭제',
-    message: `${ss.name} 실습과 그 안의 추출 기록 ${count}개를 삭제할까요? 다른 실습과 수강생 명단은 유지됩니다.`,
+    message: (`${ss.name} 실습과 그 안의 추출 기록 ${count}개를 삭제할까요? 다른 실습과 수강생 명단은 유지됩니다.`) + '\n이 작업은 되돌릴 수 없습니다.',
     confirmText: '실습 삭제',
     danger: true,
     onConfirm: () => {
+      if(!canMutatePersistentState())return false;
       c.sessions = c.sessions.filter(x => x.id !== ss.id);
       c.activeSessionId = c.sessions[0].id;
       resetClassUiAfterSwitch();
@@ -2324,7 +2597,9 @@ function fillClassFormFromLast() {
   updateClassBevHint();
 }
 function updateClassBevHint() {
-  renderMassHints('c', calcRecord(readBrewInputs('c', classRetention())));
+  const record=readBrewInputs('c',classRetention()),result=calcRecord(record);
+  renderMassHints('c', result);
+  $('cSanity').innerHTML=renderSanityStatus(record,result,{live:true});
 }
 ['cDose','cWater','cBev','cTds'].forEach(x=>$(x).addEventListener('input',()=>{if(x==='cTds')inputContext.class.tdsRevision++;updateClassBevHint()}));
 function renderTeacherFeedback(r){
@@ -2357,10 +2632,11 @@ function renderClass() {
       cl = classificationFor(d),
       card = document.createElement('div');
     card.className = 'record-card';
-    card.innerHTML = `<div class="record-top"><div class="record-title"><div class="attempt-no">${i + 1}</div><div class="record-main"><b>${esc(s.name)} · ${i + 1}차</b><span>${fmt(d.dose, 1)}g / ${fmt(d.water, 1)}g · Beverage ${fmt(d.bev, 1)}g · ${esc(calculationBasis(d))}</span></div></div><div class="actions" style="margin:0"><button class="btn ghost small" data-edit>수정</button><button class="btn danger small" data-del>삭제</button></div></div><div class="record-metrics"><span class="pill">EY ${fmt(d.ey, 2)}%</span><span class="pill">TDS ${fmt(d.tds, 2)}%</span><span class="pill">${brewRatioText(d)}</span><span class="pill ${cl.cls}">${esc(cl.label)}</span></div>${r.note ? `<div class="note"><b>추출 노트</b>${esc(r.note)}</div>` : ''}${renderTeacherFeedback(r)}${classFeedbackVisible() ? `<div class="feedback"><div><span class="arrow">${f.arrow}</span> <b>${esc(f.title)}</b></div><p>${esc(f.text)}</p><p class="rec">${esc(f.rec)}</p></div>` : ''}`;
+    card.innerHTML = `<div class="record-top"><div class="record-title"><div class="attempt-no">${i + 1}</div><div class="record-main"><b>${esc(s.name)} · ${i + 1}차</b><span>${fmt(d.dose, 1)}g / ${fmt(d.water, 1)}g · Beverage ${fmt(d.bev, 1)}g · ${esc(calculationBasis(d))}</span></div></div><div class="actions" style="margin:0"><button class="btn ghost small" data-edit>수정</button><button class="btn danger small" data-del>삭제</button></div></div><div class="record-metrics"><span class="pill">EY ${fmt(d.ey, 2)}%</span><span class="pill">TDS ${fmt(d.tds, 2)}%</span><span class="pill">${brewRatioText(d)}</span><span class="pill ${cl.cls}">${esc(cl.label)}</span></div>${r.note ? `<div class="note"><b>추출 노트</b>${esc(r.note)}</div>` : ''}${renderTeacherFeedback(r)}${renderSanityStatus(r,d,{feedback:classFeedbackVisible()})}${classFeedbackVisible() ? `<div class="feedback"><div><span class="arrow">${f.arrow}</span> <b>${esc(f.title)}</b></div><p>${esc(f.text)}</p><p class="rec">${esc(f.rec)}</p></div>` : ''}`;
     for (const name of ['edit', 'del', 'teacher-edit', 'teacher-save', 'teacher-cancel']) card.querySelectorAll('[data-' + name + ']').forEach(button => button.setAttribute('data-' + name, r.id));
     list.appendChild(card);
   });
+  bindSanityActions(list,records);
   list.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => editRecord(b.dataset.edit));
   list.querySelectorAll('[data-del]').forEach(b => b.onclick = () => deleteRecord(b.dataset.del));
   list.querySelectorAll('[data-teacher-edit]').forEach(b => b.onclick = () => {
@@ -2395,6 +2671,7 @@ function renderClass() {
   });
 }
 function saveTeacherFeedback(rid) {
+  if(!canMutatePersistentState())return false;
   const s = currentStudent(),
     r = getSessionRecords(s?.id).find(x => x.id === rid),
     ta = $('teacherFeedbackEditor');
@@ -2433,10 +2710,11 @@ function deleteRecord(rid) {
   if (idx < 0) return;
   openDialog({
     title: '추출 기록 삭제',
-    message: `${idx + 1}차 기록을 삭제할까요? 삭제 후 회차 번호는 자동으로 다시 매겨집니다.`,
+    message: (`${idx + 1}차 기록을 삭제할까요? 삭제 후 회차 번호는 자동으로 다시 매겨집니다.`) + '\n이 작업은 되돌릴 수 없습니다.',
     confirmText: '삭제',
     danger: true,
     onConfirm: () => {
+      if(!canMutatePersistentState())return false;
       records.splice(idx, 1);
       if (editingRecordId === rid) {
         editingRecordId = null;
@@ -2453,12 +2731,14 @@ function deleteRecord(rid) {
   });
 }
 $('saveRecord').onclick = () => {
+  if(!canMutatePersistentState())return false;
   const s = currentStudent();
   if (!s) return;
   const wasEditing = !!editingRecordId,
     records = ensureSessionRecords(s.id),
     rec = {
       ...readBrewInputs('c', classRetention()),
+      sanityAcknowledged:false,
       note: $('cNote').value.trim()
     };
   const d = calcRecord(rec);
@@ -2470,6 +2750,7 @@ $('saveRecord').onclick = () => {
   currentSession().studentNames[s.id] = s.name;
   if (editingRecordId) {
     const i = records.findIndex(r => r.id === editingRecordId);
+    if (i >= 0) rec.sanityAcknowledged=sanityAcknowledgementForEdit(records[i],rec);
     if (i >= 0) records[i] = {
       ...records[i],
       ...rec
@@ -2495,11 +2776,14 @@ $('cancelEdit').onclick=()=>{editingRecordId=null;fillClassFormFromLast();render
 function syncFeedbackControls(){
   $('qFeedbackToggle').checked=quickFeedbackVisible();$('classFeedbackToggle').checked=classFeedbackVisible();$('sQuickFeedback').checked=quickFeedbackVisible();$('sClassFeedback').checked=classFeedbackVisible();$('chartFeedbackToggle').checked=chartMode==='quick'?quickFeedbackVisible():classFeedbackVisible();
 }
-function setQuickFeedback(v){state.settings.showQuickFeedback=!!v;save();syncFeedbackControls();renderQuick();renderChart();renderSettingsSummaries()}
-function setClassFeedback(v){state.settings.showClassFeedback=!!v;save();syncFeedbackControls();renderClass();renderChart();renderSettingsSummaries()}
+function setQuickFeedback(v){
+  if(!canMutatePersistentState())return false;state.settings.showQuickFeedback=!!v;save();syncFeedbackControls();renderQuick();renderChart();renderSettingsSummaries()}
+function setClassFeedback(v){
+  if(!canMutatePersistentState())return false;state.settings.showClassFeedback=!!v;save();syncFeedbackControls();renderClass();renderChart();renderSettingsSummaries()}
 $('qFeedbackToggle').onchange=e=>setQuickFeedback(e.target.checked);$('classFeedbackToggle').onchange=e=>setClassFeedback(e.target.checked);$('sQuickFeedback').onchange=e=>setQuickFeedback(e.target.checked);$('sClassFeedback').onchange=e=>setClassFeedback(e.target.checked);$('chartFeedbackToggle').onchange=e=>chartMode==='quick'?setQuickFeedback(e.target.checked):setClassFeedback(e.target.checked);
 $('sMeasurementDeviceProfile').onchange=async e=>{e.target.disabled=true;try{await setMeasurementDeviceProfile(e.target.value)}finally{e.target.disabled=false;renderMeasurementDeviceSettings()}};
 $('sMeasurementControlsVisible').onchange = e => {
+  if(!canMutatePersistentState())return false;
   const profileId = measurementDeviceProfile().id;
   state.measurementDevice.controlsVisible = profileId === 'none' ? e.target.checked : true;
   save();
@@ -2537,6 +2821,7 @@ function selectedClassPoints() {
         const d = calcRecord(r);
         if (validBrewResult(d)) out.push({
           ...d,
+          sanityRecord:r,
           studentId: s.id,
           studentName: s.name,
           studentIndex: si,
@@ -2657,7 +2942,7 @@ function tooltipHtml(p) {
     cl = classificationFor(p),
     title = chartMode === 'class' ? `${esc(p.studentName)} · ${p.attempt}차` : p.attempt ? `Quick · ${p.attempt}차` : 'Quick · 현재값',
     showF = chartMode === 'quick' ? quickFeedbackVisible() : classFeedbackVisible();
-  return `<b>${title}</b><div>EY ${fmt(p.ey, 2)}% · TDS ${fmt(p.tds, 2)}% · ${brewRatioText(p)}</div><div class="muted">${esc(cl.label)} · ${fmt(p.dose, 1)}g / ${fmt(p.water, 1)}g · Beverage ${fmt(p.bev, 1)}g · ${esc(calculationBasis(p))}</div>${deltaHtml(p)}${p.note ? `<div class="muted">노트 · ${esc(p.note)}</div>` : ''}${p.teacherFeedback ? `<div class="tip-teacher"><b>강사 피드백</b><br>${esc(p.teacherFeedback)}</div>` : ''}${showF ? `<div class="tip-feedback">${f.arrow} ${esc(f.title)} · ${esc(f.rec)}</div>` : ''}`;
+  return `<b>${title}</b><div>EY ${fmt(p.ey, 2)}% · TDS ${fmt(p.tds, 2)}% · ${brewRatioText(p)}</div><div class="muted">${esc(cl.label)} · ${fmt(p.dose, 1)}g / ${fmt(p.water, 1)}g · Beverage ${fmt(p.bev, 1)}g · ${esc(calculationBasis(p))}</div>${renderSanityStatus(p.sanityRecord,p,{live:!!p.isLive,interactive:false})}${deltaHtml(p)}${p.note ? `<div class="muted">노트 · ${esc(p.note)}</div>` : ''}${p.teacherFeedback ? `<div class="tip-teacher"><b>강사 피드백</b><br>${esc(p.teacherFeedback)}</div>` : ''}${showF ? `<div class="tip-feedback">${f.arrow} ${esc(f.title)} · ${esc(f.rec)}</div>` : ''}`;
 }
 function goalTooltipHtml(touch=false){if(!state.quickGoal)return '';return `<b>TARGET POINT</b><div>EY ${fmt(state.quickGoal.ey,2)}% · TDS ${fmt(state.quickGoal.tds,3)}%</div><div class="tip-action">${touch?'다시 탭하면 목표점 삭제':'클릭하면 목표점 삭제'}</div>`}
 function coordTooltipHtml(c){return `<b>좌표 미리보기</b><div>EY ${fmt(c.ey,2)}% · TDS ${fmt(c.tds,3)}%</div><div class="muted">클릭하면 목표점 지정</div>`}
@@ -2692,6 +2977,7 @@ function renderQuickGoalControl(){
   const txt=$('quickGoalText'),btn=$('clearQuickGoal');if(state.quickGoal){txt.innerHTML=`<span class="goal-key"></span>EY <b>${fmt(state.quickGoal.ey,2)}%</b> · TDS <b>${fmt(state.quickGoal.tds,2)}%</b> · 현재값에서 점선 연결.`;btn.style.visibility='visible';btn.disabled=false}else{txt.innerHTML='<span class="chart-click-hint">차트를 클릭해 목표점을 지정합니다.</span> 미지정 시 추출 타겟 기준.';btn.style.visibility='hidden';btn.disabled=true}
 }
 $('clearQuickGoal').onclick = () => {
+  if(!canMutatePersistentState())return;
   state.quickGoal = null;
   selectedPointKey = null;
   save();
@@ -2712,7 +2998,7 @@ function renderChart(rebuildFilter=true){
   drawChart(pts);renderChartLegend(pts);renderChartDetail(pts.find(p=>p.key===selectedPointKey)||null);
 }
 function chartBounds(){const s=state.settings;return{xmin:s.chartEyMin,xmax:s.chartEyMax,ymin:s.chartTdsMin,ymax:s.chartTdsMax,xstep:s.chartEyStep,ystep:s.chartTdsStep}}
-function tickValues(min,max,step){const vals=[];if(!(step>0))return vals;const start=Math.ceil((min-1e-9)/step)*step;for(let v=start,count=0;v<=max+1e-9&&count<60;v+=step,count++)vals.push(+v.toFixed(6));return vals}
+function tickValues(min,max,step){const vals=[];if(!(step>0))return vals;const start=Math.ceil((min-1e-9)/step)*step;for(let v=start,count=0;v<=max+1e-9&&count<MAX_REQUIRED_TICKS;v+=step,count++)vals.push(+v.toFixed(6));return vals}
 function addArrowTriangle(add,x1,y1,x2,y2,color,opacity=.88){const dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy);if(len<28)return;const t=.56,cx=x1+dx*t,cy=y1+dy*t,ux=dx/len,uy=dy/len,px=-uy,py=ux,size=8;const tip=[cx+ux*size,cy+uy*size],base1=[cx-ux*size*.7+px*size*.65,cy-uy*size*.7+py*size*.65],base2=[cx-ux*size*.7-px*size*.65,cy-uy*size*.7-py*size*.65];add('polygon',{points:`${tip[0]},${tip[1]} ${base1[0]},${base1[1]} ${base2[0]},${base2[1]}`,fill:color,opacity,stroke:'#fff','stroke-width':1})}
 function drawChart(pts) {
   hideChartTooltip(true);
@@ -2820,8 +3106,8 @@ function drawChart(pts) {
   function drawGrid() {
     const xMajor = tickValues(b.xmin, b.xmax, b.xstep),
       yMajor = tickValues(b.ymin, b.ymax, b.ystep),
-      xMinor = tickValues(b.xmin, b.xmax, b.xstep / 2),
-      yMinor = tickValues(b.ymin, b.ymax, b.ystep / 2);
+      xMinor = tickValues(b.xmin, b.xmax, b.xstep / MINOR_SUBDIVISIONS),
+      yMinor = tickValues(b.ymin, b.ymax, b.ystep / MINOR_SUBDIVISIONS);
     xMinor.forEach(x => {
       if (xMajor.some(v => Math.abs(v - x) < 1e-6)) return;
       add('line', {
@@ -3121,6 +3407,7 @@ function drawChart(pts) {
           if (touchLike()) {
             if (chartTooltipPinned) {
               if (chartTooltipType === 'goal') {
+                if(!canMutatePersistentState())return;
                 state.quickGoal = null;
                 selectedPointKey = null;
                 hideChartTooltip(true);
@@ -3134,6 +3421,7 @@ function drawChart(pts) {
             showGoalTooltip(e, true);
             return;
           }
+          if(!canMutatePersistentState())return;
           state.quickGoal = null;
           selectedPointKey = null;
           hideChartTooltip(true);
@@ -3242,6 +3530,7 @@ $('chartSvg').addEventListener('click', e => {
   }
   const c = chartCoordsFromClient(e.clientX, e.clientY);
   if (!c) return;
+  if(!canMutatePersistentState())return;
   state.quickGoal = {
     ey: +c.ey.toFixed(2),
     tds: +c.tds.toFixed(3)
@@ -3266,7 +3555,8 @@ function renderChartDetail(p) {
     title = chartMode === 'class' ? `${esc(p.studentName)} · ${p.attempt}차` : p.attempt ? `Quick · ${p.attempt}차` : 'Quick · 현재값',
     d = deltaForPoint(p);
   box.classList.add('show');
-  box.innerHTML = `<h3>${title} — EY ${fmt(p.ey, 2)}% / TDS ${fmt(p.tds, 2)}% / ${brewRatioText(p)} · ${esc(cl.label)}</h3><p>${fmt(p.dose, 1)}g / ${fmt(p.water, 1)}g · Beverage ${fmt(p.bev, 1)}g · ${esc(calculationBasis(p))}${p.note ? ` · 노트: ${esc(p.note)}` : ''}</p>${d ? `<p><b>${esc(d.label)}</b> · ΔEY ${signed(d.dey, 2)}%p · ΔTDS ${signed(d.dtds, 2)}%p</p>` : ''}${p.teacherFeedback ? `<p class="teacher-line"><b>강사 피드백</b> · ${esc(p.teacherFeedback)}</p>` : ''}${showF ? `<p><b>${f.arrow} ${esc(f.title)}</b> · ${esc(f.text)} ${esc(f.rec)}</p>` : ''}`;
+  box.innerHTML = `${renderSanityStatus(p.sanityRecord,p,{live:!!p.isLive,feedback:showF})}<h3>${title} — EY ${fmt(p.ey, 2)}% / TDS ${fmt(p.tds, 2)}% / ${brewRatioText(p)} · ${esc(cl.label)}</h3><p>${fmt(p.dose, 1)}g / ${fmt(p.water, 1)}g · Beverage ${fmt(p.bev, 1)}g · ${esc(calculationBasis(p))}${p.note ? ` · 노트: ${esc(p.note)}` : ''}</p>${d ? `<p><b>${esc(d.label)}</b> · ΔEY ${signed(d.dey, 2)}%p · ΔTDS ${signed(d.dtds, 2)}%p</p>` : ''}${p.teacherFeedback ? `<p class="teacher-line"><b>강사 피드백</b> · ${esc(p.teacherFeedback)}</p>` : ''}${showF ? `<p><b>${f.arrow} ${esc(f.title)}</b> · ${esc(f.text)} ${esc(f.rec)}</p>` : ''}`;
+  if(!p.isLive&&p.sanityRecord)bindSanityActions(box,[p.sanityRecord]);
 }
 
 
@@ -3325,7 +3615,7 @@ function readTargetFields(){return {targetName:$('sTargetName').value.trim()||'�
 function readChartFields(){return {chartEyMin:parseNumber($('sChartEyMin').value),chartEyMax:parseNumber($('sChartEyMax').value),chartEyStep:parseNumber($('sChartEyStep').value),chartTdsMin:parseNumber($('sChartTdsMin').value),chartTdsMax:parseNumber($('sChartTdsMax').value),chartTdsStep:parseNumber($('sChartTdsStep').value),ratioMin:parseNumber($('sRatioMin').value),ratioMax:parseNumber($('sRatioMax').value),ratioStep:parseNumber($('sRatioStep').value)}}
 function validateCalculation(v){return Number.isFinite(v.absorption)&&v.absorption>=0}
 function validateTarget(v){return Number.isFinite(v.eyMin)&&Number.isFinite(v.eyMax)&&v.eyMin<v.eyMax&&Number.isFinite(v.tdsMin)&&Number.isFinite(v.tdsMax)&&v.tdsMin<v.tdsMax}
-function validateChart(v){if(!Number.isFinite(v.chartEyMin)||!Number.isFinite(v.chartEyMax)||v.chartEyMin>=v.chartEyMax||!isPositiveNumber(v.chartEyStep)||!Number.isFinite(v.chartTdsMin)||!Number.isFinite(v.chartTdsMax)||v.chartTdsMin>=v.chartTdsMax||!isPositiveNumber(v.chartTdsStep)||!Number.isFinite(v.ratioMin)||!Number.isFinite(v.ratioMax)||v.ratioMin>=v.ratioMax||!isPositiveNumber(v.ratioStep))return false;if((v.chartEyMax-v.chartEyMin)/v.chartEyStep>40||(v.chartTdsMax-v.chartTdsMin)/v.chartTdsStep>40||(v.ratioMax-v.ratioMin)/v.ratioStep>35)return false;return true}
+function validateChart(v){if(!Number.isFinite(v.chartEyMin)||!Number.isFinite(v.chartEyMax)||v.chartEyMin>=v.chartEyMax||!isPositiveNumber(v.chartEyStep)||!Number.isFinite(v.chartTdsMin)||!Number.isFinite(v.chartTdsMax)||v.chartTdsMin>=v.chartTdsMax||!isPositiveNumber(v.chartTdsStep)||!Number.isFinite(v.ratioMin)||!Number.isFinite(v.ratioMax)||v.ratioMin>=v.ratioMax||!isPositiveNumber(v.ratioStep))return false;if((v.chartEyMax-v.chartEyMin)/v.chartEyStep>MAX_MAJOR_INTERVALS||(v.chartTdsMax-v.chartTdsMin)/v.chartTdsStep>MAX_MAJOR_INTERVALS||(v.ratioMax-v.ratioMin)/v.ratioStep>35)return false;return true}
 function targetPayload(){const s=state.settings;return {targetName:s.targetName,eyMin:s.eyMin,eyMax:s.eyMax,tdsMin:s.tdsMin,tdsMax:s.tdsMax}}
 function chartPayload(){const s=state.settings;return {chartEyMin:s.chartEyMin,chartEyMax:s.chartEyMax,chartEyStep:s.chartEyStep,chartTdsMin:s.chartTdsMin,chartTdsMax:s.chartTdsMax,chartTdsStep:s.chartTdsStep,ratioMin:s.ratioMin,ratioMax:s.ratioMax,ratioStep:s.ratioStep}}
 function allTargetProfiles(){return [CLASSIC_TARGET_PROFILE,...state.targetProfiles]}
@@ -3422,35 +3712,26 @@ measurementDeviceManager.subscribe(snapshot=>{
   }
 });
 async function setMeasurementDeviceProfile(profileId) {
-  if (!MEASUREMENT_DEVICE_PROFILES[profileId]) profileId = 'none';
-  const previous = {
-      ...state.measurementDevice
-    },
-    nextControls = profileId === 'none' ? previous.controlsVisible === true : true;
-  state.measurementDevice = {
-    profileId,
-    controlsVisible: nextControls
-  };
-  const ok = await syncMeasurementDeviceRuntimeFromState();
-  if (!ok) {
-    state.measurementDevice = previous;
-    await syncMeasurementDeviceRuntimeFromState();
-    renderMeasurementDeviceSettings();
-    renderSettingsSummaries();
-    toast('측정기 프로필을 적용하지 못했습니다');
+  if(!canMutatePersistentState())return false;
+  if(!MEASUREMENT_DEVICE_PROFILES[profileId])profileId='none';
+  const generation=storageGeneration, previous=state.measurementDevice;
+  const next={profileId,controlsVisible:profileId==='none'?previous.controlsVisible===true:true};
+  try{await measurementDeviceManager.setProfile(profileId)}catch(error){
+    if(generation===storageGeneration&&canMutatePersistentState()){
+      await syncMeasurementDeviceRuntimeFromState();
+      renderMeasurementDeviceSettings();renderSettingsSummaries();toast('측정기 프로필을 적용하지 못했습니다');
+    }
     return false;
   }
-  save();
-  renderMeasurementDeviceSettings();
-  renderSettingsSummaries();
-  notifyAfterSave(profileId === 'none' ? '측정기 프로필을 없음으로 변경했습니다' : '측정기 프로필을 적용했습니다');
-  return true;
+  if(generation!==storageGeneration||!canMutatePersistentState())return false;
+  state.measurementDevice=next;save();renderMeasurementDeviceSettings();renderSettingsSummaries();
+  notifyAfterSave(profileId==='none'?'측정기 프로필을 없음으로 변경했습니다':'측정기 프로필을 적용했습니다');return true;
 }
 function renderSettingsSummaries(){const s=state.settings,arr=students(),cc=currentClass(),ss=currentSession();$('calculationSummary').textContent=`Liquid retention · ${trimNum(s.absorption,2)}×`;$('targetSummary').textContent=`${s.targetName} · EY ${trimNum(s.eyMin,1)}–${trimNum(s.eyMax,1)}% · TDS ${trimNum(s.tdsMin,2)}–${trimNum(s.tdsMax,2)}%`;$('chartSettingsSummary').textContent=`EY ${trimNum(s.chartEyMin,2)}–${trimNum(s.chartEyMax,2)} / ${trimNum(s.chartEyStep,2)} · TDS ${trimNum(s.chartTdsMin,2)}–${trimNum(s.chartTdsMax,2)} / ${trimNum(s.chartTdsStep,2)} · 1:${trimNum(s.ratioMin,1)}–1:${trimNum(s.ratioMax,1)}`;$('feedbackSummary').textContent=`Quick ${s.showQuickFeedback?'ON':'OFF'} · Class ${s.showClassFeedback?'ON':'OFF'}`;const md=state.measurementDevice||DEFAULT_MEASUREMENT_DEVICE,mp=measurementDeviceProfile();$('measurementDeviceSummary').textContent=mp.id==='none'?`없음 · UI ${md.controlsVisible?'ON':'OFF'}`:`${mp.displayName} · UI ON`;$('classSummary').textContent=`현재 ${cc?.name||'—'} · 실습 ${cc?.sessions?.length||0}개 · 저장된 반 ${state.classes.length}개`;$('studentSummary').textContent=`${cc?.name||'—'} · 현재 ${arr.length}명${excludedStudents().length?` · 제외 ${excludedStudents().length}명`:''} · 현재 실습 ${currentSessionRecordCount()} records`;$('backupSummary').textContent=`App v${APP_VERSION} · Schema v${APP_SCHEMA_VERSION} · 반 ${state.classes.length}개 · 실습 ${state.classes.reduce((a,c)=>a+(c.sessions?.length||0),0)}개 · Target ${state.targetProfiles.length}개 · Chart ${state.chartPresets.length}개 · 저장소 ${StorageAdapter.lastWrite.persistent?'확인':'점검 필요'}`}
 function updateTargetProfileButtons(){const selected=allTargetProfiles().find(p=>p.id===$('targetProfileSelect').value);$('overwriteTargetProfile').disabled=!!selected?.builtin;$('deleteTargetProfile').disabled=!!selected?.builtin}
 function updateChartPresetButtons(){const selected=allChartPresets().find(p=>p.id===$('chartPresetSelect').value);$('overwriteChartPreset').disabled=!!selected?.builtin;$('deleteChartPreset').disabled=!!selected?.builtin}
-function renderTargetProfileSelect(){const sel=$('targetProfileSelect'),current=sel.value;fillOptions(sel,allTargetProfiles().map(p=>({id:p.id,label:p.name+(p.builtin?'':' · 사용자')})));if(state.activeTargetProfileId&&allTargetProfiles().some(p=>p.id===state.activeTargetProfileId))sel.value=state.activeTargetProfileId;else if(current&&allTargetProfiles().some(p=>p.id===current))sel.value=current;else sel.value='builtin-target-classic';updateTargetProfileButtons();$('targetProfileStatus').innerHTML=state.activeTargetProfileId?`현재 적용: <b>${esc(currentTargetProfileName())}</b>`:'현재 타겟은 저장된 프로필에서 수정된 상태입니다.'}
-function renderChartPresetSelect(){const sel=$('chartPresetSelect'),current=sel.value;fillOptions(sel,allChartPresets().map(p=>({id:p.id,label:p.name+(p.builtin?'':' · 사용자')})));if(state.activeChartPresetId&&allChartPresets().some(p=>p.id===state.activeChartPresetId))sel.value=state.activeChartPresetId;else if(current&&allChartPresets().some(p=>p.id===current))sel.value=current;else sel.value='builtin-chart-default';updateChartPresetButtons();$('chartPresetStatus').innerHTML=state.activeChartPresetId?`현재 적용: <b>${esc(currentChartPresetName())}</b>`:'현재 차트는 저장된 프리셋에서 수정된 상태입니다.'}
+function renderTargetProfileSelect(){const sel=$('targetProfileSelect'),current=sel.value;fillOptions(sel,allTargetProfiles().map(p=>({id:p.id,label:p.name})));if(state.activeTargetProfileId&&allTargetProfiles().some(p=>p.id===state.activeTargetProfileId))sel.value=state.activeTargetProfileId;else if(current&&allTargetProfiles().some(p=>p.id===current))sel.value=current;else sel.value='builtin-target-classic';updateTargetProfileButtons();$('targetProfileStatus').innerHTML=state.activeTargetProfileId?`현재 적용: <b>${esc(currentTargetProfileName())}</b>`:'현재 타겟은 저장된 프로필에서 수정된 상태입니다.'}
+function renderChartPresetSelect(){const sel=$('chartPresetSelect'),current=sel.value;fillOptions(sel,allChartPresets().map(p=>({id:p.id,label:p.name})));if(state.activeChartPresetId&&allChartPresets().some(p=>p.id===state.activeChartPresetId))sel.value=state.activeChartPresetId;else if(current&&allChartPresets().some(p=>p.id===current))sel.value=current;else sel.value='builtin-chart-default';updateChartPresetButtons();$('chartPresetStatus').innerHTML=state.activeChartPresetId?`현재 적용: <b>${esc(currentChartPresetName())}</b>`:'현재 차트는 저장된 프리셋에서 수정된 상태입니다.'}
 function renderClassManager(){const cc=currentClass(),sel=$('sClassSelect');fillOptions(sel,state.classes.map(c=>({id:c.id,label:c.name})));sel.value=cc.id;$('sClassName').value=cc.name;$('sDeleteClass').disabled=state.classes.length<=1}
 const settingsFieldGroups={
   calculation:{sAbsorption:'absorption'},
@@ -3467,13 +3748,14 @@ function renderChartSettings(){renderSettingsGroup(settingsFieldGroups.chart)}
 function renderSettingsFields(){renderCalculationSettings();renderTargetSettings();renderChartSettings()}
 
 function renderStudentSettings(){
-  const m=$('studentManage'),arr=students(),excluded=excludedStudents(),em=$('excludedStudentManage'),details=$('excludedStudentDetails'),excludedCount=$('excludedStudentCount');m.innerHTML='';if(!arr.length)m.innerHTML='<div class="hint">현재 반에 등록된 수강생이 없습니다.</div>';arr.forEach(stu=>{const total=(currentClass()?.sessions||[]).reduce((a,ss)=>a+(ss.records?.[stu.id]?.length||0),0),row=document.createElement('div');row.className='student-manage-row';row.innerHTML=`<div class="name">${esc(stu.name)} <span style="color:#91877e;font-size:9px">· 전체 ${total} records</span></div><button class="btn ghost small" data-rename>이름</button><button class="btn danger small" data-remove>명단 제외</button>`;row.querySelector('[data-rename]').dataset.rename=stu.id;row.querySelector('[data-remove]').dataset.remove=stu.id;m.appendChild(row)});m.querySelectorAll('[data-rename]').forEach(b=>b.onclick=()=>renameStudent(b.dataset.rename));m.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>removeStudent(b.dataset.remove));details.style.display=excluded.length?'block':'none';excludedCount.textContent=`${excluded.length}명`;em.innerHTML='';excluded.forEach(stu=>{const total=(currentClass()?.sessions||[]).reduce((a,ss)=>a+(ss.records?.[stu.id]?.length||0),0),row=document.createElement('div');row.className='student-manage-row';row.innerHTML=`<div class="name">${esc(stu.name)} <span style="color:#91877e;font-size:9px">· 보존 기록 ${total}개</span></div><button class="btn secondary small" data-restore>명단 복원</button>`;row.querySelector('[data-restore]').dataset.restore=stu.id;em.appendChild(row)});em.querySelectorAll('[data-restore]').forEach(b=>b.onclick=()=>restoreStudent(b.dataset.restore));
+  const m=$('studentManage'),arr=students(),excluded=excludedStudents(),em=$('excludedStudentManage'),details=$('excludedStudentDetails'),excludedCount=$('excludedStudentCount');m.innerHTML='';if(!arr.length)m.innerHTML='<div class="hint">현재 반에 등록된 수강생이 없습니다.</div>';arr.forEach(stu=>{const total=(currentClass()?.sessions||[]).reduce((a,ss)=>a+(ss.records?.[stu.id]?.length||0),0),row=document.createElement('div');row.className='student-manage-row';row.innerHTML=`<div class="name">${esc(stu.name)} <span style="color:#91877e;font-size:9px">· 전체 ${total} records</span></div><button class="btn ghost small" data-rename>이름</button><button class="btn danger small" data-remove>명단 제외</button>`;row.querySelector('[data-rename]').dataset.rename=stu.id;row.querySelector('[data-remove]').dataset.remove=stu.id;m.appendChild(row)});m.querySelectorAll('[data-rename]').forEach(b=>b.onclick=()=>renameStudent(b.dataset.rename));m.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>removeStudent(b.dataset.remove));details.style.display=excluded.length?'block':'none';excludedCount.textContent=`${excluded.length}명`;em.innerHTML='';excluded.forEach(stu=>{const total=(currentClass()?.sessions||[]).reduce((a,ss)=>a+(ss.records?.[stu.id]?.length||0),0),row=document.createElement('div');row.className='student-manage-row';row.innerHTML=`<div class="name">${esc(stu.name)} <span style="color:#91877e;font-size:9px">· 보존 기록 ${total}개</span></div><button class="btn secondary small" data-restore>명단 복원</button><button class="btn danger small" data-permanent-delete>영구 삭제</button>`;row.querySelector('[data-restore]').dataset.restore=stu.id;row.querySelector('[data-permanent-delete]').dataset.permanentDelete=stu.id;em.appendChild(row)});em.querySelectorAll('[data-permanent-delete]').forEach(b=>b.onclick=()=>permanentlyDeleteStudent(b.dataset.permanentDelete));em.querySelectorAll('[data-restore]').forEach(b=>b.onclick=()=>restoreStudent(b.dataset.restore));
 }
 function renderSettings(){
   renderSettingsFields();syncFeedbackControls();renderMeasurementDeviceSettings();renderSettingsSummaries();
   renderTargetProfileSelect();renderChartPresetSelect();renderClassManager();renderStudentSettings();
 }
 $('applyCalculationSettings').onclick = () => {
+  if(!canMutatePersistentState())return false;
   const v = readCalculationFields();
   if (!validateCalculation(v)) {
     toast('액체 보유계수를 확인해 주세요');
@@ -3489,10 +3771,12 @@ $('applyCalculationSettings').onclick = () => {
   renderClass();
   renderChart();
   renderSettings();
+  updateClassBevHint();
   notifyAfterSave('계산 설정을 적용했습니다');
 };
 $('resetCalculationFields').onclick=()=>{Object.keys(settingsFieldGroups.calculation).forEach(key=>settingsDraftFields.add(key));$('sAbsorption').value=DEFAULT.settings.absorption;toast('기본값을 입력했습니다. 적용을 눌러 반영하세요')};
 $('applyTargetSettings').onclick = () => {
+  if(!canMutatePersistentState())return false;
   const v = readTargetFields();
   if (!validateTarget(v)) {
     toast('타겟 최소/최대 값을 확인해 주세요');
@@ -3513,6 +3797,7 @@ $('applyTargetSettings').onclick = () => {
 };
 $('resetTargetFields').onclick=()=>{Object.keys(settingsFieldGroups.target).forEach(key=>settingsDraftFields.add(key));const v=CLASSIC_TARGET_PROFILE.settings;$('sTargetName').value=v.targetName;$('sEyMin').value=v.eyMin;$('sEyMax').value=v.eyMax;$('sTdsMin').value=v.tdsMin;$('sTdsMax').value=v.tdsMax;toast('기본 타겟 값을 입력했습니다. 적용을 눌러 반영하세요')};
 $('applyChartSettings').onclick = () => {
+  if(!canMutatePersistentState())return false;
   const v = readChartFields();
   if (!validateChart(v)) {
     toast('차트 범위·눈금·Ratio 간격을 확인해 주세요');
@@ -3533,6 +3818,7 @@ $('resetChartFields').onclick=()=>{Object.keys(settingsFieldGroups.chart).forEac
 $('targetProfileSelect').onchange=updateTargetProfileButtons;
 $('chartPresetSelect').onchange=updateChartPresetButtons;
 $('loadTargetProfile').onclick = () => {
+  if(!canMutatePersistentState())return false;
   const p = allTargetProfiles().find(x => x.id === $('targetProfileSelect').value);
   if (!p) return;
   state.settings = {
@@ -3549,6 +3835,7 @@ $('loadTargetProfile').onclick = () => {
   notifyAfterSave(`${p.name} 타겟을 불러왔습니다`);
 };
 $('loadChartPreset').onclick = () => {
+  if(!canMutatePersistentState())return false;
   const p = allChartPresets().find(x => x.id === $('chartPresetSelect').value);
   if (!p) return;
   state.settings = {
@@ -3563,6 +3850,7 @@ $('loadChartPreset').onclick = () => {
   notifyAfterSave(`${p.name} 차트 프리셋을 불러왔습니다`);
 };
 $('saveNewTargetProfile').onclick = () => {
+  if(!canMutatePersistentState())return false;
   const name = $('newTargetProfileName').value.trim();
   if (!name) {
     toast('새 Target Profile 이름을 입력해 주세요');
@@ -3607,6 +3895,7 @@ $('overwriteTargetProfile').onclick = () => {
     message: `${p.name} 프로필을 현재 타겟으로 덮어쓸까요?`,
     confirmText: '덮어쓰기',
     onConfirm: () => {
+      if(!canMutatePersistentState())return false;
       state.settings = {
         ...state.settings,
         ...payload
@@ -3629,10 +3918,11 @@ $('deleteTargetProfile').onclick = () => {
   if (!p) return;
   openDialog({
     title: 'Target Profile 삭제',
-    message: `${p.name} 프로필을 삭제할까요?`,
+    message: (`${p.name} 프로필을 삭제할까요?`) + '\n이 작업은 되돌릴 수 없습니다.',
     confirmText: '삭제',
     danger: true,
     onConfirm: () => {
+      if(!canMutatePersistentState())return false;
       state.targetProfiles = state.targetProfiles.filter(x => x.id !== idv);
       if (state.activeTargetProfileId === idv) state.activeTargetProfileId = null;
       save();
@@ -3642,6 +3932,7 @@ $('deleteTargetProfile').onclick = () => {
   });
 };
 $('saveNewChartPreset').onclick = () => {
+  if(!canMutatePersistentState())return false;
   const name = $('newChartPresetName').value.trim();
   if (!name) {
     toast('새 Chart View Preset 이름을 입력해 주세요');
@@ -3684,6 +3975,7 @@ $('overwriteChartPreset').onclick = () => {
     message: `${p.name} 프리셋을 현재 차트 설정으로 덮어쓸까요?`,
     confirmText: '덮어쓰기',
     onConfirm: () => {
+      if(!canMutatePersistentState())return false;
       state.settings = {
         ...state.settings,
         ...payload
@@ -3704,10 +3996,11 @@ $('deleteChartPreset').onclick = () => {
   if (!p) return;
   openDialog({
     title: 'Chart View Preset 삭제',
-    message: `${p.name} 프리셋을 삭제할까요?`,
+    message: (`${p.name} 프리셋을 삭제할까요?`) + '\n이 작업은 되돌릴 수 없습니다.',
     confirmText: '삭제',
     danger: true,
     onConfirm: () => {
+      if(!canMutatePersistentState())return false;
       state.chartPresets = state.chartPresets.filter(x => x.id !== idv);
       if (state.activeChartPresetId === idv) state.activeChartPresetId = null;
       save();
@@ -3723,6 +4016,7 @@ $('sRenameClass').onclick=()=>renameCurrentClass($('sClassName').value);
 $('sClassName').addEventListener('keydown',e=>{if(e.key==='Enter')$('sRenameClass').click()});
 $('sDeleteClass').onclick=deleteCurrentClass;
 $('addStudent').onclick = () => {
+  if(!canMutatePersistentState())return false;
   const name = $('newStudentName').value.trim();
   if (!name) {
     toast('이름을 입력해 주세요');
@@ -3754,6 +4048,7 @@ function renameStudent(sid) {
     inputValue: s.name,
     confirmText: '변경',
     onConfirm: value => {
+      if(!canMutatePersistentState())return false;
       const v = String(value || '').trim();
       if (!v) {
         toast('이름을 입력해 주세요');
@@ -3782,6 +4077,7 @@ function removeStudent(sid) {
     confirmText: '명단 제외',
     danger: true,
     onConfirm: () => {
+      if(!canMutatePersistentState())return false;
       currentClass().students = arr.filter(x => x.id !== sid);
       currentClass().excludedStudents = currentClass().excludedStudents || [];
       if (!currentClass().excludedStudents.some(x => x.id === sid)) currentClass().excludedStudents.push(s);
@@ -3801,7 +4097,26 @@ function removeStudent(sid) {
     }
   });
 }
+function permanentlyDeleteStudent(sid){
+  if(!canMutatePersistentState())return;
+  const cc=currentClass(),student=cc?.excludedStudents.find(item=>item.id===sid);
+  if(!student)return;
+  openDialog({title:'수강생 영구 삭제',message:`수강생을 영구 삭제할까요?\n${student.name}의 모든 실습 기록과 강사 피드백이 함께 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.`,confirmText:'영구 삭제',danger:true,onConfirm:()=>{
+    if(!canMutatePersistentState())return false;
+    if(!cc.excludedStudents.some(item=>item.id===sid))return;
+    const removedIds=new Set(cc.sessions.flatMap(ss=>(ss.records[sid]||[]).map(record=>record.id)));
+    cc.excludedStudents=cc.excludedStudents.filter(item=>item.id!==sid);
+    for(const session of cc.sessions){delete session.records[sid];delete session.studentNames[sid]}
+    delete chartSelection[sid];selectedPointKey=null;hideChartTooltip(true);
+    if(removedIds.has(editingRecordId))editingRecordId=null;
+    if(removedIds.has(editingTeacherFeedbackId)){editingTeacherFeedbackId=null;editingTeacherFeedbackDraft=''}
+    if(currentStudentId===sid){repairActiveStudentSelection();editingRecordId=null;editingTeacherFeedbackId=null;fillClassFormFromLast()}
+    save();renderSettings();renderClass();renderChart();notifyAfterSave('수강생과 모든 실습 기록을 영구 삭제했습니다');
+  }});
+}
+
 function restoreStudent(sid) {
+  if(!canMutatePersistentState())return false;
   const cc = currentClass(),
     arr = excludedStudents(),
     s = arr.find(x => x.id === sid);
@@ -3828,10 +4143,11 @@ $('clearClassData').onclick = () => {
   }
   openDialog({
     title: '현재 실습 추출 기록 삭제',
-    message: `${ss.name} 실습의 모든 수강생 추출 기록 ${count}개를 지울까요? 다른 실습과 수강생 명단은 유지됩니다.`,
+    message: (`${ss.name} 실습의 모든 수강생 추출 기록 ${count}개를 지울까요? 다른 실습과 수강생 명단은 유지됩니다.`) + '\n이 작업은 되돌릴 수 없습니다.',
     confirmText: '기록 삭제',
     danger: true,
     onConfirm: () => {
+      if(!canMutatePersistentState())return false;
       ss.records = {};
       ss.studentNames = {};
       chartSelection = Object.create(null);
@@ -3849,12 +4165,18 @@ $('clearClassData').onclick = () => {
 
 function exportPayload(){return {format:BACKUP_FORMAT,schemaVersion:APP_SCHEMA_VERSION,exportedAt:new Date().toISOString(),app:'Coffee Brewing Control',data:clone(state)}}
 let pendingExportJson='',pendingExportFilename='';
+function backupFilename(date=new Date()){
+  const day=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(date);
+  const part=type=>day.find(p=>p.type===type).value;
+  return `coffee-brewing-control-backup-${part('year')}-${part('month')}-${part('day')}.json`;
+}
 function prepareExportData(){
-  const rawBlocked=['corrupt','future'].includes(storageBlocked)?StorageAdapter.candidates():null;
+  const rawBlocked=['corrupt','future','reset-anomaly'].includes(storageBlocked)?StorageAdapter.candidates():null;
   const recoveryEntries=pendingEntries().map(({key,raw,source})=>({key,raw,source}));
-  const payload=rawBlocked?{app:'Coffee Brewing Control',recoveryOnly:true,candidates:[...rawBlocked.map(({raw,source})=>({source,raw})),...recoveryEntries]}:Object.assign(exportPayload(),recoveryEntries.length?{pendingRecovery:recoveryEntries}:{}),day=new Date().toISOString().slice(0,10);
+  const payload=rawBlocked?{app:'Coffee Brewing Control',recoveryOnly:true,candidates:[...rawBlocked.map(({raw,source})=>({source,raw})),...recoveryEntries]}:Object.assign(exportPayload(),recoveryEntries.length?{pendingRecovery:recoveryEntries}:{});
+  if(storageBlocked==='reset-anomaly')payload.resetCoordination={...resetCoordination,rawResetEpoch:readSharedResetEpoch().raw};
   pendingExportJson=JSON.stringify(payload,null,2);
-  pendingExportFilename=`coffee-brewing-control-backup-${day}.json`;
+  pendingExportFilename=backupFilename();
   $('exportJsonText').value=pendingExportJson;
   $('exportPreviewText').textContent=`${pendingExportFilename} · ${importSummary(state)} · 파일 저장이 막히면 아래 JSON 복사를 사용하세요.`;
   $('exportPreview').classList.add('show');
@@ -3917,6 +4239,7 @@ $('importDataFile').onchange=async event=>{
 };
 $('cancelImportData').onclick=()=>{importReadGeneration++;pendingImportState=null;$('importPreview').classList.remove('show');$('importDataFile').value=''};
 function applyImportedState(imported) {
+  if(!canMutatePersistentState())return false;
   // Explicit restore is allowed after an unreadable dataset, but not over newer-schema or conflicting tabs.
   if (storageBlocked === 'future' || storageBlocked === 'conflict' && !pendingRecoveryConflict) {
     updateStorageWarning();
@@ -3933,6 +4256,7 @@ function applyImportedState(imported) {
     StorageAdapter.committedRaw = null;
   }
   storageGeneration++;
+  closeQuickNoteEditor();
   state = clone(imported);
   pendingImportState = null;
   importReadGeneration++;
@@ -3966,6 +4290,7 @@ $('applyImportData').onclick=()=>{
   openDialog({title:'백업 데이터 복원',message:'현재 브라우저의 모든 반·기록·프로필·프리셋·설정을 선택한 백업으로 교체합니다.',confirmText:'복원',danger:true,onConfirm:()=>applyImportedState(imported)});
 };
 
+$('resetAppData').onclick=requestFullReset;
 function init() {
   if (recoveredPendingEntries.length && !storageBlocked) save();
   repairActiveClassState();
