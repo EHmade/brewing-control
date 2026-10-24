@@ -4,6 +4,56 @@ All notable changes to Coffee Brewing Control are documented here.
 
 The project was developed iteratively before its first public GitHub release. Earlier entries are intentionally condensed to major user-facing and architectural milestones rather than every intermediate test or debugging change.
 
+## [4.5.0] - 2026-10-25
+
+### Added
+- Added DiFluid R2 as an optional Web Bluetooth Device Profile alongside the existing HM Digital profile.
+- Added PC-requested and device-initiated Single / Average measurement, Auto Single-to-Loop handling, and final TDS delivery to Quick or Class without automatically saving a record.
+- Added an R2 settings popup from the header connection control, with device-confirmed Auto / Count, model / firmware information, and an accessible settings icon.
+- Added R2-specific Windows / Android connection guidance, permission routes, and recovery steps while retaining the existing HM Digital help.
+
+### Fixed
+- Average completion now requires the final aggregate and complete progress; missing, damaged, or detectably inconsistent final data cannot reuse an earlier average.
+- Changing Quick / Class, student, session, edit target, or manual TDS cancels result delivery. Sent measurements remain locked until device completion or explicit recovery; late results do not overwrite a new target.
+- Measurement starts require matching mode / status pairs. The latest confirmed Count is checked immediately before PC command transmission.
+- Delayed or incomplete measurements retain the previous TDS and offer explicit reconnection without automatic remeasurement.
+
+### Changed
+- R2 device Count and PC measurement Count are shared. Connection reads existing settings; Auto / Count writes occur only on an explicit user change.
+- For device-origin Auto multi-measurement Single-to-Loop cycles, the app uses the last N received Loop readings, or the final Loop reading if fewer than N are available. Device Average results and other Single / Loop cycles retain their own final-result policies.
+- R2 header and measurement feedback adapt to available width, keep progress and recovery guidance concise, and expose further detail through the existing settings popup.
+- Valid numeric device readings can enter the TDS field outside the brewing-calculation interval. Existing calculation and saved-record checks remain separate.
+
+### Compatibility
+- The saved-data schema remains v7 with the existing storage key, backup identifier, Import resource budgets, and supported schema-v1 through schema-v7 migration.
+- Existing brewing formulas, saved-record interpretation, chart / PNG behavior, and HM Digital adapter are retained. Live R2 connections, Auto / Count, and auxiliary readings are not added to brew records or backups.
+- R2 requires a browser with Web Bluetooth support. Export a backup and close older app tabs before updating; retain the previous app and its pre-upgrade backup for rollback.
+
+## [4.4.5] - 2026-10-23
+
+### Added
+- Added backup Import resource guards. Files larger than 32 MiB are rejected before reading; excessive text, collection size, total structure, or nesting is rejected after parsing without truncating the backup.
+
+### Fixed
+- Device Profile switches now ignore superseded asynchronous results, keeping runtime and saved profiles consistent when selection overlaps backup restoration, full reset, or a newer selection.
+- Removed data-sized function-call spreads from record normalization and validation so large attempt collections do not fail at the JavaScript argument-count limit.
+- Measurement controls now refresh immediately after a Device Profile change in Quick and Class, without requiring a reload. Existing connection and measurement contracts are retained.
+
+### Changed
+- Canonical normalization retains known Settings and Quick draft fields while discarding unrecognized properties. Existing legacy feedback migration and explicit known values are preserved.
+- Shared saved-record iteration and measurement-control refresh, clarified selected local names, removed an unused state read, and documented mass-balance units, saved-retention ownership, and the existing HM Digital transport contract.
+
+### Compatibility
+- The saved-data schema remains **v7**. Supported schema-v1 through schema-v7 backups remain importable within the resource budgets; existing measurements, notes, feedback, acknowledgment, input modes, and retention snapshots retain their interpretation.
+- Import validation is separate from browser storage capacity. Existing storage failure, recovery, conflict, and stale-tab handling remains in place.
+- The calculation formulas, target classification, chart / PNG layout, browser storage key, backup format identifier, and HM Digital protocol remain unchanged. No R2 integration or runtime dependency is added.
+
+## [4.4.4] - 2026-10-22
+
+### Changed
+- Reformatted inline JavaScript as an internal maintenance checkpoint before the v4.4.5 hardening changes. Structural equivalence and existing regression checks were verified separately.
+- Preserved executable behavior, literal and template contents, comments, HTML / CSS, and the single-file distribution. This checkpoint was not published as a separate public release.
+
 ## [4.4.3] - 2026-09-25
 
 ### Added

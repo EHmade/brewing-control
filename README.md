@@ -33,35 +33,49 @@ The acknowledgment is stored with the record. The review result and its internal
 
 ## Measurement device support
 
-Version 4.4.0 introduces a reusable Measurement Device layer. The first supported profile is:
+Select a Device Profile in Settings to enable optional direct TDS measurement. Supported profiles are:
 
-- **HM Digital BTR-1000 / RCM-1000BT**
-- Transport: **Web Serial over Bluetooth Classic SPP**
-- Tested with **Chrome on Windows and Android**
+- **HM Digital BTR-1000 / RCM-1000BT** — Web Serial over Bluetooth Classic SPP; existing Windows / Android Chrome workflow.
+- **DiFluid R2** — Web Bluetooth (BLE); tested with DFT-R102 firmware V219. Windows Chromium and Android Chrome were used for integration testing. Device access depends on browser and operating-system support.
 
-After selecting the HM Digital Device Profile in Settings, the app can connect to the device, show connection state in the header, and expose **Measure TDS** in Quick and Class.
+The header shows connection state; Quick and Class expose the measurement button. A completed measurement fills the current TDS input through the normal input path. It does **not** automatically save a Quick attempt or create a Class record. Pending, failed, or incomplete measurements preserve the existing TDS.
 
-A successful measurement replaces the current TDS input through the same input path used for manual entry. Measurement does **not** automatically save a Quick attempt or create a Class record. Existing TDS remains in place while a measurement is pending and is preserved if the device returns Air, Unstable, Hi Range, an unknown response, a timeout, or a connection error.
+Results apply only while their original input context remains current. Switching Quick / Class, students, sessions, or edit targets, resetting the form, restoring a backup, or manually changing TDS cancels the earlier delivery. Returning to the same screen does not restore that permission. An already sent R2 measurement remains tracked and blocks another PC command until its lifecycle ends or the user explicitly reconnects. Cancelling delivery does not claim to stop the physical device. Simply repainting the screen or locking and unlocking it does not change the input target.
 
-Measurement results are applied only while their original input context is still current. Switching students or edit targets, resetting the form, restoring a backup, or manually changing TDS invalidates the earlier application target. Simply repainting the screen or locking and unlocking it does not change that context.
+Normal numeric readings are preserved in the input, including values outside the brewing-calculation interval. This confirms delivery of the device-reported value, not its physical accuracy or suitability for brewing calculations. The existing **0 < TDS < 100%** calculation / record-saving rules still apply.
 
-Successful HM Digital responses are normalized at runtime into TDS, Brix, temperature, and refractive-index values. Version 4.4.0 uses TDS in the current brew workflow; the auxiliary values are retained only in runtime measurement results and are not added to brew records or backups.
+### DiFluid R2 settings and measurement
+
+Click the connected R2 control or its settings icon in the header to open the existing settings popup. It shows confirmed model / firmware information and Auto / measurement Count. Connection reads the device settings without overwriting them; explicit user changes use device acknowledgment and readback. Auto / Count are locked while measuring. The app does not implement device calibration or firmware updates.
+
+Device Count and PC measurement Count are shared: Count 1 requests Single, and Count 2–10 requests Average with that same Count. Device-button and Auto-initiated measurements can also fill the current Quick / Class input. Progress values remain previews; the app commits a final result once.
+
+- **Device Average:** use the device's confirmed final average with complete progress and completion status.
+- **Single, including temperature-stabilization Loop:** use the final reading.
+- **Device-origin Auto ON, Count greater than 1, Single-to-Loop:** use the last N received Loop readings, where N is the captured device Count. If fewer than N are available, use the final Loop reading. This app-side averaging is not applied to PC / button Average or ordinary Single stabilization. If the device reports Average, its final average takes precedence.
+
+Average completion cannot reuse an earlier running average when final data is missing. After completion status, insufficient final data receives a bounded 1.5-second additional wait; unresolved or detectably inconsistent data preserves the previous TDS and requires explicit reconnection. This interval is an application policy, not a guaranteed maximum device delay.
+
+Start delay (20 seconds), silence after valid measurement activity (60 seconds), and a long measurement after actual Start (120 seconds) produce guidance. They do not declare completion, unlock a new PC measurement, or automatically retry. The nearby status offers **자세히** when appropriate; the existing popup offers **다시 연결**. Recovery first cancels old delivery and cleans up the connection, then reconnects and reads settings without automatically measuring.
 
 ### Connection setup
 
-**Windows**
+**HM Digital — Windows / Android**
 
 1. Turn on the refractometer.
-2. If it does not appear in Chrome's device chooser, pair `BTR1000(Coffee)_xxxx` first in **Windows Settings → Bluetooth & devices**.
-3. Return to Coffee Brewing Control and connect from Settings or the header device control.
+2. On Windows, if it does not appear in Chrome's chooser, pair **BTR1000(Coffee)_xxxx** in **Windows Settings → Bluetooth & devices** first.
+3. On Android, check **Android Settings → Apps → Chrome → Permissions → Nearby devices** if the device is missing.
+4. Return to the app and connect from Settings or the header control. The operating system may take time to report a powered-off Bluetooth Classic device as disconnected.
 
-**Android**
+**DiFluid R2 — Windows / Android**
 
-1. Turn on the refractometer.
-2. If it does not appear in Chrome's device chooser, check **Android Settings → Apps → Chrome → Permissions → Nearby devices**.
-3. Return to Chrome and connect again.
+1. Turn on R2 and the computer / phone's Bluetooth. Use a browser that supports Web Bluetooth; an HTTPS or localhost origin is recommended for device access.
+2. Choose the R2 Device Profile and connect from the app's device chooser. If another app or browser tab is using R2, disconnect it there first.
+3. On Android, if R2 is missing, check **Android Settings → Apps → Chrome → Permissions → Nearby devices**. Depending on Android / Chrome version, location permission or the system location setting may also be required. Menu names vary; return to Chrome and retry after changing permissions.
+4. If Auto / Count cannot be confirmed, open the R2 connection control at the top of the page and select **설정 다시 확인**.
+5. If the app shows Disconnected while the device still shows a connection icon and R2 is absent from the chooser, close the chooser, power R2 fully off, wait for Disconnected in the app, power it on, and connect again. Check other apps / tabs if it remains unavailable. This is a recovery procedure; the rare mismatch's cause has not been established.
 
-The operating system / Bluetooth stack may take some time to report a powered-off or sleeping Bluetooth Classic device as disconnected. The app updates its state when the browser reports the link loss and also handles transport failure if a measurement is attempted against a lost connection.
+Successful auxiliary device readings remain runtime-only. They are not added to brew records or backups. The R2 profile selection and measurement-control visibility are saved; live connections and device Auto / Count are not app backup settings.
 
 ## Default reference profile
 
@@ -89,21 +103,27 @@ Records from before schema v5 receive the dataset's configured retention value d
 
 Brew records, class records, profiles, and settings are stored locally in the browser by the application. The application does not transmit entered brew or class data to an application backend.
 
-When a supported measurement device is connected, communication is handled directly through browser device APIs. The selected Device Profile is saved with the app settings, but live serial-port objects and normalized auxiliary device readings are runtime-only. A successfully applied TDS value follows the normal Quick / Class data flow.
+When a supported measurement device is connected, communication is handled directly through browser device APIs. The selected Device Profile is saved with the app settings, but live connection objects and normalized auxiliary device readings are runtime-only. A successfully applied TDS value follows the normal Quick / Class data flow.
 
 Hosting providers may still receive ordinary web-request metadata when the page itself is loaded.
 
 ## Backup and version compatibility
 
-Version 4.4.3 uses **schema v7** with the existing browser storage key and JSON backup format identifier. Supported schema-v1 through schema-v6 data remain importable. Schema v7 adds a strict boolean review-acknowledgment field to every saved Quick and Class record. Earlier records receive an unacknowledged state during migration without changing their stored brew measurements, water-input interpretation, notes, feedback, measurement-device settings, or retained liquid-retention value.
+Version 4.5.0 uses **schema v7** with the existing browser storage key and JSON backup format identifier. Supported schema-v1 through schema-v6 data remain importable. Schema v7 adds a strict boolean review-acknowledgment field to every saved Quick and Class record. Earlier records receive an unacknowledged state during migration without changing their stored brew measurements, water-input interpretation, notes, feedback, measurement-device settings, or retained liquid-retention value.
+
+Older application versions do not support the R2 profile even though the schema number remains v7. Keep a pre-upgrade backup and the previous application for rollback.
 
 Current-schema representation is validated strictly, while supported historical shapes are handled by their migration contracts. In particular, early schema-v2 data may omit `excludedStudents`; malformed values remain rejected, and schema-v3-or-newer data retain their stricter requirement. Existing imported records with TDS outside the current calculated-result interval retain the original raw value but do not generate calculated brew results or chart points until edited to a valid TDS.
+
+Backups are checked against Import resource budgets before they are applied. The file limit is **32 MiB** (33,554,432 bytes), checked before reading. After JSON parsing, the limits are **65,536 UTF-16 code units per string or object key**, **16,777,216 code units of combined text**, **250,000 entries per collection**, **3,000,000 structural values**, and **64 levels of nesting**. Excess data is rejected with an explanation rather than truncated. These are workload limits, not recommended classroom sizes or a promise that the browser can store the data. Recovery and pending snapshots also consume storage space; retain an external JSON backup, especially for large datasets.
+
+Normalization keeps known Settings and Quick draft fields and discards unrecognized properties. Existing record values, notes, feedback, saved retention, and review acknowledgment remain subject to their existing compatibility contracts. The selected backup file remains unchanged if Import is rejected.
 
 The app checks stored candidates before loading and preserves the previous committed snapshot as a recovery copy. If no valid copy can be read, or a newer schema is found, automatic writes stop to protect the stored data. In that condition, JSON export can preserve the raw candidates as a recovery-only bundle; this bundle is for inspection and is not a normal importable app backup.
 
 Conflicting or stale tabs stop persistent mutations and retain their current in-memory content for read-only export. Full app-data reset uses a shared reset generation so participating tabs cannot restore queued, pending, primary, or recovery data from before the reset. Web Locks serialize participating tabs' writes and reset-generation changes where supported. Without that API, change detection remains available, but simultaneous operations cannot be fully coordinated. Session-only storage is temporary and should be backed up before closing the tab.
 
-Before upgrading, export a JSON backup and close older app tabs that use the same browser storage. Older versions do not participate in the reset-generation protection and should not be opened against migrated data. Keep the old application and its pre-upgrade backup if rollback is needed; schema-v7 backups are not intended for older versions.
+Before upgrading, export a JSON backup and close older app tabs that use the same browser storage. Versions before v4.4.3 do not participate in the reset-generation protection and should not be opened against migrated data. Keep the old application and its pre-upgrade backup if rollback is needed; schema-v7 backups are not intended for versions that use an older schema.
 
 ## References
 
@@ -133,7 +153,7 @@ COPYRIGHT.md
 
 ## Version
 
-Current version: **v4.4.3**
+Current version: **v4.5.0**
 
 See [CHANGELOG.md](CHANGELOG.md).
 
