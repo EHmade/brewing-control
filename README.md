@@ -15,6 +15,20 @@ The application visualizes brew strength (TDS), extraction yield, and brew ratio
 - **Local-first storage** — records are stored in the browser; full JSON backup and restore are available.
 - **Single-file app** — no build step, framework, external JavaScript library, webfont, image pack, or API key is required.
 
+## Display and classroom workflow
+
+Split mode is the default: Quick and Class each open their corresponding chart, and the chart returns to the corresponding input screen. Empty Class charts are supported.
+
+In Settings → 화면 표시 방식, integrated mode places Quick or Class inputs beside the chart with independent scrolling. The shared input-to-chart ratios are 35:65, 40:60 (default), and 45:55. A new integrated-mode selection requires a viewport of at least 1280 CSS pixels and at least 1200 pixels of workspace. Resizing does not overwrite a saved integrated preference: narrow screens show a warning, allow horizontal scrolling, and offer an explicit switch to split mode. A mode selected in Settings takes effect when leaving Settings.
+
+입력 영역 크기 offers 기본 (Default) and 작게 (Compact), in either mode. Compact applies only at widths of at least 1024 CSS pixels with a hover-capable fine pointer. Touch and narrower screens use Default and disable the size controls without erasing the saved preference. The header and chart are not reduced by this option. Mode, ratio, and size are included in browser storage and JSON backups; older backups default to Split / 40:60 / Default. Older app versions may discard these new preferences when saving.
+
+The expandable Class context panel shows the current class, student count, and practice. Its 반 / 수강생 / 실습 tabs contain the existing management actions; practice selection and creation are inside 실습. Adding a brew record still requires the explicit save button. Form entry alone does not create a saved attempt.
+
+차트 크기 offers 한눈에 보기 (Fit to screen, default) and 크게 보기 (Large). Fit uses available height while preserving minimum readability; short screens or expanded controls may still require scrolling. Large uses available width up to the existing 840-pixel stage width and permits vertical scrolling. On narrow screens the two choices may have the same width. This setting works in both modes and on mobile, is saved in JSON backups, and returns to Fit after a full reset.
+
+Chart Tools combines guide / target-point and student / attempt controls with image copy, PNG save, sharing, and a Chart / Target Settings shortcut. The shortcut scrolls to the relevant Settings sections without opening them. Collapsing Chart Tools hides its buttons, but keeps the summary and full out-of-range warning visible. Chart Tools and Class management can be toggled by clicking header text or empty space, with unboxed plus / minus indicators; other header buttons retain their own actions. Keyboard users can operate the native disclosure buttons. Image exports retain their existing geometry and exclude tooltips and coordinate previews, regardless of chart size.
+
 ## Editing saved attempts
 
 Quick history supports editing through the existing measurement form. An edit keeps the original attempt ID, position, and liquid-retention value. Saving or cancelling returns to the LIVE input that was present before editing. Brew water may remain blank for inverse estimation; editing keeps the saved liquid-retention value and preserves directly entered values. Unsaved edits are not committed records; reloading the page returns to the preserved LIVE input.
@@ -153,7 +167,7 @@ COPYRIGHT.md
 
 ## Version
 
-Current version: **v4.5.0**
+Current version: **v4.5.2**
 
 See [CHANGELOG.md](CHANGELOG.md).
 

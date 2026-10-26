@@ -4,6 +4,32 @@ All notable changes to Coffee Brewing Control are documented here.
 
 The project was developed iteratively before its first public GitHub release. Earlier entries are intentionally condensed to major user-facing and architectural milestones rather than every intermediate test or debugging change.
 
+## [4.5.2] - 2026-10-26
+
+### Added
+- Added a saved chart-size choice: Fit to screen (default) or Large with vertical scrolling, in both split and integrated modes. Chart-image export is independent of this choice.
+- Added an optional integrated layout showing Quick or Class inputs beside the corresponding chart, with shared 35:65, 40:60, and 45:55 input-to-chart ratios.
+- Added Default / Compact input-area sizing for sufficiently wide screens with a fine pointer. Touch and narrow screens use the default size while retaining the saved preference.
+- Added a Chart / Target Settings shortcut inside Chart Tools. It moves to the relevant Settings sections without opening them automatically.
+
+### Changed
+- Chart Tools and Class management now open or close by clicking their header text or empty space, with unboxed plus / minus indicators. Buttons inside the header retain their own actions and native keyboard controls remain available.
+- Split mode remains the default. Quick and Class open their corresponding chart, including an empty Class; the chart can return to the corresponding input screen.
+- Chart Tools groups guide, goal, student / attempt selection, and image copy / PNG / sharing controls. Collapsing it hides the controls while retaining the summary and full out-of-range warning.
+- Reduced on-screen chart whitespace and used the available viewport height while retaining minimum readability. Short screens or expanded controls can still require scrolling.
+- Moved class, student, and practice management into the Class context panel with a compact summary and expandable tabs; practice selection and creation are in the practice tab.
+- Stabilized Settings width, scrolling, mode-selection spacing, and Quick / Class transitions. A selected display mode is applied when leaving Settings.
+- Unified device-header space and mobile navigation-pill sizing, prevented the student Add button from wrapping, clarified storage and display guidance, and formatted HTML / CSS / JavaScript with LF line endings.
+
+### Fixed
+- Preserved native keyboard focus and Tab order after using the Chart / Target Settings shortcut; target and chart sections remain operable with Enter and Space.
+
+### Compatibility
+- Schema remains v7. Display mode, input-to-chart ratio, input size, and chart size are saved and backed up; older supported backups receive defaults. Earlier app versions may discard these new preferences.
+- Brewing calculations, record interpretation, device protocols, measurement input ownership, and chart-image export remain unchanged. Screen layout changes do not change the exported chart geometry.
+- A new integrated-mode selection requires at least a 1280 CSS-pixel viewport and 1200 pixels of workspace. A saved integrated mode is retained on resize, with a narrow-screen warning and an explicit return to split mode.
+- This release includes the v4.5.1 internal navigation baseline, which was not published separately. Export a backup and close older app tabs before updating.
+
 ## [4.5.0] - 2026-10-25
 
 ### Added

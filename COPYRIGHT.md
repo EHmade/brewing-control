@@ -1,5 +1,7 @@
 # Copyright & Usage
 
+Applies to Coffee Brewing Control v4.5.2.
+
 Copyright © 2026 Taehee Yoon. All Rights Reserved.
 
 These terms apply to the copyright-protected portions of this project's source code, interface implementation, documentation, and other materials in which Taehee Yoon holds copyright.
