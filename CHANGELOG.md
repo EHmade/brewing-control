@@ -4,6 +4,22 @@ All notable changes to Coffee Brewing Control are documented here.
 
 The project was developed iteratively before its first public GitHub release. Earlier entries are intentionally condensed to major user-facing and architectural milestones rather than every intermediate test or debugging change.
 
+## [4.5.3] - 2026-10-27
+
+### Added
+- Added Korean / English search metadata, a canonical URL, Open Graph cards, and an original social-preview image based on the app chart.
+- Added the user-issued Google Search Console verification tag and a single-URL sitemap.
+- Added an independent Cloudflare Web Analytics loader restricted to the official HTTPS app entry paths, with SPA tracking disabled.
+- Added Privacy & Data Handling, including a readable local HTML page generated from the same Markdown source.
+
+### Changed
+- Reorganized README around first use, brewing workflows, targets, display options, devices, data, and operation; corrected outdated current-version and R2 compatibility wording.
+- Aligned About, README, and privacy guidance with user-defined extraction goals and the distinction between local brew records and hosted visit analytics.
+
+### Compatibility
+- Schema v7, the storage key, backup format, brewing calculations, display preferences, device protocols, and chart-image export remain unchanged.
+- Local and non-official app copies do not request the analytics script. Analytics is not a prerequisite for core app operation.
+
 ## [4.5.2] - 2026-10-26
 
 ### Added

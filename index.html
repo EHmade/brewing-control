@@ -3,7 +3,42 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Coffee Brewing Control · Classroom v4.5.2</title>
+    <title>Coffee Brewing Control | 브루잉 컨트롤 차트</title>
+    <meta
+      name="description"
+      content="목표를 직접 설정하고 TDS·추출 수율(EY)과 회차별 변화를 차트에서 확인하세요. 설치 없이 개인 추출 테스트와 바리스타 실습에 활용하고, 지원 측정기와 직접 연결할 수 있는 브루잉 컨트롤 웹 도구입니다."
+    />
+    <link rel="canonical" href="https://ehmade.github.io/brewing-control/" />
+    <meta name="google-site-verification" content="-uVZtvqJxqbscPSffUdIloPeq08Y5CUlNgLjji8fQ7g" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Coffee Brewing Control" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:title" content="Coffee Brewing Control | 원하는 추출을 향해" />
+    <meta
+      property="og:description"
+      content="원하는 추출 목표를 정하고, 측정·기록·조정을 이어가세요. 설치 없는 웹 도구로 개인 추출부터 바리스타 실습까지. 지원 측정기 연동을 제공합니다."
+    />
+    <meta property="og:url" content="https://ehmade.github.io/brewing-control/" />
+    <meta
+      property="og:image"
+      content="https://ehmade.github.io/brewing-control/social-preview.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Coffee Brewing Control — 원하는 추출 목표를 향한 측정·기록·조정과 브루잉 컨트롤 차트 예시"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Coffee Brewing Control | 원하는 추출을 향해" />
+    <meta
+      name="twitter:description"
+      content="원하는 추출 목표를 정하고, 측정·기록·조정을 이어가세요. 설치 없는 웹 도구로 개인 추출부터 바리스타 실습까지. 지원 측정기 연동을 제공합니다."
+    />
+    <meta
+      name="twitter:image"
+      content="https://ehmade.github.io/brewing-control/social-preview.png"
+    />
     <style>
 :root {
   --bg: #f3ede4;
@@ -3588,7 +3623,7 @@ html.layout-settings.settings-integrated .tabs [data-page='chart'] {
             <button class="brand-home" id="brandHome" type="button" aria-label="Quick으로 이동">
               Coffee Brewing Control
             </button>
-            <p>Quick calculator · Class records · Target feedback</p>
+            <p>Brewing Control Chart · TDS · Extraction Yield</p>
           </div>
           <div class="head-tools">
             <button
@@ -4933,7 +4968,7 @@ PERFORMANCE OF THIS SOFTWARE.
 
               <div class="public-info">
                 <div class="meta">
-                  <b>Coffee Brewing Control v4.5.2</b><br />Local-first · single-file web app
+                  <b>Coffee Brewing Control v4.5.3</b><br />Local-first · single-file web app
                 </div>
                 <div class="actions">
                   <button class="btn ghost small" id="openAbout">About &amp; References</button
@@ -4998,10 +5033,15 @@ PERFORMANCE OF THIS SOFTWARE.
       >
         <h3 id="aboutModalTitle">About &amp; References</h3>
         <p>
-          This tool is designed for coffee brewing education, repeated brew testing, and comparative
-          analysis. It visualizes brew strength (TDS), extraction yield, and brew ratio
-          relationships using the brewing control chart framework originating from E. E. Lockhart's
-          work.
+          Coffee Brewing Control is a browser-based tool for working toward the extraction targets
+          you choose. It brings measurement, brew records, chart interpretation, and adjustment
+          guidance together for repeated personal testing and barista practice sessions. No app
+          installation is required. Direct TDS input from supported refractometers is available in
+          compatible browsers and operating systems. Target ranges are configurable references, not
+          a verdict on flavor or quality. Use tasting and your brewing goals to decide what to
+          change; the app helps you examine the measurements and follow changes across attempts.
+          Class supports student and practice-session records with instructor feedback. Notes are
+          optional and are not automatically analyzed for flavor.
         </p>
         <p>
           The built-in <b>Classic Filter</b> target profile uses a default reference range of
@@ -5070,16 +5110,31 @@ PERFORMANCE OF THIS SOFTWARE.
         </p>
         <h4>Data &amp; privacy</h4>
         <p>
-          Brew records, class data, profiles, and settings are stored locally in the browser by this
-          application. The application does not transmit entered brew or class data to an
-          application backend. When a supported measurement device is used, device communication is
-          handled directly through browser device APIs; live connection objects and normalized
-          auxiliary readings are not persisted as application records. This does not cover ordinary
-          hosting access logs or actions explicitly initiated by the user, such as export or
-          sharing. JSON export is available for manual backup and transfer.
+          Brew measurements, class data, notes, feedback, profiles, and settings are stored in your
+          browser. The app does not automatically upload these records to an application backend or
+          send them as analytics events. Device communication is direct through browser APIs. JSON
+          backup, image export, copy, and sharing occur at your request.
         </p>
         <p>
-          Version 4.5.2 uses schema v7 with the existing storage key and backup format. Import
+          The official hosted site uses Cloudflare Web Analytics for site visits and page
+          performance. Related visit and performance information is processed by Cloudflare
+          separately from your brew and class records. The original app does not load the analytics
+          script when opened as a local file, on localhost, or at other site paths. Analytics
+          blocking or loading failure does not prevent the core app from working.
+        </p>
+        <p>
+          <a href="privacy.html" target="_blank" rel="noopener"
+            >Privacy &amp; Data Handling · 개인정보 및 데이터 처리 안내</a
+          >
+        </p>
+        <p>
+          Questions can be posted in
+          <a href="https://github.com/EHmade/brewing-control/issues" target="_blank" rel="noopener"
+            >public GitHub Issues</a
+          >. Do not post personal records or raw backups there.
+        </p>
+        <p>
+          Version 4.5.3 uses schema v7 with the existing storage key and backup format. Import
           rejects files above 32 MiB and excessive text or data structures without truncation;
           passing validation does not guarantee browser storage capacity. Export a backup and close
           older app tabs before upgrading in the same browser storage context. Keep a pre-upgrade
@@ -5145,6 +5200,50 @@ PERFORMANCE OF THIS SOFTWARE.
           All notable changes to Coffee Brewing Control are documented here. Earlier development
           history is intentionally condensed to major milestones.
         </p>
+        <div class="version-block">
+          <h4>4.5.3 - 2026-10-27</h4>
+          <p><strong>Added</strong></p>
+          <ul>
+            <li>
+              Added Korean / English search metadata, a canonical URL, Open Graph cards, and an
+              original social-preview image based on the app chart.
+            </li>
+            <li>
+              Added the user-issued Google Search Console verification tag and a single-URL sitemap.
+            </li>
+            <li>
+              Added an independent Cloudflare Web Analytics loader restricted to the official HTTPS
+              app entry paths, with SPA tracking disabled.
+            </li>
+            <li>
+              Added Privacy &amp; Data Handling, including a readable local HTML page generated from
+              the same Markdown source.
+            </li>
+          </ul>
+          <p><strong>Changed</strong></p>
+          <ul>
+            <li>
+              Reorganized README around first use, brewing workflows, targets, display options,
+              devices, data, and operation; corrected outdated current-version and R2 compatibility
+              wording.
+            </li>
+            <li>
+              Aligned About, README, and privacy guidance with user-defined extraction goals and the
+              distinction between local brew records and hosted visit analytics.
+            </li>
+          </ul>
+          <p><strong>Compatibility</strong></p>
+          <ul>
+            <li>
+              Schema v7, the storage key, backup format, brewing calculations, display preferences,
+              device protocols, and chart-image export remain unchanged.
+            </li>
+            <li>
+              Local and non-official app copies do not request the analytics script. Analytics is
+              not a prerequisite for core app operation.
+            </li>
+          </ul>
+        </div>
         <div class="version-block">
           <h4>4.5.2 - 2026-10-26</h4>
           <p><strong>Added</strong></p>
@@ -6002,7 +6101,7 @@ PERFORMANCE OF THIS SOFTWARE.
   const MAX_MAJOR_INTERVALS = 40,
     MINOR_SUBDIVISIONS = 2;
   const MAX_REQUIRED_TICKS = MAX_MAJOR_INTERVALS * MINOR_SUBDIVISIONS + 1;
-  const APP_VERSION = '4.5.2';
+  const APP_VERSION = '4.5.3';
   const BACKUP_FORMAT = 'coffee-brew-control-backup'; // legacy identifier retained for backup compatibility
   const COLORS = [
     '#3157d5',
@@ -15684,6 +15783,37 @@ PERFORMANCE OF THIS SOFTWARE.
   $('chartSizeLarge').onclick = () => setChartSize('large');
 
   init();
+})();
+    </script>
+    <!-- Optional hosted-site analytics; independent of the app runtime. -->
+    <script id="cbcHostedAnalytics">
+(() => {
+  'use strict';
+
+  // Only the official app entry points use analytics. Local copies and other
+  // projects must not request the third-party script at all.
+  const allowedPaths = ['/brewing-control/', '/brewing-control/index.html'];
+  if (
+    window.location.origin !== 'https://ehmade.github.io' ||
+    !allowedPaths.includes(window.location.pathname)
+  ) {
+    return;
+  }
+
+  const source = 'https://static.cloudflareinsights.com/beacon.min.js';
+  if (Array.from(document.scripts).some(script => script.src === source))
+    return;
+
+  // This module is independent of the application runtime. No app data,
+  // storage values, or custom events are passed to the provider.
+  const script = document.createElement('script');
+  script.type = 'module';
+  script.src = source;
+  script.dataset.cfBeacon = JSON.stringify({
+    token: 'dd4acbc5709c458fa6427638e38d32f6',
+    spa: false
+  });
+  document.body.appendChild(script);
 })();
     </script>
   </body>

@@ -1,6 +1,6 @@
 # Copyright & Usage
 
-Applies to Coffee Brewing Control v4.5.2.
+Applies to Coffee Brewing Control v4.5.3.
 
 Copyright © 2026 Taehee Yoon. All Rights Reserved.
 
