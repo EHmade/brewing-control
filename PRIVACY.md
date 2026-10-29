@@ -1,10 +1,14 @@
+[한국어](#한국어) · [English](#english)
+
+<a id="한국어"></a>
+
 # 개인정보 및 데이터 처리 안내 · Privacy & Data Handling
 
-> v4.5.3 공식 배포본에 적용되는 안내입니다. 실제 서비스 적용 시점은 공식 사이트에 이 배포본이 공개 반영된 때입니다.
+> v4.6.0의 개인정보 처리 안내입니다. 공식 사이트 공개 반영 시 적용됩니다.
 
-적용 버전: Coffee Brewing Control v4.5.3
+적용 버전: Coffee Brewing Control v4.6.0
 
-작성일: 2026-10-27 · 적용: v4.5.3 공식 사이트 공개 반영 시
+갱신일: 2026-10-30 · 적용: 해당 버전의 공식 사이트 공개 반영 시
 
 ## 1. 운영자와 적용 범위
 
@@ -19,6 +23,8 @@ Quick 입력과 저장 기록, 반·수강생·실습 기록, 노트·강사 피
 같은 컴퓨터의 같은 브라우저 프로필을 공유하는 사람은 기록에 접근할 수 있습니다. 브라우저/기기 변경, 저장소 정리, 비공개 모드 또는 저장 용량 제한으로 기록이 유지되지 않을 수 있으므로 필요한 데이터는 JSON 백업으로 보관해 주세요. 학생별 기록을 작성하는 경우 사용하는 이름과 노트에 불필요한 개인정보를 넣지 않는 것이 좋습니다.
 
 개별 삭제와 설정의 전체 앱 데이터 초기화로 앱 데이터를 정리할 수 있습니다. 전체 초기화는 앱에서 사용하는 기록과 설정·복구 사본을 정리하지만, 사용자가 이미 내보낸 파일, 클립보드·공유 대상 및 외부 서비스의 방문 통계는 삭제하지 않습니다. 앱을 더 이상 사용할 수 없다면 해당 사이트의 브라우저 저장 데이터를 직접 삭제할 수도 있습니다.
+
+표시 언어는 별도의 브라우저 선호로 저장합니다. 추출 백업에는 넣지 않으며 복원 후에도 유지하고 전체 초기화 시 삭제합니다.
 
 ## 3. 측정기 연결
 
@@ -65,4 +71,77 @@ Cloudflare 공식 FAQ는 비표본 Beacon 데이터의 보관을 최근7일, 대
 
 앱은 계정, 학생 기록 또는 기기 상태를 이 게시판으로 자동 전송하지 않습니다. 내용을 직접 제출하면 GitHub가 공개 게시물로 처리합니다. 게시물의 수정·삭제 등은 GitHub 기능과 정책을 따릅니다.
 
-이 안내를 변경할 때는 적용일과 변경 내용을 함께 갱신합니다. v4.5.3에서는 공식 사이트 방문 분석과 로컬 앱 기록의 처리 범위를 구분한 안내를 처음 마련합니다.
+이 안내를 변경할 때는 적용일과 변경 내용을 함께 갱신합니다. v4.5.3에서 공식 사이트 방문 분석과 로컬 앱 기록의 처리를 처음 구분해 안내했습니다. v4.6.0은 영어 안내와 표시 언어 선호 설명을 추가하고 별도 HTML 페이지 대신 앱 내부에서 안내합니다.
+
+---
+
+<a id="english"></a>
+
+# Privacy & Data Handling
+
+> This notice applies to v4.6.0 when it is published on the official site.
+
+Applicable version: Coffee Brewing Control v4.6.0. Updated: 2026-10-30.
+
+## 1. Operator and scope
+
+Coffee Brewing Control is a coffee extraction tool operated by Taehee Yoon (EHmade). This notice explains how the app handles data on the official page, `https://ehmade.github.io/brewing-control/`, and when the distributed original files are run locally.
+
+The official page uses visit and performance analytics. The original app does not load that analytics script on local `file:` URLs, localhost development addresses, or addresses other than the official app entry points. This does not give the app control over separate actions of the browser, operating system, extensions, or sharing services selected by the user.
+
+## 2. Records entered in the app
+
+Quick inputs and saved records, classes, students, practice-session records, notes, instructor feedback, target/chart profiles, and settings are stored in the user's browser. Temporary editing state and copies used for save recovery may also be retained. The app does not automatically upload these data to the operator's server or send them as visit-analytics events. The operator does not provide a feature for viewing or remotely deleting your local records through the app.
+
+People sharing the same browser profile on the same computer may be able to access the records. Changing browsers or devices, clearing storage, private browsing, and storage limits may prevent records from being retained. Keep important data in an external JSON backup. Avoid unnecessary personal information in student names and notes.
+
+Individual deletion and full app-data reset in Settings can clear app data. Full reset clears the records, settings, and recovery copies used by the app, but does not delete files already exported, clipboard contents, sharing destinations, or visit statistics held by external services. If you can no longer use the app, you can also delete its site storage through the browser.
+
+The display language is stored separately as a browser preference. It is not added to brewing-record backups, remains selected when a backup is restored, and is cleared by full app-data reset.
+
+## 3. Measurement-device connections
+
+Supported HM Digital and DiFluid R2 devices connect directly through browser device APIs. Successfully applied TDS follows the normal input path; the user explicitly saves a record. Live connection objects and auxiliary measurements are not stored in app records or backups. The selected Device Profile and control visibility may be saved, but the live connection and R2 Auto/Count state are not backed up. There is no operator relay server for this communication.
+
+## 4. Visit and performance analytics on the official site
+
+The official page uses Cloudflare Web Analytics to understand visits, referral trends, client environments, and page performance. The analytics script is downloaded from Cloudflare. Page URLs, referring pages, client environment, and visit/performance information such as loading, responsiveness, and visual stability are sent to Cloudflare. No custom events are implemented to identify a particular person over time or associate Quick/Class actions with brewing records.
+
+Cloudflare's RUM documentation describes the beacon as neither accessing nor storing data in browser storage such as cookies, localStorage, sessionStorage, or IndexedDB. It also describes IP addresses received during normal request handling as being discarded at the nearest data center rather than stored in its core databases or logs. These are the provider's descriptions of that service; they do not mean that external JavaScript is isolated in a separate browser sandbox.
+
+The app does not attach student information, class/session records, notes, feedback, Dose/TDS/EY values, or backup JSON to analytics requests. These data are not used as analytics URLs or user identifiers.
+
+Core calculation, records, charts, and device features are designed to remain usable if the analytics script is blocked or fails to load. Statistics depend on blocking tools, browser support, and service settings and are not exact counts of real users or repeated use.
+
+## 5. Hosting and search management
+
+The official site is hosted on GitHub Pages. GitHub and analytics providers may process ordinary web-request information, such as IP addresses and browser information, while providing their services. Such request handling is distinct from automatic uploading of app records.
+
+Google Search Console is used to verify ownership of the public page and manage Google search performance and indexing. The verification meta tag is not visitor JavaScript. Google Analytics and Google Tag Manager are not installed for this purpose. Search Console is not used to receive local app records.
+
+External services process information according to their own policies and infrastructure, potentially in countries or regions other than the visitor's location. Provider information is available below:
+
+- [Cloudflare RUM data handling](https://developers.cloudflare.com/speed/observatory/rum-beacon/)
+- [Cloudflare Privacy Policy](https://www.cloudflare.com/privacypolicy/)
+- [GitHub General Privacy Statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
+- [About Google Search Console](https://support.google.com/webmasters/answer/9128668?hl=en)
+
+## 6. Materials you export or share
+
+You initiate JSON backups, chart-image saving, clipboard copying, and sharing. Materials may be processed at the selected file location, by the operating-system clipboard or sharing app, or by the recipient. Check included student names, notes, and feedback before sharing. Opening external information or GitHub Issues in a new tab also subjects that use to the external service's policies.
+
+## 7. Retention, deletion, and your choices
+
+Local app records may remain until you delete them through the app/browser or the browser removes them. The operator has no central copy of your local records and cannot recover them if your browser data are lost.
+
+Cloudflare's official FAQ describes retention of unsampled beacon data for the last 7 days and dashboard queries for the last 6 months, distinguishing aggregated and sampled data afterward. This is not a statement that all data are completely deleted after 7 days or 6 months. Consult the [Cloudflare FAQ](https://developers.cloudflare.com/web-analytics/faq/) for current retention and query policies. GitHub and other services handle their data under their respective policies.
+
+If you do not want site analytics, you can use browser blocking tools or run the original files distributed by the copyright holder locally. Browser security rules may restrict clipboard or device access for local files. Resetting the app does not retroactively delete statistics already transmitted.
+
+## 8. Contact and revisions
+
+Use the [project's public GitHub Issues](https://github.com/EHmade/brewing-control/issues) for inquiries. Issues are public. Do not post student real names, personal contact details, raw backup JSON, or screenshots containing personal information. Explain the situation with names and records redacted when necessary.
+
+The app does not automatically send accounts, student records, or device state to that forum. If you submit content yourself, GitHub processes it as a public post. Editing and deletion follow GitHub's features and policies.
+
+Changes to this notice include an updated effective date and description. v4.5.3 first documented the distinction between hosted visit analytics and local app records. The v4.6 candidate adds English text and the display-language preference and presents this notice inside the app rather than in a separate HTML page.
