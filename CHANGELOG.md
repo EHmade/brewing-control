@@ -8,6 +8,15 @@ Coffee Brewing Control의 주요 변경 사항을 기록합니다.
 
 첫 GitHub 공개 전에도 반복적으로 개발했습니다. 초기 이력은 중간 테스트·디버깅의 모든 변경이 아니라 주요 사용자 기능과 구조적 이정표 위주로 요약했습니다.
 
+## [4.6.1] — 2026-10-31
+
+- 차트 툴팁·상세정보에 사용자 이름과 추출 노트를 HTML로 삽입하기 전에 이스케이프하여 원문 텍스트로 표시하도록 수정했습니다.
+- 영어 검색·공유용 /en/ 진입 주소, 자체 canonical·한영 hreflang·사이트맵과 영문 소셜 이미지를 추가했습니다.
+- 처음 방문할 때 주소의 언어로 시작하고, 저장된 언어 선택이 있으면 두 주소 모두 그 선택을 사용합니다. 앱 내부 언어 전환은 페이지 이동 없이 입력과 측정기 연결을 유지합니다.
+- 두 공식 진입 주소의 Cloudflare 분석을 허용하며 로컬·비공식 경로의 분석 차단을 유지합니다.
+- Class 관리 제목의 번역 누락, 영문 검색·공유 설명과 모바일 플레이스홀더를 정리했습니다. About의 소제목·본문 크기·상단 여백을 개선하고 한영 브라우저·측정기 호환성 안내와 문서를 맞췄습니다.
+- schema v7, 계산·기록 해석·백업 호환성과 장치 프로토콜을 유지합니다.
+
 ## [4.6.0] — 2026-10-30
 
 ### 추가·변경
@@ -379,6 +388,15 @@ Coffee Brewing Control의 주요 변경 사항을 기록합니다.
 All notable changes to Coffee Brewing Control are documented here.
 
 The project was developed iteratively before its first public GitHub release. Earlier entries are intentionally condensed to major user-facing and architectural milestones rather than every intermediate test or debugging change.
+
+## [4.6.1] — 2026-10-31
+
+- Escaped user names and brew notes at chart tooltip and detail HTML boundaries so they remain literal text.
+- Added an English /en/ search and sharing entry with its own canonical URL, reciprocal language alternatives, sitemap entry and English social preview.
+- First visits follow the entry language; a saved language preference takes priority on both URLs. In-app language changes preserve inputs and the device connection without navigation.
+- Enabled the same Cloudflare analytics site on both official entry paths while retaining local and unofficial-path exclusions.
+- Localized the Class management heading, aligned English search/social descriptions and shortened mobile placeholders. Improved About headings, typography and top spacing, and aligned bilingual browser/device compatibility guidance and documentation.
+- Retained schema v7, calculations, record interpretation, backup compatibility and device protocols.
 
 ## [4.6.0] — 2026-10-30
 

@@ -4,7 +4,7 @@
 
 # 저작권 및 사용 안내
 
-Coffee Brewing Control v4.6.0에 적용됩니다.
+Coffee Brewing Control v4.6.1에 적용됩니다.
 
 Copyright © 2026 Taehee Yoon. All Rights Reserved.
 
@@ -56,7 +56,7 @@ PERFORMANCE OF THIS SOFTWARE.
 
 # Copyright & Usage
 
-Applies to Coffee Brewing Control v4.6.0.
+Applies to Coffee Brewing Control v4.6.1.
 
 Copyright © 2026 Taehee Yoon. All Rights Reserved.
 

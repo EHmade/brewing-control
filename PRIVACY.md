@@ -4,11 +4,11 @@
 
 # 개인정보 및 데이터 처리 안내 · Privacy & Data Handling
 
-> v4.6.0의 개인정보 처리 안내입니다. 공식 사이트 공개 반영 시 적용됩니다.
+> v4.6.1의 개인정보 처리 안내입니다. 공식 사이트 공개 반영 시 적용됩니다.
 
-적용 버전: Coffee Brewing Control v4.6.0
+적용 버전: Coffee Brewing Control v4.6.1
 
-갱신일: 2026-10-30 · 적용: 해당 버전의 공식 사이트 공개 반영 시
+갱신일: 2026-10-31 · 적용: 해당 버전의 공식 사이트 공개 반영 시
 
 ## 1. 운영자와 적용 범위
 
@@ -71,7 +71,7 @@ Cloudflare 공식 FAQ는 비표본 Beacon 데이터의 보관을 최근7일, 대
 
 앱은 계정, 학생 기록 또는 기기 상태를 이 게시판으로 자동 전송하지 않습니다. 내용을 직접 제출하면 GitHub가 공개 게시물로 처리합니다. 게시물의 수정·삭제 등은 GitHub 기능과 정책을 따릅니다.
 
-이 안내를 변경할 때는 적용일과 변경 내용을 함께 갱신합니다. v4.5.3에서 공식 사이트 방문 분석과 로컬 앱 기록의 처리를 처음 구분해 안내했습니다. v4.6.0은 영어 안내와 표시 언어 선호 설명을 추가하고 별도 HTML 페이지 대신 앱 내부에서 안내합니다.
+이 안내를 변경할 때는 적용일과 변경 내용을 함께 갱신합니다. v4.5.3에서 공식 사이트 방문 분석과 로컬 앱 기록의 처리를 처음 구분해 안내했습니다. v4.6.1은 영어 안내와 표시 언어 선호 설명을 추가하고 별도 HTML 페이지 대신 앱 내부에서 안내합니다.
 
 ---
 
@@ -79,9 +79,9 @@ Cloudflare 공식 FAQ는 비표본 Beacon 데이터의 보관을 최근7일, 대
 
 # Privacy & Data Handling
 
-> This notice applies to v4.6.0 when it is published on the official site.
+> This notice applies to v4.6.1 when it is published on the official site.
 
-Applicable version: Coffee Brewing Control v4.6.0. Updated: 2026-10-30.
+Applicable version: Coffee Brewing Control v4.6.1. Updated: 2026-10-31.
 
 ## 1. Operator and scope
 
@@ -144,4 +144,10 @@ Use the [project's public GitHub Issues](https://github.com/EHmade/brewing-contr
 
 The app does not automatically send accounts, student records, or device state to that forum. If you submit content yourself, GitHub processes it as a public post. Editing and deletion follow GitHub's features and policies.
 
-Changes to this notice include an updated effective date and description. v4.5.3 first documented the distinction between hosted visit analytics and local app records. The v4.6 candidate adds English text and the display-language preference and presents this notice inside the app rather than in a separate HTML page.
+Changes to this notice include an updated effective date and description. v4.5.3 first documented the distinction between hosted visit analytics and local app records. Version 4.6.0 adds English text and the display-language preference and presents this notice inside the app rather than in a separate HTML page.
+
+## 공식 주소와 분석 · Official URLs and analytics
+
+두 공식 주소와 각 index.html 경로는 같은 Cloudflare 분석 사이트를 사용합니다. 로컬 실행은 분석을 요청하지 않습니다.
+
+Both official language entry URLs and their index.html paths use the same Cloudflare Analytics site. Local runs do not request analytics.
